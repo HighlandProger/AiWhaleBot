@@ -2,7 +2,10 @@ package ru.rusguardian.service.process;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import ru.rusguardian.constant.ai.AILanguage;
+import ru.rusguardian.constant.ai.AIUserModel;
 import ru.rusguardian.constant.ai.AssistantRole;
 import ru.rusguardian.constant.user.SubscriptionType;
 import ru.rusguardian.domain.user.Chat;
@@ -24,6 +27,7 @@ public class ProcessChatCreationService {
     private final SubscriptionService subscriptionService;
     private final ChatService chatService;
 
+    @Transactional
     public Chat process(Update update) {
 
         Chat chat = new Chat();
@@ -38,6 +42,17 @@ public class ProcessChatCreationService {
         chat.setCampaign(TelegramStartInfoUtils.getCampaign(update).orElse(null));
         chat.setAssistantRole(AssistantRole.USUAL);
         chat.setSubscription(getFreeSubscription());
+        chat.setAiUserModel(AIUserModel.GPT_3_5_TURBO);
+        chat.setTemperature(1.0f);
+        chat.setAiLanguage(AILanguage.RUSSIAN);
+
+        chat.setClaudeTokens(0);
+        chat.setExtraGPT4Requests(0);
+        chat.setExtraImageRequests(0);
+        chat.setExtraSunoRequests(0);
+
+        chat.setContextEnabled(true);
+        chat.setVoiceResponseEnabled(false);
 
         return chatService.save(chat);
     }
@@ -48,6 +63,6 @@ public class ProcessChatCreationService {
         Subscription subscription = new Subscription();
         subscription.setSubscriptionInfo(subscriptionInfo);
 
-        return subscription;
+        return subscriptionService.save(subscription);
     }
 }

@@ -1,6 +1,8 @@
 package ru.rusguardian.service.data;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import ru.rusguardian.bot.command.service.CommandName;
 import ru.rusguardian.domain.user.Chat;
@@ -8,19 +10,12 @@ import ru.rusguardian.repository.ChatRepository;
 import ru.rusguardian.service.data.abstr.CrudService;
 
 @Service
+@RequiredArgsConstructor
 @Slf4j
-public class ChatService extends CrudService<Chat> {
+public class ChatService extends CrudService<Chat, Long> {
 
-    private ChatRepository chatRepository;
+    private final ChatRepository chatRepository;
 
-    public ChatService(ChatRepository chatRepository) {
-        super(chatRepository);
-    }
-
-    @Override
-    protected Long getIdFromEntity(Chat entity) {
-        return entity.getId();
-    }
 
     public void updateNextCommand(Long chatId, CommandName commandName) {
         log.debug("Updating chat with id = {} to next command = {}", chatId, commandName);
@@ -31,4 +26,13 @@ public class ChatService extends CrudService<Chat> {
         chatRepository.updateUserNextCommand(chatId, name);
     }
 
+    @Override
+    protected Long getIdFromEntity(Chat entity) {
+        return entity.getId();
+    }
+
+    @Override
+    protected JpaRepository<Chat, Long> getRepository() {
+        return chatRepository;
+    }
 }

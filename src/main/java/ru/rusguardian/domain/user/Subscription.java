@@ -18,7 +18,7 @@ public class Subscription {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "subscription_info_id")
     private SubscriptionInfo subscriptionInfo;
     @Column(name = "purchase_time")

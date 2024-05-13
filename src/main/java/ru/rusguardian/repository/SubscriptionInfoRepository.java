@@ -10,5 +10,5 @@ import java.util.Optional;
 @Repository
 public interface SubscriptionInfoRepository extends JpaRepository<SubscriptionInfo, Long> {
 
-    Optional<SubscriptionInfo> getBySubscriptionType(SubscriptionType type);
+    Optional<SubscriptionInfo> getByType(SubscriptionType type);
 }

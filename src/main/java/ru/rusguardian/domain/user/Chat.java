@@ -61,5 +61,19 @@ public class Chat {
     @Column(name = "ai_user_model")
     private AIUserModel aiUserModel;
 
+    @Column(name = "claude_tokens")
+    private int claudeTokens;
+    @Column(name = "extra_gpt_4_requests")
+    private int extraGPT4Requests;
+    @Column(name = "extra_image_requests")
+    private int extraImageRequests;
+    @Column(name = "extra_suno_requests")
+    private int extraSunoRequests;
+
+    @Column(name = "is_context_enabled")
+    private boolean isContextEnabled;
+    @Column(name = "is_voice_response_enabled")
+    private boolean isVoiceResponseEnabled;
+
 
 }

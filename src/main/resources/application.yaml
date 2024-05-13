@@ -6,7 +6,7 @@ spring:
   main:
     allow-circular-references: true
   profiles:
-    active:
+    active: dev
 
   datasource:
     url: type_your_value

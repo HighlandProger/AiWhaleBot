@@ -99,3 +99,4 @@ GRANT SELECT ON ALL TABLES IN SCHEMA ncs_bot TO whale_ai_bot;
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA ncs_bot TO whale_ai_bot;
 GRANT USAGE, SELECT ON SEQUENCE log_events_id_seq TO whale_ai_bot;
 GRANT USAGE, SELECT ON SEQUENCE tasks_id_seq TO whale_ai_bot;
+GRANT USAGE, SELECT ON SEQUENCE subscriptions_id_seq TO whale_ai_bot;
