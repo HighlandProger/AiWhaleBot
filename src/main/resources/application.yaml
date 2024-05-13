@@ -1,0 +1,44 @@
+logging:
+  level:
+    root: info
+
+spring:
+  main:
+    allow-circular-references: true
+  profiles:
+    active:
+
+  datasource:
+    url: type_your_value
+    username: type_your_value
+    password: type_your_value
+    driver-class-name: org.postgresql.Driver
+
+    hikari:
+      connectionTimeout: 30000
+      minimumIdle: 5
+      maximumPoolSize: 20
+    jpa:
+      properties:
+        hibernate:
+          max_fetch_depth: 3
+          dialect: org.hibernate.dialect.PostgreSQL9Dialect
+          hbm2ddl:auto: update
+          cache:
+            provider_class: org.hibernate.cache.NoCacheProvider"
+            use_query_cache: false
+            use_minimal_puts: false
+      database-platform: org.hibernate.dialect.PostgreSQL9Dialect
+      show-sql: false
+
+bot:
+  username: type_your_value
+  token: type_your_value
+
+telegram:
+  owner:
+    chat:
+      id: type_your_value
+
+open-api:
+  secret-key: type_your_value
