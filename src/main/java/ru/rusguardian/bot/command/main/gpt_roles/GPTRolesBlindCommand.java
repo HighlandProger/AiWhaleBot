@@ -39,10 +39,10 @@ public class GPTRolesBlindCommand extends Command implements GPTRolesDescription
             }
             if (ASSISTANT_TYPE_ACTION.equals(action)) {
                 AssistantRole type = AssistantRole.valueOf(TelegramCallbackUtils.getArgFromCallback(update, 2));
-                if (chat.getAssistantRole() == type) {
+                if (chat.getAiSettingsEmbedded().getAssistantRole() == type) {
                     return;
                 }
-                if (chat.getSubscription().getSubscriptionInfo().getType() == SubscriptionType.FREE) {
+                if (chat.getSubscriptionEmbedded().getSubscriptionInfo().getType() == SubscriptionType.FREE) {
                     AnswerCallbackQuery answer = new AnswerCallbackQuery();
                     answer.setCallbackQueryId(TelegramUtils.getCallbackQueryId(update));
                     answer.setShowAlert(true);
@@ -51,12 +51,12 @@ public class GPTRolesBlindCommand extends Command implements GPTRolesDescription
                     return;
                 }
 
-                chat.setAssistantRole(type);
+                chat.getAiSettingsEmbedded().setAssistantRole(type);
             }
         }
 
-        EditMessageText edit = EditMessageUtil.getMessageText(update, getDescriptionText(chat.getAssistantRole()));
-        edit.setReplyMarkup(GPTRolesInlineKeyboardUtil.getKeyboard(page, chat.getAssistantRole()));
+        EditMessageText edit = EditMessageUtil.getMessageText(update, getDescriptionText(chat.getAiSettingsEmbedded().getAssistantRole()));
+        edit.setReplyMarkup(GPTRolesInlineKeyboardUtil.getKeyboard(page, chat.getAiSettingsEmbedded().getAssistantRole()));
 
         bot.execute(edit);
     }

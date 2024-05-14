@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import ru.rusguardian.constant.user.SubscriptionType;
-import ru.rusguardian.domain.user.SubscriptionInfo;
+import ru.rusguardian.domain.SubscriptionInfo;
 import ru.rusguardian.repository.SubscriptionInfoRepository;
 import ru.rusguardian.service.data.abstr.CrudService;
 

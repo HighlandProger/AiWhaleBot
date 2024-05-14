@@ -1,23 +1,18 @@
 package ru.rusguardian.domain.user;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import lombok.Data;
+import ru.rusguardian.domain.SubscriptionInfo;
 
 import java.time.LocalDateTime;
 
-@Entity
-@Table(schema = "ncs_bot", name = "subscriptions")
-@Builder
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@ToString
-public class Subscription {
+@Embeddable
+@Data
+public class SubscriptionEmbedded {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
     @ManyToOne
     @JoinColumn(name = "subscription_info_id")
     private SubscriptionInfo subscriptionInfo;
@@ -27,6 +22,5 @@ public class Subscription {
     private LocalDateTime expirationTime;
     @Column(name = "purchase_type")
     private String purchaseType;
-
 
 }

@@ -1,30 +1,16 @@
 package ru.rusguardian.domain.user;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Data;
 import ru.rusguardian.bot.command.service.CommandName;
-import ru.rusguardian.constant.ai.AIUserModel;
-import ru.rusguardian.constant.ai.AssistantRole;
-import ru.rusguardian.domain.converters.AIUserModelConverter;
-import ru.rusguardian.domain.converters.AssistantRoleConverter;
 import ru.rusguardian.domain.converters.CommandNameConverter;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(schema = "ncs_bot", name = "chats")
-@Builder
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@ToString
+@Data
 public class Chat {
-
-    public Chat(String username, boolean isAdmin) {
-        this.username = username;
-        this.isAdmin = isAdmin;
-    }
 
     @Id
     @Column
@@ -48,32 +34,14 @@ public class Chat {
     private String trafficLink;
     @Column(name = "campaign")
     private String campaign;
-    @Convert(converter = AssistantRoleConverter.class)
-    @Column(name = "assistant_role")
-    private AssistantRole assistantRole;
-    @OneToOne
-    @JoinColumn(name = "subscription_id")
-    private Subscription subscription;
-    @Column(name = "ai_language")
-    private String aiLanguage;
-    private float temperature;
-    @Convert(converter = AIUserModelConverter.class)
-    @Column(name = "ai_user_model")
-    private AIUserModel aiUserModel;
 
-    @Column(name = "claude_tokens")
-    private int claudeTokens;
-    @Column(name = "extra_gpt_4_requests")
-    private int extraGPT4Requests;
-    @Column(name = "extra_image_requests")
-    private int extraImageRequests;
-    @Column(name = "extra_suno_requests")
-    private int extraSunoRequests;
-
-    @Column(name = "is_context_enabled")
-    private boolean isContextEnabled;
-    @Column(name = "is_voice_response_enabled")
-    private boolean isVoiceResponseEnabled;
-
+    @Embedded
+    private SubscriptionEmbedded subscriptionEmbedded;
+    @Embedded
+    private AISettingsEmbedded aiSettingsEmbedded;
+    @Embedded
+    private UserBalanceEmbedded userBalanceEmbedded;
+    @Embedded
+    private PartnerEmbedded partnerEmbeddedInfo;
 
 }

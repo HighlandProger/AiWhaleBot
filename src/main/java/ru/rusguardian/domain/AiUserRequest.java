@@ -1,4 +1,4 @@
-package ru.rusguardian.domain.user;
+package ru.rusguardian.domain;
 
 import jakarta.persistence.*;
 import lombok.*;

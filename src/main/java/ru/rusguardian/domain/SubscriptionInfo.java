@@ -1,18 +1,13 @@
-package ru.rusguardian.domain.user;
+package ru.rusguardian.domain;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Data;
 import ru.rusguardian.constant.user.SubscriptionType;
 import ru.rusguardian.domain.converters.SubscriptionTypeConverter;
 
 @Entity
 @Table(schema = "ncs_bot", name = "subscription_info")
-@Builder
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@ToString
+@Data
 public class SubscriptionInfo {
 
     @Id

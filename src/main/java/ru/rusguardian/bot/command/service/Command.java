@@ -15,7 +15,10 @@ import ru.rusguardian.bot.command.service.commands.ErrorCommand;
 import ru.rusguardian.domain.LogEvent;
 import ru.rusguardian.domain.Task;
 import ru.rusguardian.domain.user.Chat;
-import ru.rusguardian.service.data.*;
+import ru.rusguardian.service.data.ChatService;
+import ru.rusguardian.service.data.LogEventService;
+import ru.rusguardian.service.data.SubscriptionInfoService;
+import ru.rusguardian.service.data.TaskService;
 import ru.rusguardian.telegram.bot.service.BotService;
 import ru.rusguardian.telegram.bot.service.task.TaskCommandService;
 import ru.rusguardian.telegram.bot.util.util.FileUtils;
@@ -47,9 +50,6 @@ public abstract class Command implements BotService<CommandName> {
     protected ChatService chatService;
 
     @Autowired
-    protected SubscriptionService subscriptionService;
-
-    @Autowired
     protected SubscriptionInfoService subscriptionInfoService;
 
     @Autowired
@@ -71,7 +71,6 @@ public abstract class Command implements BotService<CommandName> {
     public abstract CommandName getType();
 
     protected abstract void mainExecute(Update update) throws TelegramApiException;
-
 
     public void execute(Update update) {
         log.debug("Executing command: " + this.getClass().getSimpleName());

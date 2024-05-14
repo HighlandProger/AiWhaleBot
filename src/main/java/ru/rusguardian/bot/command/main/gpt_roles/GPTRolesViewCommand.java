@@ -22,8 +22,8 @@ public class GPTRolesViewCommand extends Command implements GPTRolesDescription 
     protected void mainExecute(Update update) throws TelegramApiException {
 
         Chat chat = chatService.findById(TelegramUtils.getChatId(update));
-        SendMessage message = SendMessageUtil.getSimpleWithReplyOnLastUserMessage(update, getDescriptionText(chat.getAssistantRole()));
-        message.setReplyMarkup(GPTRolesInlineKeyboardUtil.getKeyboard(0, chat.getAssistantRole()));
+        SendMessage message = SendMessageUtil.getSimpleWithReplyOnLastUserMessage(update, getDescriptionText(chat.getAiSettingsEmbedded().getAssistantRole()));
+        message.setReplyMarkup(GPTRolesInlineKeyboardUtil.getKeyboard(0, chat.getAiSettingsEmbedded().getAssistantRole()));
         sendMessage(message);
     }
 
