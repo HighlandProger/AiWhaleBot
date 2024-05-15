@@ -7,6 +7,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import ru.rusguardian.bot.command.prompts.process.ProcessChatTextPrompt;
 import ru.rusguardian.bot.command.service.Command;
 import ru.rusguardian.bot.command.service.CommandName;
 import ru.rusguardian.telegram.bot.util.util.TelegramUtils;
@@ -16,7 +17,7 @@ import ru.rusguardian.telegram.bot.util.util.telegram_message.SendMessageUtil;
 @RequiredArgsConstructor
 public class ExecuteTextPromptCommand extends Command {
 
-//    private final AiService chatClientService;
+    private final ProcessChatTextPrompt processChatTextPrompt;
 
     @Override
     public CommandName getType() {
@@ -29,9 +30,9 @@ public class ExecuteTextPromptCommand extends Command {
         reply.setReplyToMessageId(TelegramUtils.getMessageId(update));
         int replyId = bot.execute(reply).getMessageId();
 
-//        String response = chatClientService.getTextPromptResponse(TelegramUtils.getTextMessage(update));
+        String response = processChatTextPrompt.process(update);
 
-        bot.execute(getCustomEditMessage(update, "response", replyId));
+        bot.execute(getCustomEditMessage(update, response, replyId));
     }
 
     private EditMessageText getCustomEditMessage(Update update, String text, int messageId) {

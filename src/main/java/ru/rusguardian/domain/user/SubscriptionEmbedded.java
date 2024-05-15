@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class SubscriptionEmbedded {
 
     @ManyToOne
-    @JoinColumn(name = "subscription_info_id")
+    @JoinColumn(name = "subscription_info_type")
     private SubscriptionInfo subscriptionInfo;
     @Column(name = "purchase_time")
     private LocalDateTime purchaseTime;

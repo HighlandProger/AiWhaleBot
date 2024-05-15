@@ -10,22 +10,18 @@ import ru.rusguardian.service.data.abstr.CrudService;
 
 @Service
 @RequiredArgsConstructor
-public class SubscriptionInfoService extends CrudService<SubscriptionInfo, Long> {
+public class SubscriptionInfoService extends CrudService<SubscriptionInfo, SubscriptionType> {
 
     private final SubscriptionInfoRepository repository;
 
-    public SubscriptionInfo getByType(SubscriptionType type) {
-        return repository.getByType(type).orElseThrow();
-    }
-
     @Override
-    protected JpaRepository<SubscriptionInfo, Long> getRepository() {
+    protected JpaRepository<SubscriptionInfo, SubscriptionType> getRepository() {
         return repository;
     }
 
     @Override
-    protected Long getIdFromEntity(SubscriptionInfo entity) {
-        return entity.getId();
+    protected SubscriptionType getIdFromEntity(SubscriptionInfo entity) {
+        return entity.getType();
     }
 
 }

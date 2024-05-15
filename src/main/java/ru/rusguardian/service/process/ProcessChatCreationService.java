@@ -5,12 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import ru.rusguardian.constant.ai.AIUserModel;
 import ru.rusguardian.constant.ai.AssistantRole;
 import ru.rusguardian.constant.user.PartnerLevel;
 import ru.rusguardian.constant.user.SubscriptionType;
 import ru.rusguardian.domain.SubscriptionInfo;
 import ru.rusguardian.domain.user.*;
+import ru.rusguardian.service.ai.constant.AIModel;
 import ru.rusguardian.service.data.ChatService;
 import ru.rusguardian.service.data.SubscriptionInfoService;
 import ru.rusguardian.telegram.bot.util.util.TelegramStartInfoUtils;
@@ -55,7 +55,7 @@ public class ProcessChatCreationService {
     private AISettingsEmbedded getAiSetting() {
         AISettingsEmbedded aiSettingsEmbedded = new AISettingsEmbedded();
         aiSettingsEmbedded.setAssistantRole(AssistantRole.USUAL);
-        aiSettingsEmbedded.setAiUserModel(AIUserModel.GPT_3_5_TURBO);
+        aiSettingsEmbedded.setAiActiveModel(AIModel.GPT_3_5_TURBO);
         aiSettingsEmbedded.setTemperature(1.0f);
         aiSettingsEmbedded.setAiLanguage(RUSSIAN);
         aiSettingsEmbedded.setContextEnabled(true);
@@ -64,7 +64,7 @@ public class ProcessChatCreationService {
     }
 
     private SubscriptionEmbedded getSubscription() {
-        SubscriptionInfo info = subscriptionInfoService.getByType(SubscriptionType.FREE);
+        SubscriptionInfo info = subscriptionInfoService.findById(SubscriptionType.FREE);
 
         SubscriptionEmbedded subscription = new SubscriptionEmbedded();
         subscription.setSubscriptionInfo(info);

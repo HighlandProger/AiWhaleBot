@@ -19,7 +19,7 @@ import static ru.rusguardian.bot.command.service.CommandName.WELCOME;
 public class GPTRolesInlineKeyboardUtil {
 
     public static final String PAGE_ACTION = "PAGE";
-    public static final String ASSISTANT_TYPE_ACTION = "AS-TYPE";
+    public static final String ASSISTANT_TYPE_ACTION = "AS_TYPE";
     private static final String GPT_ROLES_PREFIX = CommandName.GPT_ROLES_BLIND.getBlindName();
 
     private GPTRolesInlineKeyboardUtil() {

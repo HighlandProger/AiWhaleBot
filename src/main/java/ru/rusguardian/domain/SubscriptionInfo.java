@@ -3,7 +3,6 @@ package ru.rusguardian.domain;
 import jakarta.persistence.*;
 import lombok.Data;
 import ru.rusguardian.constant.user.SubscriptionType;
-import ru.rusguardian.domain.converters.SubscriptionTypeConverter;
 
 @Entity
 @Table(schema = "ncs_bot", name = "subscription_info")
@@ -11,9 +10,9 @@ import ru.rusguardian.domain.converters.SubscriptionTypeConverter;
 public class SubscriptionInfo {
 
     @Id
-    private Long id;
-    @Convert(converter = SubscriptionTypeConverter.class)
+    @Enumerated(EnumType.STRING)
     private SubscriptionType type;
+    @Column
     private String smile;
     @Column(name = "ru_name")
     private String ruName;

@@ -3,9 +3,9 @@ package ru.rusguardian.domain.user;
 import jakarta.persistence.*;
 import lombok.Data;
 import ru.rusguardian.bot.command.service.CommandName;
-import ru.rusguardian.domain.converters.CommandNameConverter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(schema = "ncs_bot", name = "chats")
@@ -21,7 +21,7 @@ public class Chat {
     private String telegramFirstName;
     @Column(name = "telegram_last_name")
     private String telegramLastName;
-    @Convert(converter = CommandNameConverter.class)
+    @Enumerated(EnumType.STRING)
     @Column(name = "next_command")
     private CommandName nextCommand;
     @Column(name = "registration_time")
@@ -43,5 +43,8 @@ public class Chat {
     private UserBalanceEmbedded userBalanceEmbedded;
     @Embedded
     private PartnerEmbedded partnerEmbeddedInfo;
+
+    @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ChatCompletionMessageWrapper> messages;
 
 }

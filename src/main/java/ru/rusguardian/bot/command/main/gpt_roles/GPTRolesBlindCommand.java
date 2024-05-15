@@ -1,17 +1,15 @@
 package ru.rusguardian.bot.command.main.gpt_roles;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.rusguardian.bot.command.service.Command;
 import ru.rusguardian.bot.command.service.CommandName;
-import ru.rusguardian.constant.ai.AssistantRole;
-import ru.rusguardian.constant.user.SubscriptionType;
 import ru.rusguardian.domain.user.Chat;
+import ru.rusguardian.service.process.ProcessAssistantTypeChange;
 import ru.rusguardian.telegram.bot.util.util.TelegramCallbackUtils;
-import ru.rusguardian.telegram.bot.util.util.TelegramUtils;
 import ru.rusguardian.telegram.bot.util.util.telegram_message.EditMessageUtil;
 import ru.rusguardian.util.GPTRolesInlineKeyboardUtil;
 
@@ -19,7 +17,10 @@ import static ru.rusguardian.util.GPTRolesInlineKeyboardUtil.ASSISTANT_TYPE_ACTI
 import static ru.rusguardian.util.GPTRolesInlineKeyboardUtil.PAGE_ACTION;
 
 @Component
+@RequiredArgsConstructor
 public class GPTRolesBlindCommand extends Command implements GPTRolesDescription {
+
+    private final ProcessAssistantTypeChange processAssistantTypeChange;
 
     @Override
     public CommandName getType() {
@@ -38,20 +39,9 @@ public class GPTRolesBlindCommand extends Command implements GPTRolesDescription
                 page = Integer.parseInt(TelegramCallbackUtils.getArgFromCallback(update, 2));
             }
             if (ASSISTANT_TYPE_ACTION.equals(action)) {
-                AssistantRole type = AssistantRole.valueOf(TelegramCallbackUtils.getArgFromCallback(update, 2));
-                if (chat.getAiSettingsEmbedded().getAssistantRole() == type) {
-                    return;
-                }
-                if (chat.getSubscriptionEmbedded().getSubscriptionInfo().getType() == SubscriptionType.FREE) {
-                    AnswerCallbackQuery answer = new AnswerCallbackQuery();
-                    answer.setCallbackQueryId(TelegramUtils.getCallbackQueryId(update));
-                    answer.setShowAlert(true);
-                    answer.setText("Нельзя");
-                    bot.execute(answer);
-                    return;
-                }
-
-                chat.getAiSettingsEmbedded().setAssistantRole(type);
+                //TODO editMessageIfChangePossible
+                processAssistantTypeChange.process(update, chat, bot);
+                return;
             }
         }
 

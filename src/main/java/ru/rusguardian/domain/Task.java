@@ -3,7 +3,6 @@ package ru.rusguardian.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import ru.rusguardian.bot.command.service.CommandName;
-import ru.rusguardian.domain.converters.CommandNameConverter;
 
 import java.time.LocalDateTime;
 
@@ -22,7 +21,7 @@ public class Task {
     private Long id;
     @Column(name = "chat_id")
     private Long chatId;
-    @Convert(converter = CommandNameConverter.class)
+    @Enumerated(EnumType.STRING)
     @Column(name = "command_to_execute")
     private CommandName commandToExecute;
     @Column(name = "execute_time")

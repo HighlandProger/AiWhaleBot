@@ -29,7 +29,7 @@ spring:
             use_query_cache: false
             use_minimal_puts: false
       database-platform: org.hibernate.dialect.PostgreSQL9Dialect
-      show-sql: false
+      show-sql: true
 
 bot:
   username: type_your_value

@@ -18,7 +18,7 @@ public enum CommandName {
     //START
     WELCOME(),
     GPT_ROLES_VIEW("\uD83C\uDFAD GPT - Роли"),
-    GPT_ROLES_BLIND(null, "GPT-ROLES-BLIND"),
+    GPT_ROLES_BLIND(null),
     MY_ACCOUNT("\uD83D\uDC64 Мой аккаунт"),
     PREMIUM_SUBSCRIPTION("\uD83D\uDE80 Премиум"),
     SETTINGS("⚙\uFE0F Настройки"),

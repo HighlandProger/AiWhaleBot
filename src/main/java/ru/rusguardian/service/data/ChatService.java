@@ -26,6 +26,7 @@ public class ChatService extends CrudService<Chat, Long> {
         chatRepository.updateUserNextCommand(chatId, name);
     }
 
+
     @Override
     protected Long getIdFromEntity(Chat entity) {
         return entity.getId();

@@ -8,7 +8,7 @@ import ru.rusguardian.domain.SubscriptionInfo;
 import java.util.Optional;
 
 @Repository
-public interface SubscriptionInfoRepository extends JpaRepository<SubscriptionInfo, Long> {
+public interface SubscriptionInfoRepository extends JpaRepository<SubscriptionInfo, SubscriptionType> {
 
     Optional<SubscriptionInfo> getByType(SubscriptionType type);
 }

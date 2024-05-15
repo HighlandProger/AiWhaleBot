@@ -11,7 +11,7 @@ import ru.rusguardian.bot.command.service.CommandName;
 @RequiredArgsConstructor
 public class ErrorCommand extends Command {
 
-    private static final String MESSAGE = "Произошла неизвестная ошибка, пожалуйста, попробуйте /start или обратитесь в поддержку @Vectorika";
+    private static final String MESSAGE = "Произошла неизвестная ошибка, пожалуйста, попробуйте /start или обратитесь в поддержку @freeeman98";
 
     @Override
     public CommandName getType() {

@@ -3,7 +3,6 @@ package ru.rusguardian.domain.user;
 import jakarta.persistence.*;
 import lombok.Data;
 import ru.rusguardian.constant.user.PartnerLevel;
-import ru.rusguardian.domain.converters.PartnerLevelConverter;
 
 @Embeddable
 @Data
@@ -12,7 +11,7 @@ public class PartnerEmbedded {
     @OneToOne
     @JoinColumn(name = "invited_by")
     private Chat invitedBy;
-    @Convert(converter = PartnerLevelConverter.class)
+    @Enumerated(EnumType.STRING)
     @Column(name = "partner_level")
     private PartnerLevel partnerLevel;
     @Column(name = "referrals_count")

@@ -8,8 +8,12 @@ psql whale_ai_db;
 ====================================================
 
 CREATE SCHEMA IF NOT EXISTS ncs_bot;
-SET
-    SEARCH_PATH = ncs_bot;
+
+alter schema ncs_bot owner to whale_ai_bot
+ALTER DEFAULT PRIVILEGES IN SCHEMA ncs_bot GRANT ALL ON TABLES TO whale_ai_bot;
+ALTER DEFAULT PRIVILEGES IN SCHEMA ncs_bot GRANT ALL ON SEQUENCES TO whale_ai_bot;
+ALTER DEFAULT PRIVILEGES IN SCHEMA ncs_bot GRANT ALL ON FUNCTIONS TO whale_ai_bot;
+ALTER DEFAULT PRIVILEGES IN SCHEMA ncs_bot GRANT ALL ON TYPES TO whale_ai_bot;
 
 CREATE TABLE ncs_bot.chats
 (
@@ -94,9 +98,6 @@ CREATE TABLE ncs_bot.subscription_info (
     claude_sale_size INT
 );
 
-GRANT ALL PRIVILEGES ON DATABASE whale_ai_db TO whale_ai_bot;
-GRANT SELECT ON ALL TABLES IN SCHEMA ncs_bot TO whale_ai_bot;
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA ncs_bot TO whale_ai_bot;
-GRANT USAGE, SELECT ON SEQUENCE log_events_id_seq TO whale_ai_bot;
-GRANT USAGE, SELECT ON SEQUENCE tasks_id_seq TO whale_ai_bot;
-GRANT USAGE, SELECT ON SEQUENCE subscriptions_id_seq TO whale_ai_bot;
+GRANT ALL PRIVILEGES ON ALL sequences IN SCHEMA ncs_bot TO whale_ai_bot;
+GRANT ALL PRIVILEGES ON ALL functions IN SCHEMA ncs_bot TO whale_ai_bot;

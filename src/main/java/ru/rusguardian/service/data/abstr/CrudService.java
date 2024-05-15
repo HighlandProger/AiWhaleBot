@@ -1,9 +1,8 @@
 package ru.rusguardian.service.data.abstr;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public abstract class CrudService<T, ID> {
@@ -25,7 +24,15 @@ public abstract class CrudService<T, ID> {
         return getRepository().save(entity);
     }
 
-    protected abstract JpaRepository<T, ID>  getRepository();
+    public List<T> getAll() {
+        return getRepository().findAll();
+    }
+
+    public void saveAll(List<T> entities) {
+        getRepository().saveAll(entities);
+    }
+
+    protected abstract JpaRepository<T, ID> getRepository();
 
     protected abstract ID getIdFromEntity(T entity);
 }
