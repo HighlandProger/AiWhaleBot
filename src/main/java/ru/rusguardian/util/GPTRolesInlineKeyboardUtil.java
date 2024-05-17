@@ -10,7 +10,9 @@ import ru.rusguardian.telegram.bot.util.util.telegram_message.ReplyMarkupUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static ru.rusguardian.bot.command.service.CommandName.EMPTY;
@@ -21,6 +23,14 @@ public class GPTRolesInlineKeyboardUtil {
     public static final String PAGE_ACTION = "PAGE";
     public static final String ASSISTANT_TYPE_ACTION = "AS_TYPE";
     private static final String GPT_ROLES_PREFIX = CommandName.GPT_ROLES_BLIND.getBlindName();
+    private static final List<List<AssistantRole>> assistantRolePages;
+    private static final List<AssistantRole> assistantRoles = Arrays.stream(AssistantRole.values()).toList();
+
+    static {
+        assistantRolePages = IntStream.range(0, (assistantRoles.size() + 9) / 10)
+                .mapToObj(i -> assistantRoles.subList(i * 10, Math.min(i * 10 + 10, assistantRoles.size())))
+                .toList();
+    }
 
     private GPTRolesInlineKeyboardUtil() {
     }
@@ -38,6 +48,18 @@ public class GPTRolesInlineKeyboardUtil {
         return markup;
     }
 
+    public static int getPageNumberByAssistantRole(AssistantRole role) {
+        Optional<Integer> index = IntStream.range(0, assistantRolePages.size())
+                .filter(i -> assistantRolePages.get(i).contains(role))
+                .boxed()
+                .findFirst();
+
+        if (index.isEmpty()) {
+            throw new RuntimeException(String.format("Assistant role %s not found in pages %s", role, assistantRolePages));
+        }
+        return index.get();
+    }
+
     private static InlineKeyboardMarkup getActionButtons(int page) {
         int nextPage = page == 9 ? 0 : page + 1;
         int prevPage = page == 0 ? 9 : page - 1;
@@ -47,7 +69,6 @@ public class GPTRolesInlineKeyboardUtil {
                         {"▶\uFE0F", getPageString(nextPage)}, {"⏩", getPageString(9)}}
         });
     }
-
 
     private static InlineKeyboardMarkup getAssistantTypeButtons(int page, AssistantRole type) {
         List<AssistantRole> pagedList = getPaged(page);
@@ -77,8 +98,7 @@ public class GPTRolesInlineKeyboardUtil {
     }
 
     protected static List<AssistantRole> getPaged(int pageNumber) {
-        List<AssistantRole> types = Arrays.stream(AssistantRole.values()).toList();
-        return types.subList(pageNumber * 10, (pageNumber + 1) * 10);
+        return assistantRolePages.get(pageNumber);
     }
 
     private static InlineKeyboardMarkup getBackButton() {

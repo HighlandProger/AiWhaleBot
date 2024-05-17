@@ -36,7 +36,7 @@ public class ExecuteVoicePromptCommand extends Command {
         AISettingsEmbedded settings = chatService.findById(TelegramUtils.getChatId(update)).getAiSettingsEmbedded();
 
         //TODO
-        String voiceTranscription = chatClientService.getSpeechToText(FileUtils.getFileFromUpdate(update, bot), settings.getAiLanguage(), settings.getTemperature());
+        String voiceTranscription = chatClientService.getSpeechToText(FileUtils.getFileFromUpdate(update, bot), settings.getAiLanguage().getValue(), settings.getTemperature());
 
         //TODO refactor
         String response = chatClientService.getTextPromptResponse(List.of(new OpenAiApi.ChatCompletionMessage(voiceTranscription, OpenAiApi.ChatCompletionMessage.Role.USER)), settings.getAiActiveModel(), settings.getTemperature()).choices().get(0).message().content();

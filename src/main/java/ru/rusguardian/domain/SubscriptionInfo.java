@@ -1,12 +1,14 @@
 package ru.rusguardian.domain;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.ToString;
 import ru.rusguardian.constant.user.SubscriptionType;
 
 @Entity
 @Table(schema = "ncs_bot", name = "subscription_info")
-@Data
+@Getter
+@ToString
 public class SubscriptionInfo {
 
     @Id
@@ -32,5 +34,7 @@ public class SubscriptionInfo {
     private int claudeTokensMonthLimit;
     @Column(name = "claude_sale_size")
     private int claudeSaleSize;
+    @Column(name = "context_and_tokens_x_size")
+    private int contextAndTokensXSize;
 
 }

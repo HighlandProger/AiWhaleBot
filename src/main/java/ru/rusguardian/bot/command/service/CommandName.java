@@ -18,10 +18,26 @@ public enum CommandName {
     //START
     WELCOME(),
     GPT_ROLES_VIEW("\uD83C\uDFAD GPT - Роли"),
-    GPT_ROLES_BLIND(null),
-    MY_ACCOUNT("\uD83D\uDC64 Мой аккаунт"),
-    PREMIUM_SUBSCRIPTION("\uD83D\uDE80 Премиум"),
-    SETTINGS("⚙\uFE0F Настройки"),
+    GPT_ROLES_BLIND(GPT_ROLES_VIEW.viewName),
+    MY_ACCOUNT_VIEW("\uD83D\uDC64 Мой аккаунт"),
+    SUBSCRIPTION_VIEW("\uD83D\uDE80 Премиум"),
+    SETTINGS_VIEW("⚙\uFE0F Настройки"),
+    SETTINGS_BLIND(SETTINGS_VIEW.viewName),
+
+    //SETTINGS
+    CHOOSE_AI_MODEL_BLIND(null),
+    CHOOSE_AI_ROLE_BLIND(null),
+    CHOOSE_TEMPERATURE_BLIND(null),
+    SWITCH_CONTEXT_BLIND(null),
+    VOICE_RESPONSE_BLIND(null),
+    INTERFACE_LANGUAGE_BLIND(null),
+
+
+    //MY_ACCOUNT
+    //SETTINGS(),
+    PARTNER_CABINET_BLIND("\uD83D\uDCBC Кабинет Партнера"),
+    //SUPPORT_BUTTON(),
+    BUY_PREMIUM("\uD83D\uDE80 Купить Премиум"),
 
     //GPT_ROLES_PROCESS
     PROCESS_ASSISTANT_TYPE_CHANGE(),

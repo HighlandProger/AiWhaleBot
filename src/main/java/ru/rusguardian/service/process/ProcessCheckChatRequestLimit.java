@@ -2,61 +2,50 @@ package ru.rusguardian.service.process;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.rusguardian.constant.user.SubscriptionType;
 import ru.rusguardian.domain.user.Chat;
-import ru.rusguardian.domain.user.SubscriptionEmbedded;
+import ru.rusguardian.domain.user.UserBalanceEmbedded;
 import ru.rusguardian.service.ai.constant.AIModel;
 import ru.rusguardian.service.data.AIUserRequestService;
-import ru.rusguardian.service.data.ChatService;
 
 @Service
 @RequiredArgsConstructor
 public class ProcessCheckChatRequestLimit {
 
-    private final ChatService chatService;
     private final AIUserRequestService aiUserRequestService;
 
-    public int getCount(Chat chat, AIModel model) {
-        SubscriptionEmbedded subscription = chat.getSubscriptionEmbedded();
+    public int getSubscriptionMinusUsedCount(Chat chat, AIModel model) {
+        AIModel.BalanceType balanceType = model.getBalanceType();
+        int allowedBySubscriptionRequestCount = chat.getAllowedBySubscriptionRequestCount(balanceType);
+        //For not limited
+        if (allowedBySubscriptionRequestCount == -1) {
+            return 1000000000;
+        }
 
-        if (subscription.getSubscriptionInfo().getType() == SubscriptionType.FREE) {
-            return getForFree();
+        if (balanceType == AIModel.BalanceType.GPT_3 || balanceType == AIModel.BalanceType.GPT_4 || balanceType == AIModel.BalanceType.IMAGE) {
+            int dayUsedCount = aiUserRequestService.getDayRequestsCountByChatIdAndModels(chat.getId(), AIModel.getByBalanceType(balanceType));
+            return allowedBySubscriptionRequestCount - dayUsedCount;
         }
-        if (subscription.getSubscriptionInfo().getType() == SubscriptionType.ALPHA) {
-            return getForAlpha();
+        if (balanceType == AIModel.BalanceType.CLAUDE || balanceType == AIModel.BalanceType.MUSIC) {
+            int monthUsedCount = aiUserRequestService.getInSubscriptionUsedCount(chat, balanceType);
+            return allowedBySubscriptionRequestCount - monthUsedCount;
         }
-        if (subscription.getSubscriptionInfo().getType() == SubscriptionType.PREMIUM) {
-            return getForPremium();
-        }
-        if (subscription.getSubscriptionInfo().getType() == SubscriptionType.STARTER) {
-            return getForStarter();
-        }
-        if (subscription.getSubscriptionInfo().getType() == SubscriptionType.ULTIMATE) {
-            return getForUltimate();
-        }
-        throw new RuntimeException("UNKNOWN SUBSCRIPTION TYPE");
+        throw new RuntimeException("UNKNOWN BALANCE TYPE: " + balanceType);
     }
 
-    private int getForFree() {
-        return 0;
-    }
+    public int getTotalAllowedCount(Chat chat, AIModel model) {
+        UserBalanceEmbedded userBalance = chat.getUserBalanceEmbedded();
+        int subscriptionMinusUsedCount = getSubscriptionMinusUsedCount(chat, model);
+        AIModel.BalanceType balanceType = model.getBalanceType();
 
-    private int getForAlpha() {
-        return 0;
-
-    }
-
-    private int getForPremium() {
-        return 0;
-
-    }
-
-    private int getForStarter() {
-        return 0;
-
-    }
-
-    private int getForUltimate() {
-        return 0;
+        if (balanceType == AIModel.BalanceType.GPT_4) {
+            return subscriptionMinusUsedCount + userBalance.getExtraGPT4Requests();
+        }
+        if (balanceType == AIModel.BalanceType.IMAGE) {
+            return subscriptionMinusUsedCount + userBalance.getExtraImageRequests();
+        }
+        if (balanceType == AIModel.BalanceType.MUSIC) {
+            return subscriptionMinusUsedCount + userBalance.getExtraSunoRequests();
+        }
+        return subscriptionMinusUsedCount;
     }
 }

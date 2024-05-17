@@ -1,26 +1,22 @@
 package ru.rusguardian.domain.user;
 
-import jakarta.persistence.*;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.springframework.ai.openai.api.OpenAiApi;
 
-@Entity
-@Table(schema = "ncs_bot", name = "chat_completion_messages")
-@Data
-@RequiredArgsConstructor
+@Embeddable
+@AllArgsConstructor
+@NoArgsConstructor
 public class ChatCompletionMessageWrapper {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    @ManyToOne
-    @JoinColumn(name = "chat_id")
-    private Chat chat;
     @Column
-    private final String content;
+    private String content;
     @Enumerated(EnumType.STRING)
-    private final OpenAiApi.ChatCompletionMessage.Role role;
+    private OpenAiApi.ChatCompletionMessage.Role role;
 
     public ChatCompletionMessageWrapper(OpenAiApi.ChatCompletionMessage message) {
         this.content = message.content();
@@ -29,5 +25,9 @@ public class ChatCompletionMessageWrapper {
 
     public OpenAiApi.ChatCompletionMessage getInner() {
         return new OpenAiApi.ChatCompletionMessage(content, role);
+    }
+
+    public static ChatCompletionMessageWrapper getWrapped(OpenAiApi.ChatCompletionMessage chatCompletionMessage) {
+        return new ChatCompletionMessageWrapper(chatCompletionMessage.content(), chatCompletionMessage.role());
     }
 }

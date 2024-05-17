@@ -2,7 +2,9 @@ package ru.rusguardian.service.ai.constant;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,24 +13,27 @@ import static ru.rusguardian.service.ai.constant.Provider.*;
 
 @RequiredArgsConstructor
 @Getter
+@Slf4j
 public enum AIModel {
 
-    GPT_4_OMNI(OPEN_AI, "gpt-4-o"),
-    GPT_4_TURBO(OPEN_AI, "gpt-4-turbo"),
-    GPT_4(OPEN_AI, "gpt-4"),
-    GPT_3_5_TURBO_16_K(OPEN_AI, "gpt-3.5-turbo-16k"),
-    GPT_3_5_TURBO(OPEN_AI, "gpt-3.5-turbo"),
-    ADA_V2_EMBEDDINGS(OPEN_AI, "ada-v2-embedding"),
-    DALL_E_2(OPEN_AI, "dall-e-2"),
-    DALL_E_3(OPEN_AI, "dall-e-3"),
-    WHISPER(OPEN_AI, "whisper"),
-    TTS(OPEN_AI, "tts"),
-    CLAUDE_3_OPUS(ANTHROPIC, "claude-3-opus-20240229"),
-    CLAUDE_3_SONNET(ANTHROPIC, "claude-3-sonnet-20240229"),
-    CLAUDE_3_HAIKU(ANTHROPIC, "claude-3-haiku-20240307"),
-    GEMINI_1_5_PRO(GOOGLE, "???");
+    GPT_4_OMNI(OPEN_AI, BalanceType.GPT_4, "gpt-4-o"),
+    GPT_4_TURBO(OPEN_AI, BalanceType.GPT_4, "gpt-4-turbo"),
+    GPT_4(OPEN_AI, BalanceType.GPT_4, "gpt-4"),
+    GPT_3_5_TURBO_16_K(OPEN_AI, BalanceType.GPT_3, "gpt-3.5-turbo-16k"),
+    GPT_3_5_TURBO(OPEN_AI, BalanceType.GPT_3, "gpt-3.5-turbo-0125"),
+    ADA_V2_EMBEDDINGS(OPEN_AI, null, "ada-v2-embedding"),
+    DALL_E_2(OPEN_AI, BalanceType.IMAGE, "dall-e-2"),
+    DALL_E_3(OPEN_AI, BalanceType.IMAGE, "dall-e-3"),
+    WHISPER(OPEN_AI, null, "whisper"),
+    TTS(OPEN_AI, null, "tts"),
+    CLAUDE_3_OPUS(ANTHROPIC, BalanceType.CLAUDE, "claude-3-opus-20240229"),
+    CLAUDE_3_SONNET(ANTHROPIC, BalanceType.CLAUDE, "claude-3-sonnet-20240229"),
+    CLAUDE_3_HAIKU(ANTHROPIC, BalanceType.CLAUDE, "claude-3-haiku-20240307"),
+    GEMINI_1_5_PRO(GOOGLE, BalanceType.GPT_3, "???"),
+    SUNO(UNKNOWN, BalanceType.MUSIC, "???");
 
     private final Provider provider;
+    private final BalanceType balanceType;
     private final String modelName;
 
     private static final List<AIModel> getUserChatModels = List.of(
@@ -52,7 +57,25 @@ public enum AIModel {
     }
 
     public static AIModel getByModelName(String modelName) {
-        return MODEL_NAME_MAP.get(modelName);
+        AIModel model = MODEL_NAME_MAP.get(modelName);
+        if (model == null) {
+            log.error("UNKNOWN model type {}", modelName);
+            throw new RuntimeException("AIModel parsing exception");
+        }
+        return model;
     }
 
+    public static List<AIModel> getByBalanceType(BalanceType balanceType) {
+        return Arrays.stream(AIModel.values())
+                .filter(model -> model.balanceType == balanceType)
+                .toList();
+    }
+
+    public enum BalanceType {
+        GPT_3,
+        GPT_4,
+        IMAGE,
+        MUSIC,
+        CLAUDE
+    }
 }

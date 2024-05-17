@@ -5,6 +5,7 @@ import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.Data;
+import ru.rusguardian.constant.ai.AILanguage;
 import ru.rusguardian.constant.ai.AssistantRole;
 import ru.rusguardian.service.ai.constant.AIModel;
 
@@ -15,8 +16,9 @@ public class AISettingsEmbedded {
     @Enumerated(EnumType.STRING)
     @Column(name = "assistant_role")
     private AssistantRole assistantRole;
+    @Enumerated(EnumType.STRING)
     @Column(name = "ai_language")
-    private String aiLanguage;
+    private AILanguage aiLanguage;
     private float temperature;
     @Enumerated(EnumType.STRING)
     @Column(name = "ai_active_model")

@@ -8,7 +8,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.rusguardian.bot.command.service.Command;
 import ru.rusguardian.bot.command.service.CommandName;
 import ru.rusguardian.domain.user.Chat;
-import ru.rusguardian.service.process.ProcessChatCreationService;
+import ru.rusguardian.service.process.ProcessCreateChat;
 import ru.rusguardian.telegram.bot.util.util.TelegramUtils;
 
 @Component
@@ -16,7 +16,7 @@ import ru.rusguardian.telegram.bot.util.util.TelegramUtils;
 @RequiredArgsConstructor
 public class StartCommand extends Command {
 
-    private final ProcessChatCreationService processChatCreationService;
+    private final ProcessCreateChat processCreateChat;
 
     @Override
     public CommandName getType() {
@@ -31,7 +31,7 @@ public class StartCommand extends Command {
     }
 
     private Chat createNewUser(Update update) {
-        return processChatCreationService.process(update);
+        return processCreateChat.process(update);
     }
 
 }

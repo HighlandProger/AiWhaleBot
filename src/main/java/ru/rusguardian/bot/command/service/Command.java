@@ -121,4 +121,9 @@ public abstract class Command implements BotService<CommandName> {
         bot.execute(edit);
     }
 
+    protected String getTextFromFileByChatLanguage(String filePath, Chat chat) {
+        String path = filePath + chat.getAiSettingsEmbedded().getAiLanguage().getValue() + ".txt";
+        return FileUtils.getTextFromFile(FileUtils.getFileFromResources2(this, path));
+    }
+
 }

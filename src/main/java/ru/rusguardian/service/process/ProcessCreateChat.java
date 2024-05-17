@@ -24,7 +24,7 @@ import static ru.rusguardian.constant.ai.AILanguage.RUSSIAN;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ProcessChatCreationService {
+public class ProcessCreateChat {
 
     private static final String INVITED_BY = "invitedBy";
     private final SubscriptionInfoService subscriptionInfoService;

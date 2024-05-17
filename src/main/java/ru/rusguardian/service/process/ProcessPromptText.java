@@ -1,4 +1,4 @@
-package ru.rusguardian.bot.command.prompts.process;
+package ru.rusguardian.service.process;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.openai.api.OpenAiApi;
@@ -10,9 +10,9 @@ import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.domain.user.ChatCompletionMessageWrapper;
 import ru.rusguardian.service.ai.AiService;
 import ru.rusguardian.service.ai.constant.AIModel;
+import ru.rusguardian.service.ai.constant.AIRequestSetting;
 import ru.rusguardian.service.data.AIUserRequestService;
 import ru.rusguardian.service.data.ChatService;
-import ru.rusguardian.service.process.ProcessUpdateUserExtraBalance;
 import ru.rusguardian.telegram.bot.util.util.TelegramUtils;
 
 import java.time.Instant;
@@ -20,15 +20,17 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
-public class ProcessChatTextPrompt {
+public class ProcessPromptText {
 
     private static final String LIMIT_EXPIRED_MESSAGE = "Извините, но ваш лимит запросов на день для модели %s исчерпан. Купите подписку для увеличения лимита";
     private final AiService aiService;
     private final ChatService chatService;
     private final AIUserRequestService aiUserRequestService;
+    private final ProcessCheckChatRequestLimit checkChatRequestLimit;
     private final ProcessUpdateUserExtraBalance updateChatBalance;
 
     public String process(Update update) {
@@ -36,56 +38,49 @@ public class ProcessChatTextPrompt {
         String prompt = TelegramUtils.getTextMessage(update);
         AIModel model = chat.getAiSettingsEmbedded().getAiActiveModel();
         float temperature = chat.getAiSettingsEmbedded().getTemperature();
+        int maxTokens = chat.getSubscriptionEmbedded().getSubscriptionInfo().getContextAndTokensXSize() * AIRequestSetting.TOKEN_SIZE.getValue();
 
         //1 Check for chat limit
-        if (isChatLimitExpired(chat)) {
-            return getLimitExpiredMessage(chat);
+        if (isChatLimitExpired(chat, model)) {
+            return getLimitExpiredMessage(model);
         }
 
+        //1.5 Get messages for context
+        List<OpenAiApi.ChatCompletionMessage> completionMessages = getChatCompletionMessages(chat, prompt);
+
         //2 Get Response from AI
-        OpenAiApi.ChatCompletion chatCompletion = aiService.getTextPromptResponse(getChatCompletionMessages(chat, prompt), model, temperature);
+        OpenAiApi.ChatCompletion chatCompletion = aiService.getTextPromptResponse(completionMessages, model, temperature, maxTokens);
 
         //3 Add request to database
         addAIUserRequestToDatabase(chat, chatCompletion);
 
         //4 Add response to chat messages
-        addResponseMessageToChatList(chat, chatCompletion);
+        completionMessages.add(chatCompletion.choices().get(0).message());
+        chat.setMessages(completionMessages);
+        chatService.update(chat);
 
         //5 Update balance (for extra tokens)
-//        updateChatBalance.process();
+        updateChatBalance.updateUserExtraBalance(chat, chatCompletion);
 
 
         //Choices depends on "n" in ChatCompletionRequest
         return chatCompletion.choices().get(0).message().content();
     }
 
-    void isExpired() {
-
-    }
-
     //1
-    private String getLimitExpiredMessage(Chat chat) {
-        return String.format(LIMIT_EXPIRED_MESSAGE, chat.getAiSettingsEmbedded().getAiActiveModel().getModelName());
+    private boolean isChatLimitExpired(Chat chat, AIModel model) {
+        return checkChatRequestLimit.getTotalAllowedCount(chat, model) > 0;
     }
 
-    //TODO
-    private boolean isChatLimitExpired(Chat chat) {
-
-        return false;
-    }
-
-
-    //TODO
-    // 2
-    private int getMaxTokens(Chat chat) {
-        return 4096;
+    private String getLimitExpiredMessage(AIModel model) {
+        return String.format(LIMIT_EXPIRED_MESSAGE, model.name());
     }
 
     private List<OpenAiApi.ChatCompletionMessage> getPreviousChatCompletionMessages(Chat chat) {
         if (!chat.getAiSettingsEmbedded().isContextEnabled()) {
             return new ArrayList<>();
         }
-        return chat.getMessages().stream().map(ChatCompletionMessageWrapper::getInner).toList();
+        return new ArrayList<>(chat.getMessages().stream().map(ChatCompletionMessageWrapper::getInner).toList());
     }
 
     private List<OpenAiApi.ChatCompletionMessage> getChatCompletionMessages(Chat chat, String currentText) {
@@ -95,15 +90,24 @@ public class ProcessChatTextPrompt {
             AssistantRole role = chat.getAiSettingsEmbedded().getAssistantRole();
             messages.add(new OpenAiApi.ChatCompletionMessage(role.getPrompt(), OpenAiApi.ChatCompletionMessage.Role.SYSTEM));
         }
-        messages.add(new OpenAiApi.ChatCompletionMessage(currentText, OpenAiApi.ChatCompletionMessage.Role.USER));
-        return chatService.update(chat).getMessages().stream().map(ChatCompletionMessageWrapper::getInner).toList();
+
+        List<OpenAiApi.ChatCompletionMessage> cuttedMessages = getCuttedMessages(chat, messages);
+        cuttedMessages.add(new OpenAiApi.ChatCompletionMessage(currentText, OpenAiApi.ChatCompletionMessage.Role.USER));
+        return cuttedMessages;
     }
 
+    private List<OpenAiApi.ChatCompletionMessage> getCuttedMessages(Chat chat, List<OpenAiApi.ChatCompletionMessage> messages) {
+        int messagesInList = AIRequestSetting.MESSAGES_IN_LIST.getValue() * chat.getSubscriptionEmbedded().getSubscriptionInfo().getContextAndTokensXSize();
+        return new ArrayList<>(Stream.concat(
+                messages.stream().limit(1),
+                messages.stream().skip(Math.max(0, messages.size() - messagesInList))
+        ).toList());
+    }
 
     //3
     private void addAIUserRequestToDatabase(Chat chat, OpenAiApi.ChatCompletion chatCompletion) {
         AIUserRequest request = new AIUserRequest();
-        request.setRequestTime(LocalDateTime.ofInstant(Instant.ofEpochMilli(chatCompletion.created()), ZoneId.systemDefault()));
+        request.setRequestTime(LocalDateTime.ofInstant(Instant.ofEpochSecond(chatCompletion.created()), ZoneId.systemDefault()));
         request.setChat(chat);
         request.setPromptTokens(chatCompletion.usage().promptTokens());
         request.setCompletionTokens(chatCompletion.usage().completionTokens());
@@ -114,10 +118,5 @@ public class ProcessChatTextPrompt {
         aiUserRequestService.save(request);
     }
 
-
-    // 4
-    private void addResponseMessageToChatList(Chat chat, OpenAiApi.ChatCompletion chatCompletion) {
-        chat.getMessages().add(new ChatCompletionMessageWrapper(chatCompletion.choices().get(0).message()));
-    }
 
 }

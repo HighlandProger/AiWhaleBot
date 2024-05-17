@@ -4,5 +4,6 @@ public enum Provider {
 
     OPEN_AI(),
     ANTHROPIC(),
-    GOOGLE()
+    GOOGLE(),
+    UNKNOWN(),
 }

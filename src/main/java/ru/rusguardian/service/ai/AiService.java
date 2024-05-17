@@ -30,6 +30,11 @@ public class AiService {
         return api.chatCompletionEntity(request).getBody();
     }
 
+    public OpenAiApi.ChatCompletion getTextPromptResponse(List<OpenAiApi.ChatCompletionMessage> messages, AIModel model, float temperature, int maxTokens) {
+        OpenAiApi.ChatCompletionRequest request = new OpenAiApi.ChatCompletionRequest(messages, model.getModelName(), null, null, maxTokens, null, null, null, null, null, false, temperature, null, null, null, null);
+        return api.chatCompletionEntity(request).getBody();
+    }
+
     public String getSpeechToText(File file, String language, float temperature) {
 
         OpenAiAudioApi.TranscriptionRequest request = OpenAiAudioApi.TranscriptionRequest.builder()

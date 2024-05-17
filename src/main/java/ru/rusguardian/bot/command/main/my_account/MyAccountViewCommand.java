@@ -1,99 +1,54 @@
 package ru.rusguardian.bot.command.main.my_account;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.rusguardian.bot.command.service.Command;
 import ru.rusguardian.bot.command.service.CommandName;
-import ru.rusguardian.constant.user.SubscriptionType;
 import ru.rusguardian.domain.user.Chat;
-import ru.rusguardian.telegram.bot.util.util.FileUtils;
+import ru.rusguardian.service.process.ProcessGetTextUserAccount;
+import java.util.List;
 
-import java.text.MessageFormat;
-import java.time.LocalDateTime;
+import static ru.rusguardian.bot.command.service.CommandName.*;
 
 @Component
+@RequiredArgsConstructor
 public class MyAccountViewCommand extends Command {
+
+    private static final String FILE_PATH = "text/my_account/";
+
+    private final ProcessGetTextUserAccount getUserAccountTextService;
 
     @Override
     public CommandName getType() {
-        return CommandName.MY_ACCOUNT;
+        return CommandName.MY_ACCOUNT_VIEW;
     }
 
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
-        sendMessage(update, getText(update));
+        sendMessage(update, getText(update), getKeyboard());
     }
 
     private String getText(Update update) {
-
-        String textPattern = FileUtils.getTextFromFile(FileUtils.getFileFromResources2(this, "text/my_account.txt"));
         Chat chat = getChat(update);
-
-        return MessageFormat.format(textPattern,
-                chat.getId(),
-                chat.getSubscriptionEmbedded().getSubscriptionInfo().getType(),
-                chat.getSubscriptionEmbedded().getSubscriptionInfo().getType() == SubscriptionType.FREE ? "-" : chat.getSubscriptionEmbedded().getExpirationTime(),
-                chat.getSubscriptionEmbedded().getPurchaseType() == null ? "-" : chat.getSubscriptionEmbedded().getPurchaseType(),
-                //----------------------------------------------------------
-                getGpt3_5PerDayRequests(chat.getId()),
-                getGemini1_5PerDayRequests(chat.getId()),
-                getGPT4PerDayRequests(chat.getId()),
-                getImagePerDayRequests(chat.getId()),
-                chat.getUserBalanceEmbedded().getClaudeTokens(),
-                chat.getSubscriptionEmbedded().getSubscriptionInfo().getSongMonthLimit() - getSunoMonthRequests(chat.getId()),
-                //----------------------------------------------------------
-                chat.getUserBalanceEmbedded().getExtraGPT4Requests(),
-                chat.getUserBalanceEmbedded().getExtraImageRequests(),
-                chat.getUserBalanceEmbedded().getExtraSunoRequests(),
-                //----------------------------------------------------------
-                chat.getAiSettingsEmbedded().getAiActiveModel(),
-                chat.getAiSettingsEmbedded().getAssistantRole(),
-                chat.getAiSettingsEmbedded().getTemperature(),
-                chat.getAiSettingsEmbedded().isContextEnabled() ? "✅ Вкл" : "❌ Выкл",
-                chat.getAiSettingsEmbedded().isVoiceResponseEnabled() ? "✅ Вкл" : "❌ Выкл",
-
-                getHoursAndMinsOfDayRemaining());
+        String textPattern = getTextFromFileByChatLanguage(FILE_PATH, chat);
+        return getUserAccountTextService.process(chat, textPattern);
     }
 
-    //TODO
-    private int getGpt3_5PerDayRequests(Long chatId) {
-        return 0;
-    }
+    private InlineKeyboardMarkup getKeyboard() {
 
-    //TODO
-    private int getGemini1_5PerDayRequests(Long chatId) {
-        return 0;
-    }
+        InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+        InlineKeyboardButton button1 = InlineKeyboardButton.builder().text(SETTINGS_BLIND.getViewName()).callbackData(SETTINGS_BLIND.getBlindName()).build();
+        InlineKeyboardButton button2 = InlineKeyboardButton.builder().text(PARTNER_CABINET_BLIND.getViewName()).callbackData(PARTNER_CABINET_BLIND.getBlindName()).build();
+        InlineKeyboardButton button3 = InlineKeyboardButton.builder().text("\uD83D\uDC68\u200D\uD83D\uDD27 Техподдержка").url("https://t.me/freeeman98").build();
+        InlineKeyboardButton button4 = InlineKeyboardButton.builder().text(BUY_PREMIUM.getViewName()).callbackData(BUY_PREMIUM.getBlindName()).build();
 
-    //TODO
-    private int getGPT4PerDayRequests(Long chatId) {
-        return 0;
-    }
+        markup.setKeyboard(List.of(List.of(button1), List.of(button2), List.of(button3), List.of(button4)));
 
-    //TODO
-    private int getImagePerDayRequests(Long chatId) {
-        return 0;
-    }
-
-    //TODO
-    private int getSunoMonthRequests(Long chatId) {
-        return 0;
-    }
-
-    private String getHoursAndMinsOfDayRemaining() {
-        LocalDateTime currentTime = LocalDateTime.now();
-        LocalDateTime endOfDay = LocalDateTime.MAX;
-
-        LocalDateTime timeRemaining = endOfDay.minusHours(currentTime.getHour())
-                .minusMinutes(currentTime.getMinute())
-                .minusSeconds(currentTime.getSecond())
-                .minusNanos(currentTime.getNano());
-
-        int hoursRemaining = timeRemaining.getHour();
-        int minutesRemaining = timeRemaining.getMinute();
-
-        return String.format("%s ч. %s мин.", hoursRemaining, minutesRemaining);
+        return markup;
     }
 
 

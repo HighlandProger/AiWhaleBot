@@ -2,7 +2,10 @@ package ru.rusguardian.domain.user;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.springframework.ai.openai.api.OpenAiApi;
 import ru.rusguardian.bot.command.service.CommandName;
+import ru.rusguardian.domain.SubscriptionInfo;
+import ru.rusguardian.service.ai.constant.AIModel;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -44,7 +47,32 @@ public class Chat {
     @Embedded
     private PartnerEmbedded partnerEmbeddedInfo;
 
-    @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Embedded
     private List<ChatCompletionMessageWrapper> messages;
 
+
+    public void setMessages(List<OpenAiApi.ChatCompletionMessage> completionMessages) {
+        this.messages = completionMessages.stream().map(ChatCompletionMessageWrapper::getWrapped).toList();
+    }
+
+    public int getAllowedBySubscriptionRequestCount(AIModel.BalanceType balanceType) {
+        SubscriptionInfo subscriptionInfo = this.getSubscriptionEmbedded().getSubscriptionInfo();
+        if (balanceType == AIModel.BalanceType.GPT_3) {
+            return subscriptionInfo.getGpt3DayLimit();
+        }
+        if (balanceType == AIModel.BalanceType.GPT_4) {
+            return subscriptionInfo.getGpt4DayLimit();
+        }
+        if (balanceType == AIModel.BalanceType.IMAGE) {
+            return subscriptionInfo.getImageDayLimit();
+        }
+        if (balanceType == AIModel.BalanceType.CLAUDE) {
+            return subscriptionInfo.getClaudeTokensMonthLimit();
+        }
+        if (balanceType == AIModel.BalanceType.MUSIC) {
+            return subscriptionInfo.getSongMonthLimit();
+        }
+        throw new RuntimeException("UNKNOWN BALANCE TYPE: " + balanceType);
+    }
 }
