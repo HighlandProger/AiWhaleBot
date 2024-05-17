@@ -37,6 +37,10 @@ public class ProcessCheckChatRequestLimit {
         int subscriptionMinusUsedCount = getSubscriptionMinusUsedCount(chat, model);
         AIModel.BalanceType balanceType = model.getBalanceType();
 
+        if (balanceType == AIModel.BalanceType.GPT_3){
+            int extraForSubscriptionCount = isChatHasSubscriptions(chat) ? 5 : 0;
+            return subscriptionMinusUsedCount + extraForSubscriptionCount;
+        }
         if (balanceType == AIModel.BalanceType.GPT_4) {
             return subscriptionMinusUsedCount + userBalance.getExtraGPT4Requests();
         }
@@ -47,5 +51,10 @@ public class ProcessCheckChatRequestLimit {
             return subscriptionMinusUsedCount + userBalance.getExtraSunoRequests();
         }
         return subscriptionMinusUsedCount;
+    }
+
+    //TODO
+    public boolean isChatHasSubscriptions(Chat chat){
+        return false;
     }
 }

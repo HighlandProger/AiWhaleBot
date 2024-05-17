@@ -12,9 +12,6 @@ import ru.rusguardian.telegram.bot.util.constants.MessageType;
 @Component
 public class PromptCommand extends Command {
 
-//    @Autowired
-//    private AiService chatClientService;
-
     @Override
     public CommandName getType() {
         return CommandName.PROMPT;

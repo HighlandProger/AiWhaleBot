@@ -30,7 +30,7 @@ public class ExecuteTextPromptCommand extends Command {
         reply.setReplyToMessageId(TelegramUtils.getMessageId(update));
         int replyId = bot.execute(reply).getMessageId();
 
-        String response = processPromptText.process(update);
+        String response = processPromptText.prompt(update);
 
         bot.execute(getCustomEditMessage(update, response, replyId));
     }

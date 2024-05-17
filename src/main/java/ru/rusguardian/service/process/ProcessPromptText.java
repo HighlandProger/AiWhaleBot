@@ -32,8 +32,9 @@ public class ProcessPromptText {
     private final AIUserRequestService aiUserRequestService;
     private final ProcessCheckChatRequestLimit checkChatRequestLimit;
     private final ProcessUpdateUserExtraBalance updateChatBalance;
+    private final ProcessGetTextLimitExpired getTextLimitExpired;
 
-    public String process(Update update) {
+    public String prompt(Update update) {
         Chat chat = chatService.findById(TelegramUtils.getChatId(update));
         String prompt = TelegramUtils.getTextMessage(update);
         AIModel model = chat.getAiSettingsEmbedded().getAiActiveModel();
@@ -42,7 +43,7 @@ public class ProcessPromptText {
 
         //1 Check for chat limit
         if (isChatLimitExpired(chat, model)) {
-            return getLimitExpiredMessage(model);
+            return getTextLimitExpired.get(chat, model);
         }
 
         //1.5 Get messages for context
@@ -62,18 +63,13 @@ public class ProcessPromptText {
         //5 Update balance (for extra tokens)
         updateChatBalance.updateUserExtraBalance(chat, chatCompletion);
 
-
         //Choices depends on "n" in ChatCompletionRequest
         return chatCompletion.choices().get(0).message().content();
     }
 
     //1
     private boolean isChatLimitExpired(Chat chat, AIModel model) {
-        return checkChatRequestLimit.getTotalAllowedCount(chat, model) > 0;
-    }
-
-    private String getLimitExpiredMessage(AIModel model) {
-        return String.format(LIMIT_EXPIRED_MESSAGE, model.name());
+        return checkChatRequestLimit.getTotalAllowedCount(chat, model) < 0;
     }
 
     private List<OpenAiApi.ChatCompletionMessage> getPreviousChatCompletionMessages(Chat chat) {
