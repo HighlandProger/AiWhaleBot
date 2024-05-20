@@ -10,7 +10,6 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.rusguardian.bot.command.service.Command;
 import ru.rusguardian.bot.command.service.CommandName;
 import ru.rusguardian.domain.user.Chat;
-import ru.rusguardian.telegram.bot.util.constants.Telegram;
 import ru.rusguardian.telegram.bot.util.util.TelegramUtils;
 import ru.rusguardian.telegram.bot.util.util.telegram_message.SendMessageUtil;
 
@@ -43,6 +42,6 @@ public class InviteWIthButtonBlindCommand extends Command {
 
 
     private String getUrl(Long chatId) {
-        return String.format("%s%s?start=%s", Telegram.USER_PREFIX, bot.getBotUsername(), chatId);
+        return String.format("%s%s?start=%s", "https://t.me/", bot.getBotUsername(), chatId);
     }
 }
