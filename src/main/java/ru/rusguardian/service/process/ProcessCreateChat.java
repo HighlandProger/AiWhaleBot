@@ -33,6 +33,7 @@ public class ProcessCreateChat {
     @Transactional
     public Chat process(Update update) {
 
+        //TODO partner referral info
         Chat chat = new Chat();
         chat.setId(TelegramUtils.getChatId(update));
         chat.setUsername(TelegramUtils.getUsername(update));

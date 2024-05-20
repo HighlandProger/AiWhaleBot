@@ -23,7 +23,7 @@ public class ProcessGetTextUserAccount {
 
     private final AIUserRequestService userRequestService;
 
-    public String process(Chat chat, String textPattern) {
+    public String get(Chat chat, String textPattern) {
         SubscriptionEmbedded subscription = chat.getSubscriptionEmbedded();
         SubscriptionInfo subscriptionInfo = subscription.getSubscriptionInfo();
         UserBalanceEmbedded userBalance = chat.getUserBalanceEmbedded();

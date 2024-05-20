@@ -28,7 +28,7 @@ public class WelcomeCommand extends Command {
 
     private ReplyKeyboard getMainKeyboard() {
         return ReplyMarkupUtil.getReplyKeyboard(List.of(
-                List.of(CommandName.GPT_ROLES_VIEW.getViewName(), CommandName.MY_ACCOUNT_VIEW.getViewName()),
+                List.of(CommandName.GPT_ROLES_VIEW.getViewName(), CommandName.MY_ACCOUNT.getViewName()),
                 List.of(CommandName.SUBSCRIPTION_VIEW.getViewName(), CommandName.SETTINGS_VIEW.getViewName())
         ));
     }

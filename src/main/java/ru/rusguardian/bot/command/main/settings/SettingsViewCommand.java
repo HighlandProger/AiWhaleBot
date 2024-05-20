@@ -42,12 +42,12 @@ public class SettingsViewCommand extends Command {
         String smileForLanguage = AILanguage.RUSSIAN.getSmile();
 
         return new String[][][]{
-                {{"\uD83E\uDD16 Выбрать модель GPT & Claude", CommandName.CHOOSE_AI_MODEL_BLIND.getBlindName()}},
+                {{"\uD83E\uDD16 Выбрать модель GPT & Claude", CommandName.CHOOSE_AI_MODEL_BLIND_D.getBlindName()}},
                 {{"\uD83C\uDFAD Выбрать GPT - Роль", CommandName.CHOOSE_AI_ROLE_BLIND.getBlindName()}},
                 {{"\uD83C\uDFA8 Креативность ответов", CommandName.CHOOSE_TEMPERATURE_BLIND.getBlindName()}},
                 {{smileForContext + " Поддержка контекста", CommandName.SWITCH_CONTEXT_BLIND.getBlindName()}},
                 {{smileForVoice + " Голосовые ответы", CommandName.VOICE_RESPONSE_BLIND.getBlindName()}},
-                {{smileForLanguage + " Голосовые ответы", CommandName.INTERFACE_LANGUAGE_BLIND.getBlindName()}}
+                {{smileForLanguage + " Язык интерфейса", CommandName.INTERFACE_LANGUAGE_BLIND.getBlindName()}}
         };
     }
 }

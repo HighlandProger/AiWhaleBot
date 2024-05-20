@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.ai.openai.api.OpenAiAudioApi;
 import org.springframework.ai.openai.api.OpenAiImageApi;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import ru.rusguardian.constant.ai.speech.AiSpeechModel;
 import ru.rusguardian.service.ai.constant.AIModel;
@@ -15,6 +16,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +35,17 @@ public class AiService {
     public OpenAiApi.ChatCompletion getTextPromptResponse(List<OpenAiApi.ChatCompletionMessage> messages, AIModel model, float temperature, int maxTokens) {
         OpenAiApi.ChatCompletionRequest request = new OpenAiApi.ChatCompletionRequest(messages, model.getModelName(), null, null, maxTokens, null, null, null, null, null, false, temperature, null, null, null, null);
         return api.chatCompletionEntity(request).getBody();
+    }
+
+    @Async
+    public CompletableFuture<OpenAiApi.ChatCompletion> getTextPromptResponseAsync(List<OpenAiApi.ChatCompletionMessage> messages, AIModel model, float temperature, int maxTokens) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                return getTextPromptResponse(messages, model, temperature, maxTokens);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     public String getSpeechToText(File file, String language, float temperature) {

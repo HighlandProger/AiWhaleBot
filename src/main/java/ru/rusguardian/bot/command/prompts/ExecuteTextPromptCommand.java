@@ -1,6 +1,7 @@
 package ru.rusguardian.bot.command.prompts;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -13,8 +14,11 @@ import ru.rusguardian.service.process.ProcessPromptText;
 import ru.rusguardian.telegram.bot.util.util.TelegramUtils;
 import ru.rusguardian.telegram.bot.util.util.telegram_message.SendMessageUtil;
 
+import java.util.concurrent.CompletableFuture;
+
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class ExecuteTextPromptCommand extends Command {
 
     private final ProcessPromptText processPromptText;
@@ -30,9 +34,16 @@ public class ExecuteTextPromptCommand extends Command {
         reply.setReplyToMessageId(TelegramUtils.getMessageId(update));
         int replyId = bot.execute(reply).getMessageId();
 
-        String response = processPromptText.prompt(update);
+        CompletableFuture.runAsync(() -> {
+            String response = processPromptText.prompt(update);
+            try {
+                bot.execute(getCustomEditMessage(update, response, replyId));
+            } catch (TelegramApiException e) {
+                log.error(e.getMessage());
+                throw new RuntimeException(e);
+            }
+        });
 
-        bot.execute(getCustomEditMessage(update, response, replyId));
     }
 
     private EditMessageText getCustomEditMessage(Update update, String text, int messageId) {

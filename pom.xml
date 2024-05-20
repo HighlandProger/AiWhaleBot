@@ -101,6 +101,11 @@
             <version>${telegrambots.spring.boot.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>ru.rusguardian</groupId>
+            <artifactId>payment</artifactId>
+            <version>1.0.0</version>
+        </dependency>
     </dependencies>
 
     <repositories>

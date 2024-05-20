@@ -16,12 +16,12 @@ public class SubscriptionInfo {
     private SubscriptionType type;
     @Column
     private String smile;
+    @Column
+    private String name;
     @Column(name = "ru_name")
     private String ruName;
-    @Column(name = "month_cost")
-    private float monthCost;
-    @Column(name = "year_cost")
-    private float yearCost;
+    @Column(name = "price")
+    private float price;
     @Column(name = "gpt_3_day_limit")
     private int gpt3DayLimit;
     @Column(name = "gpt_4_day_limit")

@@ -11,6 +11,7 @@ import ru.rusguardian.service.data.ChatService;
 import ru.rusguardian.telegram.bot.util.util.TelegramUtils;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static ru.rusguardian.bot.command.service.CommandName.*;
@@ -45,20 +46,31 @@ public class ProcessUpdateService {
 
     private Optional<CommandName> getByBlindName(Update update) {
         if (!update.hasCallbackQuery()) return Optional.empty();
-        if (TelegramUtils.getCallbackQueryData(update).startsWith(GPT_ROLES_BLIND.getBlindName()))
-            return Optional.of(GPT_ROLES_BLIND);
+        String callback = TelegramUtils.getCallbackQueryData(update);
+
+        Optional<CommandName> blindDifOptional = getByBlindDiff(callback);
+        if (blindDifOptional.isPresent()) {
+            return blindDifOptional;
+        }
+
         return Arrays.stream(CommandName.values())
                 .filter(c -> c.getBlindName() != null)
-                .filter(c -> c.getBlindName().equals(TelegramUtils.getCallbackQueryData(update)))
+                .filter(c -> c.getBlindName().equals(callback))
                 .findFirst();
+    }
+
+    private Optional<CommandName> getByBlindDiff(String callback) {
+        List<CommandName> differableBlinds = Arrays.stream(values()).filter(c -> c.name().endsWith("_D")).toList();
+        return differableBlinds.stream().filter(d -> callback.startsWith(d.getBlindName())).findFirst();
     }
 
     private Optional<CommandName> getByViewName(Update update) {
         if (!update.hasMessage() || !update.getMessage().hasText()) return Optional.empty();
-        if (update.getMessage().getText().startsWith(START.getViewName())) return Optional.of(START);
+        String text = TelegramUtils.getTextMessage(update);
+        if (text.startsWith(START.getViewName())) return Optional.of(START);
         return Arrays.stream(CommandName.values())
                 .filter(c -> c.getViewName() != null)
-                .filter(c -> c.getViewName().equals(TelegramUtils.getTextMessage(update)))
+                .filter(c -> c.getViewName().equals(text))
                 .findFirst();
     }
 

@@ -22,7 +22,7 @@ public class GPTRolesInlineKeyboardUtil {
 
     public static final String PAGE_ACTION = "PAGE";
     public static final String ASSISTANT_TYPE_ACTION = "AS_TYPE";
-    private static final String GPT_ROLES_PREFIX = CommandName.GPT_ROLES_BLIND.getBlindName();
+    private static final String GPT_ROLES_PREFIX = CommandName.GPT_ROLES_BLIND_D.getBlindName();
     private static final List<List<AssistantRole>> assistantRolePages;
     private static final List<AssistantRole> assistantRoles = Arrays.stream(AssistantRole.values()).toList();
 

@@ -1,6 +1,7 @@
 package ru.rusguardian.service.process;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -20,10 +21,12 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ProcessPromptText {
 
     private static final String LIMIT_EXPIRED_MESSAGE = "Извините, но ваш лимит запросов на день для модели %s исчерпан. Купите подписку для увеличения лимита";
@@ -50,7 +53,13 @@ public class ProcessPromptText {
         List<OpenAiApi.ChatCompletionMessage> completionMessages = getChatCompletionMessages(chat, prompt);
 
         //2 Get Response from AI
-        OpenAiApi.ChatCompletion chatCompletion = aiService.getTextPromptResponse(completionMessages, model, temperature, maxTokens);
+        OpenAiApi.ChatCompletion chatCompletion = null;
+        try {
+            chatCompletion = aiService.getTextPromptResponseAsync(completionMessages, model, temperature, maxTokens).get();
+        } catch (InterruptedException | ExecutionException e) {
+            log.error(e.getMessage());
+            throw new RuntimeException(e);
+        }
 
         //3 Add request to database
         addAIUserRequestToDatabase(chat, chatCompletion);
@@ -81,14 +90,17 @@ public class ProcessPromptText {
 
     private List<OpenAiApi.ChatCompletionMessage> getChatCompletionMessages(Chat chat, String currentText) {
         List<OpenAiApi.ChatCompletionMessage> messages = getPreviousChatCompletionMessages(chat);
+        OpenAiApi.ChatCompletionMessage userMessage = new OpenAiApi.ChatCompletionMessage(currentText, OpenAiApi.ChatCompletionMessage.Role.USER);
 
         if (messages.isEmpty()) {
             AssistantRole role = chat.getAiSettingsEmbedded().getAssistantRole();
             messages.add(new OpenAiApi.ChatCompletionMessage(role.getPrompt(), OpenAiApi.ChatCompletionMessage.Role.SYSTEM));
+            messages.add(userMessage);
+            return messages;
         }
 
         List<OpenAiApi.ChatCompletionMessage> cuttedMessages = getCuttedMessages(chat, messages);
-        cuttedMessages.add(new OpenAiApi.ChatCompletionMessage(currentText, OpenAiApi.ChatCompletionMessage.Role.USER));
+        cuttedMessages.add(userMessage);
         return cuttedMessages;
     }
 

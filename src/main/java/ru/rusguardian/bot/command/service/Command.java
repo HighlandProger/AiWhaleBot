@@ -126,4 +126,9 @@ public abstract class Command implements BotService<CommandName> {
         return FileUtils.getTextFromFile(FileUtils.getFileFromResources2(this, path));
     }
 
+    protected void edit(EditMessageText editText) throws TelegramApiException {
+        editText.setParseMode(ParseMode.HTML);
+        bot.execute(editText);
+    }
+
 }

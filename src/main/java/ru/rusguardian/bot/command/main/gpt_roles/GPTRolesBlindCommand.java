@@ -25,7 +25,7 @@ public class GPTRolesBlindCommand extends Command implements GPTRolesDescription
 
     @Override
     public CommandName getType() {
-        return CommandName.GPT_ROLES_BLIND;
+        return CommandName.GPT_ROLES_BLIND_D;
     }
 
     @Override

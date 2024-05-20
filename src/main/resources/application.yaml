@@ -42,3 +42,12 @@ telegram:
 
 open-api:
   secret-key: type_your_value
+
+
+payment:
+  robokassa:
+    merchant-login:
+    merchant-password:
+  cryptocloud:
+    shop-id:
+    token:
