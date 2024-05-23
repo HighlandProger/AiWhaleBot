@@ -41,6 +41,7 @@ public class InviteWIthButtonBlindCommand extends Command {
     }
 
 
+    //TODO minor refactor
     private String getUrl(Long chatId) {
         return String.format("%s%s?start=%s", "https://t.me/", bot.getBotUsername(), chatId);
     }

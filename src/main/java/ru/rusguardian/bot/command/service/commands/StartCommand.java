@@ -8,7 +8,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.rusguardian.bot.command.service.Command;
 import ru.rusguardian.bot.command.service.CommandName;
 import ru.rusguardian.domain.user.Chat;
-import ru.rusguardian.service.process.ProcessCreateChat;
+import ru.rusguardian.service.process.create.ProcessCreateChat;
 import ru.rusguardian.telegram.bot.util.util.TelegramUtils;
 
 @Component

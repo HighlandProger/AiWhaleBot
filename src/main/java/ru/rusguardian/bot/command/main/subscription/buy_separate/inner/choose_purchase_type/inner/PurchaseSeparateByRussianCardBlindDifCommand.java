@@ -12,7 +12,7 @@ import ru.rusguardian.bot.command.service.Command;
 import ru.rusguardian.bot.command.service.CommandName;
 import ru.rusguardian.constant.purchase.SeparatePurchase;
 import ru.rusguardian.domain.user.Chat;
-import ru.rusguardian.service.process.ProcessCreateSeparateInvoice;
+import ru.rusguardian.service.process.create.ProcessCreateSeparateInvoice;
 import ru.rusguardian.telegram.bot.util.util.TelegramCallbackUtils;
 import ru.rusguardian.telegram.bot.util.util.telegram_message.EditMessageUtil;
 

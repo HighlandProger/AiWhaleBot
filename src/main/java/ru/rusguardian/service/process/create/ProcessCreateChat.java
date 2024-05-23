@@ -1,4 +1,4 @@
-package ru.rusguardian.service.process;
+package ru.rusguardian.service.process.create;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

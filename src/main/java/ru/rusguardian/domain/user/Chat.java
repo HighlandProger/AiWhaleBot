@@ -49,12 +49,7 @@ public class Chat {
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Embedded
-    private List<ChatCompletionMessageWrapper> messages;
-
-
-    public void setMessages(List<OpenAiApi.ChatCompletionMessage> completionMessages) {
-        this.messages = completionMessages.stream().map(ChatCompletionMessageWrapper::getWrapped).toList();
-    }
+    private List<ChatCompletionMessage> messages;
 
     public int getAllowedBySubscriptionRequestCount(AIModel.BalanceType balanceType) {
         SubscriptionInfo subscriptionInfo = this.getSubscriptionEmbedded().getSubscriptionInfo();

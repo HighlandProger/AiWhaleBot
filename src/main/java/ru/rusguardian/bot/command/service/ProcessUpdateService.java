@@ -60,18 +60,29 @@ public class ProcessUpdateService {
     }
 
     private Optional<CommandName> getByBlindDiff(String callback) {
-        List<CommandName> differableBlinds = Arrays.stream(values()).filter(c -> c.name().endsWith("_D")).toList();
+        List<CommandName> differableBlinds = Arrays.stream(values()).filter(c -> c.name().endsWith("BLIND_D")).toList();
         return differableBlinds.stream().filter(d -> callback.startsWith(d.getBlindName())).findFirst();
     }
 
     private Optional<CommandName> getByViewName(Update update) {
         if (!update.hasMessage() || !update.getMessage().hasText()) return Optional.empty();
         String text = TelegramUtils.getTextMessage(update);
+
+        Optional<CommandName> viewDifOptional = getByViewDiff(text);
+        if (viewDifOptional.isPresent()) {
+            return viewDifOptional;
+        }
+
         if (text.startsWith(START.getViewName())) return Optional.of(START);
         return Arrays.stream(CommandName.values())
                 .filter(c -> c.getViewName() != null)
                 .filter(c -> c.getViewName().equals(text))
                 .findFirst();
+    }
+
+    private Optional<CommandName> getByViewDiff(String callback) {
+        List<CommandName> differableViews = Arrays.stream(values()).filter(c -> c.name().endsWith("VIEW_D")).toList();
+        return differableViews.stream().filter(d -> callback.startsWith(d.getViewName())).findFirst();
     }
 
     private Optional<CommandName> findCommandByNextCommand(Update update) {

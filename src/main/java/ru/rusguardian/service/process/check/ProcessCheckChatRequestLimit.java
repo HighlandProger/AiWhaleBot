@@ -1,4 +1,4 @@
-package ru.rusguardian.service.process;
+package ru.rusguardian.service.process.check;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -37,7 +37,7 @@ public class ProcessCheckChatRequestLimit {
         int subscriptionMinusUsedCount = getSubscriptionMinusUsedCount(chat, model);
         AIModel.BalanceType balanceType = model.getBalanceType();
 
-        if (balanceType == AIModel.BalanceType.GPT_3){
+        if (balanceType == AIModel.BalanceType.GPT_3) {
             int extraForSubscriptionCount = isChatHasSubscriptions(chat) ? 5 : 0;
             return subscriptionMinusUsedCount + extraForSubscriptionCount;
         }
@@ -53,8 +53,8 @@ public class ProcessCheckChatRequestLimit {
         return subscriptionMinusUsedCount;
     }
 
-    //TODO
-    public boolean isChatHasSubscriptions(Chat chat){
+    //TODO functional checkSubscription
+    public boolean isChatHasSubscriptions(Chat chat) {
         return false;
     }
 }

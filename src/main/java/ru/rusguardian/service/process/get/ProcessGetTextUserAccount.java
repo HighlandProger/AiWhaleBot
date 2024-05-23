@@ -1,4 +1,4 @@
-package ru.rusguardian.service.process;
+package ru.rusguardian.service.process.get;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

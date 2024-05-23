@@ -1,4 +1,4 @@
-package ru.rusguardian.service.process;
+package ru.rusguardian.service.process.create;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,7 +29,7 @@ public class ProcessCreateSeparateInvoice {
         return url;
     }
 
-    //TODO
+    //TODO functional paySelection
     public URL getPayselectionInvoiceUrl() {
         return null;
     }

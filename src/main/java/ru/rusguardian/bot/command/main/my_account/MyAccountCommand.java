@@ -9,7 +9,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.rusguardian.bot.command.service.Command;
 import ru.rusguardian.bot.command.service.CommandName;
 import ru.rusguardian.domain.user.Chat;
-import ru.rusguardian.service.process.ProcessGetTextUserAccount;
+import ru.rusguardian.service.process.get.ProcessGetTextUserAccount;
 
 import java.util.List;
 

@@ -68,6 +68,8 @@ public enum CommandName {
     //PROMPTS
     PROMPT(),
     EXECUTE_TEXT_PROMPT(),
+    OBTAIN_IMAGE_PROMPT_VIEW_D("/img"),
+    EXECUTE_IMAGE_PROMPT_BLIND_D(),
     EXECUTE_VOICE_PROMPT(),
 
     //ADMIN
