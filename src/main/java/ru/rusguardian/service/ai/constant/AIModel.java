@@ -27,7 +27,7 @@ public enum AIModel {
     STABLE_DIFFUSION(null, BalanceType.IMAGE, "???"),
     MIDJOURNEY(null, BalanceType.IMAGE, "???"),
     WHISPER(OPEN_AI, null, "whisper-1"),
-    TTS(OPEN_AI, null, "tts"),
+    TTS(OPEN_AI, null, "tts-1"),
     CLAUDE_3_OPUS(ANTHROPIC, BalanceType.CLAUDE, "claude-3-opus-20240229"),
     CLAUDE_3_SONNET(ANTHROPIC, BalanceType.CLAUDE, "claude-3-sonnet-20240229"),
     CLAUDE_3_HAIKU(ANTHROPIC, BalanceType.CLAUDE, "claude-3-haiku-20240307"),

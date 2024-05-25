@@ -1,10 +1,8 @@
 package ru.rusguardian.domain.user;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.Data;
+import ru.rusguardian.constant.purchase.PurchaseProvider;
 import ru.rusguardian.domain.SubscriptionInfo;
 
 import java.time.LocalDateTime;
@@ -20,7 +18,8 @@ public class SubscriptionEmbedded {
     private LocalDateTime purchaseTime;
     @Column(name = "expiration_date")
     private LocalDateTime expirationTime;
+    @Enumerated(EnumType.STRING)
     @Column(name = "purchase_type")
-    private String purchaseType;
+    private PurchaseProvider purchaseType;
 
 }

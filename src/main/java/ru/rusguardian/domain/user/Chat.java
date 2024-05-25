@@ -2,7 +2,6 @@ package ru.rusguardian.domain.user;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import org.springframework.ai.openai.api.OpenAiApi;
 import ru.rusguardian.bot.command.service.CommandName;
 import ru.rusguardian.domain.SubscriptionInfo;
 import ru.rusguardian.service.ai.constant.AIModel;

@@ -9,13 +9,14 @@ import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.repository.ChatRepository;
 import ru.rusguardian.service.data.abstr.CrudService;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class ChatService extends CrudService<Chat, Long> {
 
     private final ChatRepository chatRepository;
-
 
     public void updateNextCommand(Long chatId, CommandName commandName) {
         log.debug("Updating chat with id = {} to next command = {}", chatId, commandName);
@@ -35,5 +36,9 @@ public class ChatService extends CrudService<Chat, Long> {
     @Override
     protected JpaRepository<Chat, Long> getRepository() {
         return chatRepository;
+    }
+
+    public List<Chat> findAllReferrals(Long chatId) {
+        return chatRepository.findByInvitedBy(chatId);
     }
 }

@@ -17,13 +17,13 @@ import static ru.rusguardian.bot.command.service.CommandName.*;
 
 @Component
 @RequiredArgsConstructor
-public class ChoosePurchaseTypeBlindDifCommand extends Command {
+public class ChooseSeparatePurchaseTypeBlindDifCommand extends Command {
 
-    private static final String FILE_PATH = "text/subscription/buy_separate/purchase/";
+    private static final String FILE_PATH = "text/subscription/purchase/";
 
     @Override
     public CommandName getType() {
-        return CommandName.CHS_PURCH_TYPE_BLIND_D;
+        return CommandName.CHS_SEP_PURCH_TYPE_BLIND_D;
     }
 
     @Override

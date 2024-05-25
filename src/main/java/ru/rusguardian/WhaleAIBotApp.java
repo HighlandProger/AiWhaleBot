@@ -9,15 +9,31 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 @SpringBootApplication
 public class WhaleAIBotApp {
 
-    @Autowired
-    private static ApplicationContext context;
-
     public static void main(String[] args) throws TelegramApiException {
         SpringApplication.run(WhaleAIBotApp.class, "");
 
-    }
+        /*TODO list:
 
-    public void run() throws TelegramApiException {
+        - add payment check
+
+        - add Claude integration
+        - add StableDiffusion integration
+        - add Midjourney integration
+        - add Gemini integration
+
+        - change voice response for user
+        - add voice response for user
+
+        - change temperature feature
+        - remove context feature
+
+        - change language feature
+        - add different language files
+
+        - add prompts to AiRole
+        - minor user naming for AIModel, AiRole, SubscriptionType
+
+         */
 
     }
 }

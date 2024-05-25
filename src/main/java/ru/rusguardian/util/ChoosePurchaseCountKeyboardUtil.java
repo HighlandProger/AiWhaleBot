@@ -29,23 +29,15 @@ public class ChoosePurchaseCountKeyboardUtil {
     }
 
     private static String getButtonText(SeparatePurchase separatePurchase) {
-        switch (separatePurchase.getBalanceType()) {
-            case GPT_4:
-            case IMAGE: {
-                return separatePurchase.getCount() + " запросов - $" + separatePurchase.getPrice();
-            }
-            case MUSIC: {
-                return separatePurchase.getCount() + " песен - $" + separatePurchase.getPrice();
-            }
-            case CLAUDE: {
-                return separatePurchase.getCount() / 1000000 + " млн токенов - $" + separatePurchase.getPrice();
-            }
-            default:
-                throw new RuntimeException("Not supported balance type");
-        }
+        return switch (separatePurchase.getBalanceType()) {
+            case GPT_4, IMAGE -> separatePurchase.getCount() + " запросов - $" + separatePurchase.getPrice();
+            case MUSIC -> separatePurchase.getCount() + " песен - $" + separatePurchase.getPrice();
+            case CLAUDE -> separatePurchase.getCount() / 1000000 + " млн токенов - $" + separatePurchase.getPrice();
+            default -> throw new RuntimeException("Not supported balance type");
+        };
     }
 
     private static String getCallback(SeparatePurchase separatePurchase) {
-        return TelegramCallbackUtils.getCallbackWithArgs(CHS_PURCH_TYPE_BLIND_D.getBlindName(), separatePurchase.name());
+        return TelegramCallbackUtils.getCallbackWithArgs(CHS_SEP_PURCH_TYPE_BLIND_D.getBlindName(), separatePurchase.name());
     }
 }

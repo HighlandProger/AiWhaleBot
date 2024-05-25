@@ -15,7 +15,7 @@ public enum PartnerLevel {
     private final String name;
     private final int percentsOfPurchase;
 
-    PartnerLevel getByPurchaseBalance(double balance) {
+    public static PartnerLevel getByPurchaseBalance(double balance) {
 
         if (balance >= 0 && balance < 501) return STANDARD;
         if (balance >= 501 && balance < 1001) return SILVER;

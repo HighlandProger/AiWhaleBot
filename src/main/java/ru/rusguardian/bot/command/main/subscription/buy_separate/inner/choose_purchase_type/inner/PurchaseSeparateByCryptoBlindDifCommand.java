@@ -12,7 +12,7 @@ import ru.rusguardian.bot.command.service.Command;
 import ru.rusguardian.bot.command.service.CommandName;
 import ru.rusguardian.constant.purchase.SeparatePurchase;
 import ru.rusguardian.domain.user.Chat;
-import ru.rusguardian.service.process.create.ProcessCreateSeparateInvoice;
+import ru.rusguardian.service.process.create.ProcessCreateInvoice;
 import ru.rusguardian.telegram.bot.util.util.TelegramCallbackUtils;
 import ru.rusguardian.telegram.bot.util.util.telegram_message.EditMessageUtil;
 
@@ -23,8 +23,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PurchaseSeparateByCryptoBlindDifCommand extends Command {
 
-    private static final String FILE_PATH = "text/subscription/buy_separate/purchase/info/";
-    private final ProcessCreateSeparateInvoice createSeparateInvoice;
+    private static final String FILE_PATH = "text/subscription/purchase/info_separate/";
+    private final ProcessCreateInvoice createSeparateInvoice;
 
     @Override
     public CommandName getType() {
@@ -36,7 +36,7 @@ public class PurchaseSeparateByCryptoBlindDifCommand extends Command {
         SeparatePurchase separatePurchase = SeparatePurchase.valueOf(TelegramCallbackUtils.getArgFromCallback(update, 1));
 
         EditMessageText edit = EditMessageUtil.getMessageText(update, getText(update, separatePurchase));
-        edit.setReplyMarkup(getKeyboard(separatePurchase));
+        edit.setReplyMarkup(getKeyboard(getChat(update), separatePurchase));
         edit.setParseMode(ParseMode.HTML);
 
         bot.execute(edit);
@@ -47,11 +47,11 @@ public class PurchaseSeparateByCryptoBlindDifCommand extends Command {
         return MessageFormat.format(getTextFromFileByChatLanguage(FILE_PATH, chat), separatePurchase.getBalanceType().name());
     }
 
-    private InlineKeyboardMarkup getKeyboard(SeparatePurchase separatePurchase) {
+    private InlineKeyboardMarkup getKeyboard(Chat chat, SeparatePurchase separatePurchase) {
         InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
         InlineKeyboardButton button = new InlineKeyboardButton();
         button.setText("Перейти к оплате");
-        button.setUrl(createSeparateInvoice.getCryptocloudInvoiceUrl(separatePurchase).toString());
+        button.setUrl(createSeparateInvoice.getCryptocloudInvoiceUrl(chat, separatePurchase).toString());
         keyboard.setKeyboard(List.of(List.of(button)));
         return keyboard;
     }

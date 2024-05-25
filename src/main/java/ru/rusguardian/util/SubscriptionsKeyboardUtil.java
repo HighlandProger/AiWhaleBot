@@ -3,9 +3,9 @@ package ru.rusguardian.util;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import ru.rusguardian.bot.command.main.subscription.Type;
-import ru.rusguardian.bot.command.service.CommandName;
 import ru.rusguardian.domain.SubscriptionInfo;
 import ru.rusguardian.telegram.bot.util.constants.Callback;
+import ru.rusguardian.telegram.bot.util.util.TelegramCallbackUtils;
 import ru.rusguardian.telegram.bot.util.util.telegram_message.ReplyMarkupUtil;
 
 import java.util.Collections;
@@ -20,7 +20,7 @@ public class SubscriptionsKeyboardUtil {
 
     public static InlineKeyboardMarkup getKeyboard(Type currentType, List<SubscriptionInfo> subscriptionInfos) {
         InlineKeyboardMarkup head = getChangeTypeButtons(currentType);
-        InlineKeyboardMarkup subscriptions = getSubscriptionButtons(subscriptionInfos);
+        InlineKeyboardMarkup subscriptions = getSubscriptionButtons(currentType, subscriptionInfos);
         InlineKeyboardMarkup separately = getSeparatelyBuyButtons();
 
         return ReplyMarkupUtil.getMergedKeyboard(head, subscriptions, separately);
@@ -38,10 +38,12 @@ public class SubscriptionsKeyboardUtil {
         });
     }
 
-    private static InlineKeyboardMarkup getSubscriptionButtons(List<SubscriptionInfo> subscriptionInfos) {
+    private static InlineKeyboardMarkup getSubscriptionButtons(Type currentType, List<SubscriptionInfo> subscriptionInfos) {
+
         Collections.reverse(subscriptionInfos);
         return new InlineKeyboardMarkup(subscriptionInfos.stream()
                 .distinct()
+                .filter(el -> el.getType().getTimeType() == currentType)
                 .map(el -> {
                     InlineKeyboardButton button = new InlineKeyboardButton();
                     button.setText(getSubscriptionInfoString(el));
@@ -58,9 +60,8 @@ public class SubscriptionsKeyboardUtil {
         });
     }
 
-    //TODO
     private static String getBuySubscriptionCommand(SubscriptionInfo info) {
-        return CommandName.EMPTY.getBlindName();
+        return TelegramCallbackUtils.getCallbackWithArgs(CHS_SUBS_PURCH_TYPE_BLIND_D.getBlindName(), info.getType().name());
     }
 
     //TODO refactor

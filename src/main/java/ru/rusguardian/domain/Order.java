@@ -5,6 +5,7 @@ import lombok.*;
 import ru.rusguardian.constant.purchase.PurchaseProvider;
 import ru.rusguardian.constant.purchase.SeparatePurchase;
 import ru.rusguardian.constant.user.SubscriptionType;
+import ru.rusguardian.domain.user.Chat;
 
 import java.time.LocalDateTime;
 
@@ -21,10 +22,13 @@ public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @ManyToOne
+    @JoinColumn(name = "chat_id")
+    private Chat chat;
     @Column
     private String info;
     @Column
-    private float price;
+    private double price;
     @Enumerated(EnumType.STRING)
     @Column(name = "purchase_provider")
     private PurchaseProvider purchaseProvider;
@@ -42,19 +46,23 @@ public class Order {
     private String invoiceUrl;
     @Column(name = "is_purchased")
     private boolean isPurchased;
+    @Column(name = "partner_income")
+    private Double partnerIncome;
 
-    public Order(PurchaseProvider purchaseProvider, SeparatePurchase separatePurchase) {
+    public Order(Chat chat, PurchaseProvider purchaseProvider, SeparatePurchase separatePurchase) {
         this.info = separatePurchase.name();
         this.price = separatePurchase.getPrice();
+        this.chat = chat;
         this.purchaseProvider = purchaseProvider;
         this.separatePurchase = separatePurchase;
         this.createdAt = LocalDateTime.now();
         this.isPurchased = false;
     }
 
-    public Order(PurchaseProvider provider, SubscriptionInfo subscriptionInfo) {
+    public Order(Chat chat, PurchaseProvider provider, SubscriptionInfo subscriptionInfo) {
         this.info = subscriptionInfo.getName();
         this.price = subscriptionInfo.getPrice();
+        this.chat = chat;
         this.purchaseProvider = provider;
         this.subscriptionType = subscriptionInfo.getType();
         this.createdAt = LocalDateTime.now();

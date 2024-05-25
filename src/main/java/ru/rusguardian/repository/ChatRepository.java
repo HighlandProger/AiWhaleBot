@@ -8,6 +8,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ru.rusguardian.domain.user.Chat;
 
+import java.util.List;
+
 @Repository
 public interface ChatRepository extends JpaRepository<Chat, Long> {
 
@@ -26,4 +28,7 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
 
     @Query(value = "SELECT id FROM ncs_bot.chats WHERE message_thread_id = :message_thread_id", nativeQuery = true)
     Long findIdByMessageThreadId(@Param("message_thread_id") Integer messageThreadId);
+
+    @Query("SELECT c FROM Chat c WHERE c.partnerEmbeddedInfo.invitedBy.id = :invitedById")
+    List<Chat> findByInvitedBy(@Param("invitedById") Long id);
 }

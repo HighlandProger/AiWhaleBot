@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.rusguardian.constant.ai.AssistantRole;
-import ru.rusguardian.constant.user.PartnerLevel;
 import ru.rusguardian.constant.user.SubscriptionType;
 import ru.rusguardian.domain.SubscriptionInfo;
 import ru.rusguardian.domain.user.*;
@@ -75,13 +74,8 @@ public class ProcessCreateChat {
     private PartnerEmbedded getPartner(Update update) {
 
         PartnerEmbedded partner = new PartnerEmbedded();
-        partner.setPartnerLevel(PartnerLevel.STANDARD);
         partner.setBalance(0);
         partner.setInvitedBy(getInvitedBy(update));
-        partner.setReferralsCount(0);
-        partner.setReferralsPurchaseValue(0);
-        partner.setReferralsExtraPurchaseCount(0);
-        partner.setReferralsSubscriptionsPurchaseCount(0);
 
         return partner;
     }

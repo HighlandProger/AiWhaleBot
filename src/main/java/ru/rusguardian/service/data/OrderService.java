@@ -7,6 +7,8 @@ import ru.rusguardian.domain.Order;
 import ru.rusguardian.repository.OrderRepository;
 import ru.rusguardian.service.data.abstr.CrudService;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class OrderService extends CrudService<Order, Long> {
@@ -22,5 +24,13 @@ public class OrderService extends CrudService<Order, Long> {
     @Override
     protected JpaRepository<Order, Long> getRepository() {
         return orderRepository;
+    }
+
+    public void setPurchased(Long orderId) {
+        orderRepository.setOrderAsPurchased(orderId);
+    }
+
+    public List<Order> findAllPurchasedReferralsOrders(List<Long> referralsIds) {
+        return orderRepository.findOrdersByIsPurchasedAndChatIdIn(true, referralsIds);
     }
 }
