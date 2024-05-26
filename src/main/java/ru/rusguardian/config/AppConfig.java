@@ -36,6 +36,12 @@ public class AppConfig {
     }
 
     @Bean
+    public WebClient stablediffusionWebClient() {
+        return WebClient.builder()
+                .build();
+    }
+
+    @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();
     }

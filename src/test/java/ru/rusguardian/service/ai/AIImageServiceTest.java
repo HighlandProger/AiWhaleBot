@@ -13,8 +13,9 @@ import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.rusguardian.service.ai.constant.AIModel;
-import ru.rusguardian.service.ai.dto.open_ai.image.OpenAiImageRequestDto;
-import ru.rusguardian.service.ai.dto.open_ai.image.OpenAiImageResponseDto;
+import ru.rusguardian.service.ai.dto.midjourney.image.MidjourneyTextToImageRequestDto;
+import ru.rusguardian.service.ai.dto.open_ai.image.OpenAiTextToImageRequestDto;
+import ru.rusguardian.service.ai.dto.open_ai.image.OpenAiTextToImageResponseDto;
 import ru.rusguardian.telegram.bot.util.util.telegram_message.InputFileUtil;
 
 import java.util.List;
@@ -35,10 +36,13 @@ class AIImageServiceTest {
     @Test
     void getImageUrlFromText() throws InterruptedException {
 
-        imageService.getImageUrl(324L, AIModel.DALL_E_2, "белый котенок").thenAccept(url -> {
+        MidjourneyTextToImageRequestDto dto = new MidjourneyTextToImageRequestDto();
+        dto.setImagine("белый котенок");
+
+        imageService.getMidjourneyImageUrl(dto).thenAccept(response -> {
             System.out.println("end of request");
 
-            InputFile inputFile = InputFileUtil.getInputFileFromURL(url);
+            InputFile inputFile = InputFileUtil.getInputFileFromURL(response.getUrl());
             SendPhoto photo = SendPhoto.builder().photo(inputFile).chatId(366902969L).build();
             try {
                 bot.execute(photo);
@@ -56,12 +60,12 @@ class AIImageServiceTest {
 
     @Test
     void test() {
-        OpenAiImageRequestDto requestDto = new OpenAiImageRequestDto(AIModel.DALL_E_2.getModelName(), "белый котенок", 1, "1024x1024", "1");
+        OpenAiTextToImageRequestDto requestDto = new OpenAiTextToImageRequestDto(AIModel.DALL_E_2.getModelName(), "белый котенок", 1, "1024x1024", "1");
 
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.put("Authorization", List.of(token));
-        HttpEntity<OpenAiImageRequestDto> request = new HttpEntity<>(requestDto, map);
-        ResponseEntity<OpenAiImageResponseDto> responseDto = restTemplate.postForEntity("https://api.openai.com/v1/images/generations", request, OpenAiImageResponseDto.class);
+        HttpEntity<OpenAiTextToImageRequestDto> request = new HttpEntity<>(requestDto, map);
+        ResponseEntity<OpenAiTextToImageResponseDto> responseDto = restTemplate.postForEntity("https://api.openai.com/v1/images/generations", request, OpenAiTextToImageResponseDto.class);
 
         System.out.println(responseDto.getBody());
     }

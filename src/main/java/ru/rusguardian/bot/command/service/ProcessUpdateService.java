@@ -73,6 +73,10 @@ public class ProcessUpdateService {
             return viewDifOptional;
         }
 
+        if (update.getMessage().isCommand()) {
+            return Optional.of(TEXT_COMMAND_DISTRIBUTOR);
+        }
+
         if (text.startsWith(START.getViewName())) return Optional.of(START);
         return Arrays.stream(CommandName.values())
                 .filter(c -> c.getViewName() != null)

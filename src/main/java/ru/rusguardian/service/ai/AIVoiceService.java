@@ -68,6 +68,7 @@ public class AIVoiceService {
     @Async
     public CompletableFuture<File> getTextToSpeech(OpenAiCreateSpeechRequestDto dto) {
 
+        String fileFormat = dto.getResponseFormat() == null ? "mp3" : dto.getResponseFormat();
         return webClient.post()
                 .uri(CREATE_SPEECH_URL)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -76,8 +77,7 @@ public class AIVoiceService {
                 .bodyToMono(Resource.class)
                 .toFuture().thenApply(res -> {
                     try {
-                        //TODO minor functional refactor for response type
-                        return FileUtils.getTempFileFromBytes(res.getContentAsByteArray(), "mp3");
+                        return FileUtils.getTempFileFromBytes(res.getContentAsByteArray(), fileFormat);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }

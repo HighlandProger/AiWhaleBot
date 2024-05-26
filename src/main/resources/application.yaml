@@ -47,6 +47,9 @@ midjourney:
   key: type_your_value
   secret: type_your_value
 
+stable-diffusion:
+  key: type_your_value
+
 payment:
   robokassa:
     merchant-login:

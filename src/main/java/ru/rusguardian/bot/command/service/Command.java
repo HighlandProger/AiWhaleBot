@@ -32,7 +32,7 @@ public abstract class Command implements BotService<CommandName> {
     @Value("${telegram.owner.chat.id}")
     private String ownerChatId;
     @Autowired
-    private ErrorCommand errorCommand;
+    protected ErrorCommand errorCommand;
 
     @Autowired
     @Getter
@@ -109,16 +109,6 @@ public abstract class Command implements BotService<CommandName> {
 
     protected String getTextFromFileInResources(String fileName) {
         return FileUtils.getTextFromFile(FileUtils.getFileFromResources2(this, fileName));
-    }
-
-    protected void editMessageWithMarkdown(Update update, String text, int messageId) throws TelegramApiException {
-        EditMessageText edit = new EditMessageText();
-        edit.setChatId(TelegramUtils.getChatId(update));
-        edit.setMessageId(messageId);
-        edit.setText(text);
-        edit.setParseMode(ParseMode.MARKDOWN);
-
-        bot.execute(edit);
     }
 
     protected String getTextFromFileByChatLanguage(String filePath, Chat chat) {

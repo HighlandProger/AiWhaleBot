@@ -10,7 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class OpenAiImageResponseDto {
+public class OpenAiTextToImageResponseDto {
 
     private long created;
     private List<Data> data;

@@ -51,8 +51,10 @@ public class ExecuteImagePromptViewDifCommand extends PromptCommand {
         if (!isChatLimitExpired) {
             processPromptImage.processUrl(chat, model, prompt).thenAccept(url ->
                     sendResponseToUser(url, chat.getId(), model.getModelName(), prompt)
-            ).exceptionally(e -> {
-                throw new RuntimeException(e);
+            ).exceptionally(ex -> {
+                log.error("EXCEPTION DURING EXECUTING ProcessPromptImage. Model: {}, prompt: {}, ExMessage: {}", model, prompt, ex.getMessage());
+                errorCommand.execute(update);
+                throw new RuntimeException(ex);
             });
         }
 

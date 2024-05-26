@@ -14,6 +14,7 @@ public enum CommandName {
     EMPTY(null, "/empty"),
     MAIN_MENU("\uD83C\uDFE0 В главное меню", "/mainMenu"),
     ERROR("ERROR", "/error"),
+    TEXT_COMMAND_DISTRIBUTOR(),
 
     //START
     WELCOME(),
@@ -63,7 +64,9 @@ public enum CommandName {
 
     //MY_ACCOUNT
     //SETTINGS(),
-    PARTNER_CABINET_BLIND("\uD83D\uDCBC Кабинет Партнера"),
+    PARTNER_CABINET_VIEW("\uD83D\uDCBC Кабинет Партнера"),
+    PARTNER_CABINET_BLIND(PARTNER_CABINET_VIEW.viewName),
+
     //PARTNER
     INVITE_WITH_BUTTON_BLIND("✉\uFE0F Приглашение с кнопкой"),
     CASH_OUT_BLIND("\uD83D\uDCE5 Вывести"),

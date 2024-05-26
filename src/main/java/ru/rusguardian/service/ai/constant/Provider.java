@@ -6,5 +6,6 @@ public enum Provider {
     ANTHROPIC(),
     GOOGLE(),
     MIDJOURNEY(),
+    STABLE_DIFFUSION(),
     UNKNOWN(),
 }

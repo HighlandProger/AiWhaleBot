@@ -1,16 +1,19 @@
 package ru.rusguardian.service.ai.dto.open_ai.image;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
+@NoArgsConstructor
 @Data
-public class OpenAiImageRequestDto {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class OpenAiTextToImageRequestDto {
 
-    //TODO minor add all types by documentation
     private String model;
     private String prompt;
-    private int n;
+    private Integer n;
     private String size;
     private String user;
 }
