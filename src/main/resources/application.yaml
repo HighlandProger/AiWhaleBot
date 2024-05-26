@@ -43,6 +43,9 @@ telegram:
 open-api:
   secret-key: type_your_value
 
+midjourney:
+  key: type_your_value
+  secret: type_your_value
 
 payment:
   robokassa:

@@ -25,7 +25,7 @@ public enum AIModel {
     DALL_E_2(OPEN_AI, BalanceType.IMAGE, "dall-e-2"),
     DALL_E_3(OPEN_AI, BalanceType.IMAGE, "dall-e-3"),
     STABLE_DIFFUSION(null, BalanceType.IMAGE, "???"),
-    MIDJOURNEY(null, BalanceType.IMAGE, "???"),
+    MIDJOURNEY(Provider.MIDJOURNEY, BalanceType.IMAGE, "Midjourney"),
     WHISPER(OPEN_AI, null, "whisper-1"),
     TTS(OPEN_AI, null, "tts-1"),
     CLAUDE_3_OPUS(ANTHROPIC, BalanceType.CLAUDE, "claude-3-opus-20240229"),

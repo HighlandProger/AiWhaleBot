@@ -1,4 +1,4 @@
-package ru.rusguardian.service.ai.dto.voice;
+package ru.rusguardian.service.ai.dto.open_ai.voice;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.DecimalMax;

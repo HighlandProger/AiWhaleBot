@@ -39,7 +39,7 @@ public enum CommandName {
     CHOOSE_AI_ROLE_BLIND(null),
     CHOOSE_TEMPERATURE_BLIND(null),
     SWITCH_CONTEXT_BLIND(null),
-    VOICE_RESPONSE_BLIND(null),
+    SWITCH_VOICE_RESPONSE_BLIND(null),
     INTERFACE_LANGUAGE_BLIND(null),
 
     //PURCHASE

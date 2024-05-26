@@ -6,8 +6,8 @@ import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import ru.rusguardian.service.ai.dto.text.OpenAiTextRequestDto;
-import ru.rusguardian.service.ai.dto.text.OpenAiTextResponseDto;
+import ru.rusguardian.service.ai.dto.open_ai.text.OpenAiTextRequestDto;
+import ru.rusguardian.service.ai.dto.open_ai.text.OpenAiTextResponseDto;
 
 import java.util.concurrent.CompletableFuture;
 

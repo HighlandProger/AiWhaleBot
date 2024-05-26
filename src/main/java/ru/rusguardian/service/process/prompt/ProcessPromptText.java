@@ -4,14 +4,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import ru.rusguardian.constant.ai.AssistantRole;
+import ru.rusguardian.domain.ChatCompletionMessage;
 import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.service.ai.AITextService;
 import ru.rusguardian.service.ai.constant.AIRequestSetting;
 import ru.rusguardian.service.ai.constant.Role;
-import ru.rusguardian.service.ai.dto.text.MessageDto;
-import ru.rusguardian.service.ai.dto.text.OpenAiTextRequestDto;
-import ru.rusguardian.service.ai.dto.text.OpenAiTextResponseDto;
+import ru.rusguardian.service.ai.dto.open_ai.text.MessageDto;
+import ru.rusguardian.service.ai.dto.open_ai.text.OpenAiTextRequestDto;
+import ru.rusguardian.service.data.ChatCompletionMessageService;
 import ru.rusguardian.service.process.transactional.ProcessTransactionalAITextRequestUpdate;
 
 import java.util.ArrayList;
@@ -26,14 +26,16 @@ public class ProcessPromptText {
 
     private final AITextService aiTextService;
     private final ProcessTransactionalAITextRequestUpdate transactionalAITextRequestUpdate;
+    private final ChatCompletionMessageService chatCompletionMessageService;
 
     @Async
-    public CompletableFuture<OpenAiTextResponseDto> process(Chat chat, String prompt) {
+    public CompletableFuture<String> process(Chat chat, String prompt) {
 
-        return aiTextService.getText(getRequestDto(chat, prompt))
-                .thenCompose(responseDto -> {
-                    transactionalAITextRequestUpdate.update(chat, responseDto);
-                    return CompletableFuture.completedFuture(responseDto);
+        OpenAiTextRequestDto requestDto = getRequestDto(chat, prompt);
+        return aiTextService.getText(requestDto)
+                .thenApply(responseDto -> {
+                    transactionalAITextRequestUpdate.update(chat, prompt, responseDto);
+                    return responseDto.getChoices().get(0).getMessage().getContent();
                 });
     }
 
@@ -43,6 +45,7 @@ public class ProcessPromptText {
         dto.setMaxTokens(getChatMaxTokens(chat));
         dto.setTemperature(chat.getAiSettingsEmbedded().getTemperature());
         dto.setMessages(getChatMessages(chat, prompt));
+        dto.setUser((String.valueOf(chat.getId())));
 
         return dto;
     }
@@ -56,9 +59,8 @@ public class ProcessPromptText {
         MessageDto userMessage = new MessageDto(prompt, Role.USER.getValue());
 
         if (messages.isEmpty()) {
-            AssistantRole role = chat.getAiSettingsEmbedded().getAssistantRole();
-            messages.add(new MessageDto(role.getPrompt(), Role.SYSTEM.getValue()));
-            messages.add(userMessage);
+            ChatCompletionMessage systemMessage = createSystemChatCompletionMessage(chat);
+            messages.add(new MessageDto(systemMessage));
             return messages;
         }
 
@@ -67,11 +69,20 @@ public class ProcessPromptText {
         return cuttedMessages;
     }
 
+    private ChatCompletionMessage createSystemChatCompletionMessage(Chat chat) {
+        ChatCompletionMessage systemMessage = new ChatCompletionMessage();
+        systemMessage.setChat(chat);
+        systemMessage.setRole(Role.SYSTEM);
+        systemMessage.setMessage(chat.getAiSettingsEmbedded().getAssistantRole().getDescription());
+        return chatCompletionMessageService.save(systemMessage);
+    }
+
     private List<MessageDto> getPreviousChatCompletionMessages(Chat chat) {
         if (!chat.getAiSettingsEmbedded().isContextEnabled()) {
             return new ArrayList<>();
         }
-        return chat.getMessages().stream().map(MessageDto::new).toList();
+        List<ChatCompletionMessage> messages = chatCompletionMessageService.findByChatId(chat.getId());
+        return new ArrayList<>(messages.stream().map(MessageDto::new).toList());
     }
 
     private List<MessageDto> getCuttedMessages(Chat chat, List<MessageDto> messages) {

@@ -40,8 +40,7 @@ public class ExecuteVoicePromptCommand extends PromptCommand {
 
         if (!isChatLimitExpired(chat, model)) {
             //TODO functional. Voice response support
-            processPromptVoice.processTextResponse(chat, voiceFile).thenAccept(responseDto -> {
-                String response = responseDto.getChoices().get(0).getMessage().getContent();
+            processPromptVoice.processTextResponse(chat, voiceFile).thenAccept(response -> {
                 try {
                     bot.execute(getEditMessageWithResponse(chat.getId(), response, replyId));
                 } catch (TelegramApiException e) {

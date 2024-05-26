@@ -1,4 +1,4 @@
-package ru.rusguardian.service.ai.dto.image;
+package ru.rusguardian.service.ai.dto.open_ai.image;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

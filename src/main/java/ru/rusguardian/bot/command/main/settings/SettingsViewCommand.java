@@ -2,7 +2,6 @@ package ru.rusguardian.bot.command.main.settings;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -30,7 +29,6 @@ public class SettingsViewCommand extends Command {
 
         SendMessage message = SendMessageUtil.getSimple(update, getTextFromFileByChatLanguage(FILE_PATH, chat));
         message.setReplyMarkup(ReplyMarkupUtil.getInlineKeyboard(getButtons(chat)));
-        message.setParseMode(ParseMode.MARKDOWN);
 
         sendMessage(message);
     }
@@ -46,7 +44,7 @@ public class SettingsViewCommand extends Command {
                 {{"\uD83C\uDFAD Выбрать GPT - Роль", CommandName.CHOOSE_AI_ROLE_BLIND.getBlindName()}},
                 {{"\uD83C\uDFA8 Креативность ответов", CommandName.CHOOSE_TEMPERATURE_BLIND.getBlindName()}},
                 {{smileForContext + " Поддержка контекста", CommandName.SWITCH_CONTEXT_BLIND.getBlindName()}},
-                {{smileForVoice + " Голосовые ответы", CommandName.VOICE_RESPONSE_BLIND.getBlindName()}},
+                {{smileForVoice + " Голосовые ответы", CommandName.SWITCH_VOICE_RESPONSE_BLIND.getBlindName()}},
                 {{smileForLanguage + " Язык интерфейса", CommandName.INTERFACE_LANGUAGE_BLIND.getBlindName()}}
         };
     }

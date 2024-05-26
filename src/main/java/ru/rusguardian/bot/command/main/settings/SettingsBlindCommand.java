@@ -38,7 +38,7 @@ public class SettingsBlindCommand extends Command {
                 {{"\uD83C\uDFAD Выбрать GPT - Роль", CommandName.GPT_ROLES_BLIND_D.getBlindName()}},
                 {{"\uD83C\uDFA8 Креативность ответов", CommandName.CHOOSE_TEMPERATURE_BLIND.getBlindName()}},
                 {{smileForContext + " Поддержка контекста", CommandName.SWITCH_CONTEXT_BLIND.getBlindName()}},
-                {{smileForVoice + " Голосовые ответы", CommandName.VOICE_RESPONSE_BLIND.getBlindName()}},
+                {{smileForVoice + " Голосовые ответы", CommandName.SWITCH_VOICE_RESPONSE_BLIND.getBlindName()}},
                 {{smileForLanguage + " Язык интерфейса", CommandName.INTERFACE_LANGUAGE_BLIND.getBlindName()}}
         };
     }

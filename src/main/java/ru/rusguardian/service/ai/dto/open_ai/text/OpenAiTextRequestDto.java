@@ -1,4 +1,4 @@
-package ru.rusguardian.service.ai.dto.text;
+package ru.rusguardian.service.ai.dto.open_ai.text;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.DecimalMax;
@@ -22,7 +22,6 @@ public class OpenAiTextRequestDto {
     @DecimalMin("0.0")
     @DecimalMax("2.0")
     private float temperature;
-    //TODO A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse
-//    private String user;
+    private String user;
 
 }

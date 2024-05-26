@@ -1,4 +1,4 @@
-package ru.rusguardian.service.ai.dto.text;
+package ru.rusguardian.service.ai.dto.open_ai.text;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -36,7 +36,7 @@ public class OpenAiTextResponseDto {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class Usage{
+    public static class Usage {
         @JsonProperty("prompt_tokens")
         private int promptTokens;
         @JsonProperty("completion_tokens")

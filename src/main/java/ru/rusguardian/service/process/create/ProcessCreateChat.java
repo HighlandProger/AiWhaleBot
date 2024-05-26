@@ -7,9 +7,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.rusguardian.constant.ai.AssistantRole;
 import ru.rusguardian.constant.user.SubscriptionType;
+import ru.rusguardian.domain.ChatCompletionMessage;
 import ru.rusguardian.domain.SubscriptionInfo;
 import ru.rusguardian.domain.user.*;
 import ru.rusguardian.service.ai.constant.AIModel;
+import ru.rusguardian.service.ai.constant.Role;
+import ru.rusguardian.service.data.ChatCompletionMessageService;
 import ru.rusguardian.service.data.ChatService;
 import ru.rusguardian.service.data.SubscriptionInfoService;
 import ru.rusguardian.telegram.bot.util.util.TelegramStartInfoUtils;
@@ -28,11 +31,11 @@ public class ProcessCreateChat {
     private static final String INVITED_BY = "invitedBy";
     private final SubscriptionInfoService subscriptionInfoService;
     private final ChatService chatService;
+    private final ChatCompletionMessageService chatCompletionMessageService;
 
     @Transactional
     public Chat process(Update update) {
 
-        //TODO partner referral info
         Chat chat = new Chat();
         chat.setId(TelegramUtils.getChatId(update));
         chat.setUsername(TelegramUtils.getUsername(update));
@@ -49,6 +52,7 @@ public class ProcessCreateChat {
         chat.setPartnerEmbeddedInfo(getPartner(update));
         chat.setUserBalanceEmbedded(getUserBalance());
 
+        createSystemCompletionMessage(chat);
         return chatService.save(chat);
     }
 
@@ -109,5 +113,14 @@ public class ProcessCreateChat {
         userBalance.setExtraSunoRequests(0);
 
         return userBalance;
+    }
+
+    private void createSystemCompletionMessage(Chat chat) {
+        AssistantRole assistantRole = AssistantRole.USUAL;
+        ChatCompletionMessage message = new ChatCompletionMessage();
+        message.setChat(chat);
+        message.setMessage(assistantRole.getDescription());
+        message.setRole(Role.SYSTEM);
+        chatCompletionMessageService.save(message);
     }
 }

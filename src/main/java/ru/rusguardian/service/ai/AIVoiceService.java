@@ -11,9 +11,9 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
-import ru.rusguardian.service.ai.dto.voice.OpenAiCreateSpeechRequestDto;
-import ru.rusguardian.service.ai.dto.voice.OpenAiTranscriptionRequestDto;
-import ru.rusguardian.service.ai.dto.voice.OpenAiTranscriptionResponseDto;
+import ru.rusguardian.service.ai.dto.open_ai.voice.OpenAiCreateSpeechRequestDto;
+import ru.rusguardian.service.ai.dto.open_ai.voice.OpenAiTranscriptionRequestDto;
+import ru.rusguardian.service.ai.dto.open_ai.voice.OpenAiTranscriptionResponseDto;
 import ru.rusguardian.telegram.bot.util.util.FileUtils;
 
 import java.io.File;
@@ -31,7 +31,7 @@ public class AIVoiceService {
     private final WebClient webClient;
 
     @Async
-    public CompletableFuture<OpenAiTranscriptionResponseDto> getSpeechToText(OpenAiTranscriptionRequestDto requestBody) {
+    public CompletableFuture<String> getSpeechToText(OpenAiTranscriptionRequestDto requestBody) {
 
         return webClient.post()
                 .uri(TRANSCRIPTIONS_URL)
@@ -39,6 +39,7 @@ public class AIVoiceService {
                 .body(BodyInserters.fromMultipartData(getObjectMultiValueMap(requestBody)))
                 .retrieve()
                 .bodyToMono(OpenAiTranscriptionResponseDto.class)
+                .map(e -> e.getText())
                 .toFuture();
     }
 

@@ -1,4 +1,4 @@
-package ru.rusguardian.service.ai.dto.image;
+package ru.rusguardian.service.ai.dto.open_ai.image;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,6 +12,5 @@ public class OpenAiImageRequestDto {
     private String prompt;
     private int n;
     private String size;
-    //TODO A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse
-//    private String user;
+    private String user;
 }

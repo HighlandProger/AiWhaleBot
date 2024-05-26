@@ -7,7 +7,6 @@ import ru.rusguardian.domain.SubscriptionInfo;
 import ru.rusguardian.service.ai.constant.AIModel;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Table(schema = "ncs_bot", name = "chats")
@@ -45,10 +44,6 @@ public class Chat {
     private UserBalanceEmbedded userBalanceEmbedded;
     @Embedded
     private PartnerEmbedded partnerEmbeddedInfo;
-
-    @ElementCollection(fetch = FetchType.EAGER)
-    @Embedded
-    private List<ChatCompletionMessage> messages;
 
     public int getAllowedBySubscriptionRequestCount(AIModel.BalanceType balanceType) {
         SubscriptionInfo subscriptionInfo = this.getSubscriptionEmbedded().getSubscriptionInfo();

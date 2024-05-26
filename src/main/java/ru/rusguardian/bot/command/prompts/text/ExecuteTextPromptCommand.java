@@ -35,8 +35,7 @@ public class ExecuteTextPromptCommand extends PromptCommand {
         String prompt = TelegramUtils.getTextMessage(update);
 
         if (!isChatLimitExpired(chat, model)) {
-            processPromptText.process(chat, prompt).thenAccept(responseDto -> {
-                String response = responseDto.getChoices().get(0).getMessage().getContent();
+            processPromptText.process(chat, prompt).thenAccept(response -> {
                 try {
                     bot.execute(getEditMessageWithResponse(chat.getId(), response, replyId));
                 } catch (TelegramApiException e) {
@@ -45,8 +44,7 @@ public class ExecuteTextPromptCommand extends PromptCommand {
             }).exceptionally(e -> {
                 log.error(e.getMessage());
                 commandContainerService.getCommand(CommandName.ERROR).execute(update);
-                //TODO minor correct exceptionally obtain
-                return null;
+                throw new RuntimeException("EXCEPTION DURING FUTURE");
             });
         } else {
             String response;
