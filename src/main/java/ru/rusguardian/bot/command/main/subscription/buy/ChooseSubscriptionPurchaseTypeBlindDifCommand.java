@@ -40,7 +40,7 @@ public class ChooseSubscriptionPurchaseTypeBlindDifCommand extends Command {
 
         return ReplyMarkupUtil.getInlineKeyboard(new String[][][]{
                 {{PURCH_SUBS_RUS_BLIND_D.getViewName(), getCallback(PURCH_SUBS_RUS_BLIND_D, subscriptionType)}},
-                {{PURCH_SUBS_INTERN_BLIND_D.getViewName(), getCallback(PURCH_SUBS_INTERN_BLIND_D, subscriptionType)}},
+//                {{PURCH_SUBS_INTERN_BLIND_D.getViewName(), getCallback(PURCH_SUBS_INTERN_BLIND_D, subscriptionType)}},
                 {{PURCH_SUBS_CRYPTO_BLIND_D.getViewName(), getCallback(PURCH_SUBS_CRYPTO_BLIND_D, subscriptionType)}},
                 {{BACK.getViewName(), SUBSCRIPTION_BLIND_D.getBlindName()}},
         });

@@ -30,7 +30,7 @@ public class ProcessGetTextUserAccount {
         AISettingsEmbedded aiSettings = chat.getAiSettingsEmbedded();
 
         return MessageFormat.format(textPattern,
-                chat.getId(),
+                String.valueOf(chat.getId()),
                 subscriptionInfo.getType(),
                 subscriptionInfo.getType() == SubscriptionType.FREE ? "-" : getSubscriptionExpirationDateString(subscription),
                 subscription.getPurchaseType() == null ? "-" : subscription.getPurchaseType(),
@@ -38,7 +38,7 @@ public class ProcessGetTextUserAccount {
                 getModelsPerDayUsage(chat.getId(), List.of(AIModel.GPT_3_5_TURBO, AIModel.GPT_3_5_TURBO_16_K)),
                 getModelsPerDayUsage(chat.getId(), List.of(AIModel.GEMINI_1_5_PRO)),
                 getModelsPerDayUsage(chat.getId(), AIModel.getByBalanceType(AIModel.BalanceType.GPT_4)),
-                getModelsPerDayUsage(chat.getId(), AIModel.getByBalanceType(AIModel.BalanceType.IMAGE)),
+                getAllowedImageCount(chat),
                 userBalance.getClaudeTokens(),
                 subscriptionInfo.getSongMonthLimit() - getSongMonthRequests(chat),
                 //----------------------------------------------------------
@@ -47,7 +47,7 @@ public class ProcessGetTextUserAccount {
                 userBalance.getExtraSunoRequests(),
                 //----------------------------------------------------------
                 aiSettings.getAiActiveModel(),
-                aiSettings.getAssistantRole(),
+                aiSettings.getAssistantRole().getName(),
                 aiSettings.getTemperature(),
                 aiSettings.isContextEnabled() ? "✅ Вкл" : "❌ Выкл",
                 aiSettings.isVoiceResponseEnabled() ? "✅ Вкл" : "❌ Выкл",
@@ -62,6 +62,13 @@ public class ProcessGetTextUserAccount {
 
     private int getModelsPerDayUsage(Long chatId, List<AIModel> models) {
         return userRequestService.getDayRequestsCountByChatIdAndModels(chatId, models);
+    }
+
+    private String getAllowedImageCount(Chat chat){
+        int dayLimit = chat.getSubscriptionEmbedded().getSubscriptionInfo().getImageDayLimit();
+        if (dayLimit == -1) return "+";
+        return String.valueOf(chat.getSubscriptionEmbedded().getSubscriptionInfo().getImageDayLimit()
+                - getModelsPerDayUsage(chat.getId(), AIModel.getByBalanceType(AIModel.BalanceType.IMAGE)));
     }
 
     private int getSongMonthRequests(Chat chat) {

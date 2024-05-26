@@ -19,7 +19,7 @@ public class AISettingsEmbedded {
     @Enumerated(EnumType.STRING)
     @Column(name = "ai_language")
     private AILanguage aiLanguage;
-    private float temperature;
+    private double temperature;
     @Enumerated(EnumType.STRING)
     @Column(name = "ai_active_model")
     private AIModel aiActiveModel;

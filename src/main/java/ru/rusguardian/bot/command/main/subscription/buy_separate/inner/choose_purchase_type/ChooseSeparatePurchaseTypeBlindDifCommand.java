@@ -40,7 +40,7 @@ public class ChooseSeparatePurchaseTypeBlindDifCommand extends Command {
 
         return ReplyMarkupUtil.getInlineKeyboard(new String[][][]{
                 {{PURCH_SEP_RUS_BLIND_D.getViewName(), getCallback(PURCH_SEP_RUS_BLIND_D, separatePurchase)}},
-                {{PURCH_SEP_INTERN_BLIND_D.getViewName(), getCallback(PURCH_SEP_INTERN_BLIND_D, separatePurchase)}},
+//                {{PURCH_SEP_INTERN_BLIND_D.getViewName(), getCallback(PURCH_SEP_INTERN_BLIND_D, separatePurchase)}},
                 {{PURCH_SEP_CRYPTO_BLIND_D.getViewName(), getCallback(PURCH_SEP_CRYPTO_BLIND_D, separatePurchase)}},
                 {{BACK.getViewName(), BUY_SEPARATE_BLIND.getBlindName()}},
         });

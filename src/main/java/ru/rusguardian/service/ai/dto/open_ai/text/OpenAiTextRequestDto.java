@@ -21,7 +21,7 @@ public class OpenAiTextRequestDto {
     private Integer maxTokens;
     @DecimalMin("0.0")
     @DecimalMax("2.0")
-    private float temperature;
+    private double temperature;
     private String user;
 
 }

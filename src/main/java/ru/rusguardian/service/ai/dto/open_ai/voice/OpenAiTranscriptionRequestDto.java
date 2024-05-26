@@ -24,5 +24,5 @@ public class OpenAiTranscriptionRequestDto {
     private String responseFormat;
     @DecimalMax("1.0")
     @DecimalMin("0.0")
-    private float temperature;
+    private double temperature;
 }

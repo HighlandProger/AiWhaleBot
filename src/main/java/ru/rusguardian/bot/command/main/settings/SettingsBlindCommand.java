@@ -27,7 +27,6 @@ public class SettingsBlindCommand extends Command {
         editMessage(update, getTextFromFileByChatLanguage(FILE_PATH, chat), ReplyMarkupUtil.getInlineKeyboard(getButtons(chat)));
     }
 
-
     private String[][][] getButtons(Chat chat) {
         String smileForContext = chat.getAiSettingsEmbedded().isContextEnabled() ? "✅" : "❌";
         String smileForVoice = chat.getAiSettingsEmbedded().isVoiceResponseEnabled() ? "\uD83D\uDD0A" : "\uD83D\uDD07";
