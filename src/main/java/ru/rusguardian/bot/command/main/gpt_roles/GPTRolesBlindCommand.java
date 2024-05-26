@@ -11,6 +11,7 @@ import ru.rusguardian.bot.command.service.CommandName;
 import ru.rusguardian.constant.ai.AssistantRole;
 import ru.rusguardian.constant.user.SubscriptionType;
 import ru.rusguardian.domain.user.Chat;
+import ru.rusguardian.service.data.ChatCompletionMessageService;
 import ru.rusguardian.telegram.bot.util.util.TelegramCallbackUtils;
 import ru.rusguardian.telegram.bot.util.util.TelegramUtils;
 import ru.rusguardian.telegram.bot.util.util.telegram_message.EditMessageUtil;
@@ -22,6 +23,8 @@ import static ru.rusguardian.util.GPTRolesInlineKeyboardUtil.PAGE_ACTION;
 @Component
 @RequiredArgsConstructor
 public class GPTRolesBlindCommand extends Command implements GPTRolesDescription {
+
+    private final ChatCompletionMessageService chatCompletionMessageService;
 
     @Override
     public CommandName getType() {
@@ -55,6 +58,7 @@ public class GPTRolesBlindCommand extends Command implements GPTRolesDescription
 
                 chat.getAiSettingsEmbedded().setAssistantRole(role);
                 chatService.update(chat);
+                chatCompletionMessageService.setSystemMessageForChat(chat.getId(), role.getDescription());
                 page = GPTRolesInlineKeyboardUtil.getPageNumberByAssistantRole(role);
             }
         }
