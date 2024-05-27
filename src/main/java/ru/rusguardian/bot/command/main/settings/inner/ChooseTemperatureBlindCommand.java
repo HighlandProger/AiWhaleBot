@@ -22,7 +22,6 @@ public class ChooseTemperatureBlindCommand extends Command {
     private static final String FILE_PATH = "text/settings/choose_temperature/";
     private static final String OPERATION_RESTRICTED_FILE_PATH = "text/settings/choose_temperature/operation_restricted/";
 
-
     @Override
     public CommandName getType() {
         return CommandName.CHOOSE_TEMPERATURE_BLIND;
@@ -50,11 +49,11 @@ public class ChooseTemperatureBlindCommand extends Command {
 
     private String[][][] getButtons() {
         return new String[][][]{
-                {{"Максимально креативный", getCallback("2.0")}},
-                {{"Креативный", getCallback("1.5")}},
+                {{"Максимально креативный", getCallback("1.8")}},
+                {{"Креативный", getCallback("1.4")}},
                 {{"Средний", getCallback("1.0")}},
-                {{"Мало креативный", getCallback("0.5")}},
-                {{"Некреативный", getCallback("0.0")}},
+                {{"Мало креативный", getCallback("0.6")}},
+                {{"Некреативный", getCallback("0.2")}},
                 {{CommandName.BACK.getViewName(), CommandName.SETTINGS_BLIND.getViewName()}}
         };
     }

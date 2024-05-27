@@ -89,7 +89,7 @@ public class ProcessPromptText {
         int messagesInList = AIRequestSetting.MESSAGES_IN_LIST.getValue() * chat.getSubscriptionEmbedded().getSubscriptionInfo().getContextAndTokensXSize();
         return new ArrayList<>(Stream.concat(
                 messages.stream().limit(1),
-                messages.stream().skip(Math.max(0, messages.size() - messagesInList))
+                messages.stream().skip(Math.max(1, messages.size() - messagesInList))
         ).toList());
     }
 }

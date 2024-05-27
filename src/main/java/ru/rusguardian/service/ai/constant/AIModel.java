@@ -18,8 +18,8 @@ public enum AIModel {
 
     GPT_4_OMNI(OPEN_AI, BalanceType.GPT_4, "gpt-4o-2024-05-13"),
     GPT_4_TURBO(OPEN_AI, BalanceType.GPT_4, "gpt-4-turbo"),
-    GPT_4(OPEN_AI, BalanceType.GPT_4, "gpt-4"),
-    GPT_3_5_TURBO_16_K(OPEN_AI, BalanceType.GPT_3, "gpt-3.5-turbo-16k-0613"),
+    GPT_4(OPEN_AI, BalanceType.GPT_4, "gpt-4-0613"),
+    GPT_3_5_TURBO_16_K(OPEN_AI, BalanceType.GPT_3, "gpt-3.5-turbo-16k"),
     GPT_3_5_TURBO(OPEN_AI, BalanceType.GPT_3, "gpt-3.5-turbo-0125"),
     ADA_V2_EMBEDDINGS(OPEN_AI, null, "ada-v2-embedding"),
     DALL_E_2(OPEN_AI, BalanceType.IMAGE, "dall-e-2"),
