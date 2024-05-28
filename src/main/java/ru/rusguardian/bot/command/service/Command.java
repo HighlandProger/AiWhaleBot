@@ -112,8 +112,8 @@ public abstract class Command implements BotService<CommandName> {
     }
 
     protected String getTextFromFileByChatLanguage(String filePath, Chat chat) {
-        String path = filePath + chat.getAiSettingsEmbedded().getAiLanguage().getValue() + ".txt";
-        return FileUtils.getTextFromFile(FileUtils.getFileFromResources2(this, path));
+        String path = "/" + filePath + chat.getAiSettingsEmbedded().getAiLanguage().getValue() + ".txt";
+        return FileUtils.getTextFromFileInResources(this, path);
     }
 
     protected void edit(EditMessageText editText) throws TelegramApiException {

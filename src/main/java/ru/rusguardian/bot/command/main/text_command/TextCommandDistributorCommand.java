@@ -20,6 +20,11 @@ public class TextCommandDistributorCommand extends Command {
     protected void mainExecute(Update update) throws TelegramApiException {
         String command = TelegramUtils.getTextMessage(update);
 
+
+        if (command.equals("/start")) {
+            commandContainerService.getCommand(CommandName.START).execute(update);
+            return;
+        }
         if (command.equals("/account")) {
             commandContainerService.getCommand(CommandName.MY_ACCOUNT).execute(update);
             return;
