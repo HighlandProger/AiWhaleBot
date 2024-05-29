@@ -6,7 +6,7 @@ spring:
   main:
     allow-circular-references: true
   profiles:
-    active: dev
+    active: test
 
   datasource:
     url: type_your_value
@@ -52,8 +52,8 @@ stable-diffusion:
 
 payment:
   robokassa:
-    merchant-login:
-    merchant-password:
+    merchant-login: type_your_value
+    merchant-password: type_your_value
   cryptocloud:
-    shop-id:
-    token:
+    shop-id: type_your_value
+    token: type_your_value

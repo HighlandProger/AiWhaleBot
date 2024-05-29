@@ -42,13 +42,6 @@ public class ProcessCreateInvoice {
         return url;
     }
 
-
-    //TODO functional paySelection
-    public URL getPayselectionInvoiceUrl() {
-        return null;
-    }
-
-
     @Transactional
     public URL getRobokassaInvoiceUrl(Chat chat, SubscriptionType subscriptionType) {
         SubscriptionInfo info = subscriptionInfoService.findById(subscriptionType);

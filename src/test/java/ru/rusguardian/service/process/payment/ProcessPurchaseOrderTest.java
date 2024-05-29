@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Transactional
 @Rollback
 //TODO need test!
-class ProcessSuccessfulPaymentTest {
+class ProcessPurchaseOrderTest {
 
     @Autowired
     private OrderService orderService;
@@ -33,7 +33,7 @@ class ProcessSuccessfulPaymentTest {
     @Autowired
     private SubscriptionInfoService subscriptionInfoService;
     @Autowired
-    private ProcessSuccessfulPayment processSuccessfulPayment;
+    private ProcessPurchaseOrder processPurchaseOrder;
     @Autowired
     private ProcessCreateChat processCreateChat;
 
@@ -58,7 +58,7 @@ class ProcessSuccessfulPaymentTest {
 
     @Test
     void testProcess_shouldUpdateOrderAsPurchased() {
-        processSuccessfulPayment.process(order.getId());
+        processPurchaseOrder.process(order.getId());
 
         assertTrue(order.isPurchased());
         assertEquals(15.0, partnerChat.getPartnerEmbeddedInfo().getBalance());
@@ -72,7 +72,7 @@ class ProcessSuccessfulPaymentTest {
 
         // Ожидаемый результат
         Exception exception = assertThrows(RuntimeException.class, () -> {
-            processSuccessfulPayment.process(order.getId());
+            processPurchaseOrder.process(order.getId());
         });
 
         assertTrue(exception.getMessage().contains("UNKNOWN ORDER"));
@@ -84,7 +84,7 @@ class ProcessSuccessfulPaymentTest {
         order.setSubscriptionType(null);
         order.setPrice(SeparatePurchase.GPT4_100.getPrice());
 
-        processSuccessfulPayment.process(order.getId());
+        processPurchaseOrder.process(order.getId());
 
         assertEquals(100, chat.getUserBalanceEmbedded().getExtraGPT4Requests());
         assertEquals(SeparatePurchase.GPT4_100.getPrice() * 0.15, partnerChat.getPartnerEmbeddedInfo().getBalance());

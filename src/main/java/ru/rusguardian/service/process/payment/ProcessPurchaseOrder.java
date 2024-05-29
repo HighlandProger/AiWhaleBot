@@ -3,6 +3,9 @@ package ru.rusguardian.service.process.payment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.rusguardian.bot.command.main.subscription.Type;
 import ru.rusguardian.constant.purchase.SeparatePurchase;
 import ru.rusguardian.constant.user.SubscriptionType;
@@ -23,12 +26,13 @@ import java.time.temporal.ChronoUnit;
 
 @Service
 @RequiredArgsConstructor
-public class ProcessSuccessfulPayment {
+public class ProcessPurchaseOrder {
 
     private final OrderService orderService;
     private final ChatService chatService;
     private final ProcessGetPartnerInfoDto getPartnerInfoDto;
     private final SubscriptionInfoService subscriptionInfoService;
+    private final TelegramLongPollingBot bot;
 
     @Transactional
     public void process(Long orderId) {
@@ -36,7 +40,6 @@ public class ProcessSuccessfulPayment {
         order.setPurchased(true);
         Chat user = order.getChat();
         Chat partner = user.getPartnerEmbeddedInfo().getInvitedBy();
-        PartnerEmbedded partnerEmbedded = partner.getPartnerEmbeddedInfo();
 
         if (order.getSubscriptionType() == null && order.getSeparatePurchase() == null) {
             throw new RuntimeException("UNKNOWN ORDER:" + order);
@@ -49,11 +52,31 @@ public class ProcessSuccessfulPayment {
         }
         double partnerIncome = getPartnerIncome(partner, order);
         order.setPartnerIncome(partnerIncome);
-        partnerEmbedded.setBalance(partnerEmbedded.getBalance() + partnerIncome);
 
-        chatService.update(partner);
+        updatePartnerBalance(partner, partnerIncome);
         chatService.update(user);
         orderService.update(order);
+
+        sendNotificationAboutPurchase(order);
+    }
+
+    private void updatePartnerBalance(Chat partner, double partnerIncome){
+        if (partner == null || partnerIncome == 0) {return;}
+        PartnerEmbedded partnerEmbedded = partner.getPartnerEmbeddedInfo();
+        partnerEmbedded.setBalance(partnerEmbedded.getBalance() + partnerIncome);
+        chatService.update(partner);
+    }
+
+    private void sendNotificationAboutPurchase(Order order) {
+        SendMessage message = new SendMessage();
+        message.setChatId(order.getChat().getId());
+        message.setText(String.format("Заказ №%s успешно оплачен. Благодарим вас за покупку!", order.getId()));
+
+        try {
+            bot.execute(message);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private double getPartnerIncome(Chat partner, Order order) {
@@ -91,8 +114,12 @@ public class ProcessSuccessfulPayment {
     }
 
     private LocalDateTime getExpirationTime(SubscriptionType subscriptionType) {
-        if(subscriptionType.getTimeType() == Type.MONTH) {return LocalDateTime.now().plusMonths(1);}
-        if(subscriptionType.getTimeType() == Type.YEAR) {return LocalDateTime.now().plusYears(1);}
+        if (subscriptionType.getTimeType() == Type.MONTH) {
+            return LocalDateTime.now().plusMonths(1);
+        }
+        if (subscriptionType.getTimeType() == Type.YEAR) {
+            return LocalDateTime.now().plusYears(1);
+        }
         throw new RuntimeException("UNKNOWN TIME TYPE " + subscriptionType.getTimeType());
     }
 
