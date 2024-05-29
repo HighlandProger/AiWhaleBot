@@ -52,8 +52,10 @@ public class ProcessCreateChat {
         chat.setPartnerEmbeddedInfo(getPartner(update));
         chat.setUserBalanceEmbedded(getUserBalance());
 
+        chatService.save(chat);
         createSystemCompletionMessage(chat);
-        return chatService.save(chat);
+
+        return chat;
     }
 
     private AISettingsEmbedded getAiSetting() {
