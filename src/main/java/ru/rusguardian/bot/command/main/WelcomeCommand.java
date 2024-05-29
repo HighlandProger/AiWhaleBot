@@ -6,6 +6,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.rusguardian.bot.command.service.Command;
 import ru.rusguardian.bot.command.service.CommandName;
+import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.telegram.bot.util.util.telegram_message.ReplyMarkupUtil;
 
 import java.util.List;
@@ -19,11 +20,12 @@ public class WelcomeCommand extends Command {
 
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
-        sendMessage(update, getText(), getMainKeyboard());
+        Chat chat = getChat(update);
+        sendMessage(update, getText(chat), getMainKeyboard());
     }
 
-    public String getText() {
-        return getTextFromFileInResources("text/welcome.txt");
+    public String getText(Chat chat) {
+        return getTextFromFileByChatLanguage("text/welcome/", chat);
     }
 
     private ReplyKeyboard getMainKeyboard() {
