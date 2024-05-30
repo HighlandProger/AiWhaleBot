@@ -56,7 +56,6 @@ public class SubscriptionsKeyboardUtil {
         return ReplyMarkupUtil.getInlineKeyboard(new String[][][]{
                 {{BUY_SEPARATE_BLIND.getViewName(), BUY_SEPARATE_BLIND.getBlindName()}},
                 {{BUY_CLAUDE_BLIND.getViewName(), BUY_CLAUDE_BLIND.getBlindName()}},
-                {{BUY_SUNO_BLIND.getViewName(), BUY_SUNO_BLIND.getBlindName()}},
         });
     }
 

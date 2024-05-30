@@ -47,9 +47,6 @@ public class ProcessCheckChatRequestLimit {
         if (balanceType == AIModel.BalanceType.IMAGE) {
             return subscriptionMinusUsedCount + userBalance.getExtraImageRequests();
         }
-        if (balanceType == AIModel.BalanceType.MUSIC) {
-            return subscriptionMinusUsedCount + userBalance.getExtraSunoRequests();
-        }
         return subscriptionMinusUsedCount;
     }
 

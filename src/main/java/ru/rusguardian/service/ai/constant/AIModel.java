@@ -31,8 +31,7 @@ public enum AIModel {
     CLAUDE_3_OPUS(ANTHROPIC, BalanceType.CLAUDE, "claude-3-opus-20240229"),
     CLAUDE_3_SONNET(ANTHROPIC, BalanceType.CLAUDE, "claude-3-sonnet-20240229"),
     CLAUDE_3_HAIKU(ANTHROPIC, BalanceType.CLAUDE, "claude-3-haiku-20240307"),
-    GEMINI_1_5_PRO(GOOGLE, BalanceType.GPT_3, "???"),
-    SUNO(UNKNOWN, BalanceType.MUSIC, "???");
+    GEMINI_1_5_PRO(GOOGLE, BalanceType.GPT_3, "???");
 
     private final Provider provider;
     private final BalanceType balanceType;

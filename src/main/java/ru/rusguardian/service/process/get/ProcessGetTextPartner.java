@@ -2,6 +2,7 @@ package ru.rusguardian.service.process.get;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.service.process.get.dto.PartnerInfoDto;
 
@@ -15,6 +16,7 @@ import java.util.Locale;
 public class ProcessGetTextPartner {
 
     private final ProcessGetPartnerInfoDto processGetPartnerInfoDto;
+    private final TelegramLongPollingBot bot;
 
     public String get(Chat chat, String textPattern) {
         PartnerInfoDto partnerInfo = processGetPartnerInfoDto.get(chat);
@@ -30,7 +32,7 @@ public class ProcessGetTextPartner {
                 partnerInfo.getReferralPurchasesSum(),
                 partnerInfo.getPartnerIncome(),
 
-                String.valueOf(chat.getId()));
+                bot.getBotUsername(), String.valueOf(chat.getId()));
     }
 
     private String getDate() {

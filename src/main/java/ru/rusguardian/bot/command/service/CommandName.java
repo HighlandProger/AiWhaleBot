@@ -31,7 +31,6 @@ public enum CommandName {
     BUY_GPT_4_BLIND("\uD83E\uDD16 Купить GPT-4"),
     BUY_IMAGE_BLIND("\uD83C\uDF06 Купить Midjourney/SD/DALLE 3"),
     BUY_CLAUDE_BLIND("\uD83E\uDDE0 Купить токены Claude"),
-    BUY_SUNO_BLIND("\uD83C\uDFB8 Купить песни Suno"),
 
     BUY_SUBSCRIPTION_BLIND_D(),
 

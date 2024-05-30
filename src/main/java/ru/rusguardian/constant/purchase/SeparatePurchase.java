@@ -27,12 +27,7 @@ public enum SeparatePurchase {
     CLAUDE_5_MIL(AIModel.BalanceType.CLAUDE, 5000000, 24.71),
     CLAUDE_10_MIL(AIModel.BalanceType.CLAUDE, 10000000, 46.46),
     CLAUDE_20_MIL(AIModel.BalanceType.CLAUDE, 20000000, 79.46),
-    CLAUDE_50_MIL(AIModel.BalanceType.CLAUDE, 50000000, 181.95),
-
-    SUNO_50(AIModel.BalanceType.MUSIC, 50, 3.20),
-    SUNO_100(AIModel.BalanceType.MUSIC, 100, 6.30),
-    SUNO_200(AIModel.BalanceType.MUSIC, 200, 9.50),
-    SUNO_500(AIModel.BalanceType.MUSIC, 500, 19.70);
+    CLAUDE_50_MIL(AIModel.BalanceType.CLAUDE, 50000000, 181.95);
 
     private final AIModel.BalanceType balanceType;
     private final int count;

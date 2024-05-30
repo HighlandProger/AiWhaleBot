@@ -40,11 +40,9 @@ public class ProcessGetTextUserAccount {
                 getModelsPerDayUsage(chat.getId(), AIModel.getByBalanceType(AIModel.BalanceType.GPT_4)),
                 getAllowedImageCount(chat),
                 userBalance.getClaudeTokens(),
-                subscriptionInfo.getSongMonthLimit() - getSongMonthRequests(chat),
                 //----------------------------------------------------------
                 userBalance.getExtraGPT4Requests(),
                 userBalance.getExtraImageRequests(),
-                userBalance.getExtraSunoRequests(),
                 //----------------------------------------------------------
                 aiSettings.getAiActiveModel(),
                 aiSettings.getAssistantRole().getName(),

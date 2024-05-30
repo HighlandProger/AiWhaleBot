@@ -21,7 +21,7 @@ public class TextCommandDistributorCommand extends Command {
         String command = TelegramUtils.getTextMessage(update);
 
 
-        if (command.equals("/start")) {
+        if (command.startsWith("/start")) {
             commandContainerService.getCommand(CommandName.START).execute(update);
             return;
         }

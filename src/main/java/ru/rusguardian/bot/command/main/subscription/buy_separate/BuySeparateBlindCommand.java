@@ -38,7 +38,6 @@ public class BuySeparateBlindCommand extends Command {
                 {{BUY_GPT_4_BLIND.getViewName(), BUY_GPT_4_BLIND.getBlindName()}},
                 {{BUY_IMAGE_BLIND.getViewName(), BUY_IMAGE_BLIND.getBlindName()}},
                 {{BUY_CLAUDE_BLIND.getViewName(), BUY_CLAUDE_BLIND.getBlindName()}},
-                {{BUY_SUNO_BLIND.getViewName(), BUY_SUNO_BLIND.getBlindName()}},
                 {{BACK.getViewName(), SUBSCRIPTION_BLIND_D.getBlindName()}}
 
         };

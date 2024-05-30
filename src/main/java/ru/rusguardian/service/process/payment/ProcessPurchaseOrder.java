@@ -95,7 +95,6 @@ public class ProcessPurchaseOrder {
             case GPT_4 -> userBalance.setExtraGPT4Requests(userBalance.getExtraGPT4Requests() + purchase.getCount());
             case IMAGE -> userBalance.setExtraImageRequests(userBalance.getExtraImageRequests() + purchase.getCount());
             case CLAUDE -> userBalance.setClaudeTokens(userBalance.getClaudeTokens() + purchase.getCount());
-            case MUSIC -> userBalance.setExtraSunoRequests(userBalance.getExtraSunoRequests() + purchase.getCount());
             default -> throw new RuntimeException("UNKNOWN BALANCE TYPE " + balanceType);
         }
     }

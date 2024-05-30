@@ -112,7 +112,6 @@ public class ProcessCreateChat {
         userBalance.setClaudeTokens(0);
         userBalance.setExtraImageRequests(0);
         userBalance.setExtraGPT4Requests(0);
-        userBalance.setExtraSunoRequests(0);
 
         return userBalance;
     }
