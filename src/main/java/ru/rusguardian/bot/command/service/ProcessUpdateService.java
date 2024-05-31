@@ -65,7 +65,7 @@ public class ProcessUpdateService {
     }
 
     private Optional<CommandName> getByViewName(Update update) {
-        if (!update.hasMessage() || !update.getMessage().hasText()) return Optional.empty();
+        if (!isUpdateHasViewText(update)) return Optional.empty();
         String text = TelegramUtils.getTextMessage(update);
 
         Optional<CommandName> viewDifOptional = getByViewDiff(text);
@@ -82,6 +82,10 @@ public class ProcessUpdateService {
                 .filter(c -> c.getViewName() != null)
                 .filter(c -> c.getViewName().equals(text))
                 .findFirst();
+    }
+
+    private boolean isUpdateHasViewText(Update update) {
+        return update.hasMessage() && (update.getMessage().hasText() || update.getMessage().getCaption() != null);
     }
 
     private Optional<CommandName> getByViewDiff(String callback) {
