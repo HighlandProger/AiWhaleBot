@@ -1,4 +1,4 @@
-package ru.rusguardian.bot.command.prompts.voice;
+package ru.rusguardian.bot.command.prompts.vision;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,34 +11,34 @@ import ru.rusguardian.bot.command.service.CommandName;
 import ru.rusguardian.constant.user.SubscriptionType;
 import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.service.ai.constant.AIModel;
-import ru.rusguardian.service.process.prompt.ProcessPromptVoice;
+import ru.rusguardian.service.process.prompt.ProcessPromptVision;
 import ru.rusguardian.telegram.bot.util.util.FileUtils;
-
-import java.io.File;
+import ru.rusguardian.telegram.bot.util.util.TelegramUtils;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class ExecuteVoicePromptCommand extends PromptCommand {
+public class ExecuteVisionPromptCommand extends PromptCommand {
 
-    private final ProcessPromptVoice processPromptVoice;
+    private final ProcessPromptVision processPromptVision;
 
     @Override
     public CommandName getType() {
-        return CommandName.EXECUTE_VOICE_PROMPT;
+        return CommandName.EXECUTE_VISION_PROMPT;
     }
 
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
         int replyId = sendQuickReply(update);
 
+        String imageUrl = FileUtils.getFileDownloadLink(TelegramUtils.getFileDownloadPath(update, bot), bot.getBotToken());
+        String prompt = TelegramUtils.getTextMessage(update).substring(CommandName.OBTAIN_VISION_PROMPT_VIEW_D.getViewName().length()).trim();
+
         Chat chat = getChat(update);
-        AIModel model = chat.getAiSettingsEmbedded().getAiActiveModel();
-        File voiceFile = FileUtils.getFileFromUpdate(update, bot);
+        AIModel model = AIModel.GPT_4_OMNI;
 
         if (!isChatLimitExpired(chat, model)) {
-            //TODO functional. Voice response support
-            processPromptVoice.processTextResponse(chat, voiceFile).thenAccept(response -> {
+            processPromptVision.process(chat, imageUrl, prompt).thenAccept(response -> {
                 try {
                     bot.execute(getEditMessageWithResponse(chat.getId(), response, replyId));
                 } catch (TelegramApiException e) {
@@ -47,8 +47,7 @@ public class ExecuteVoicePromptCommand extends PromptCommand {
             }).exceptionally(e -> {
                 log.error(e.getMessage());
                 commandContainerService.getCommand(CommandName.ERROR).execute(update);
-                //TODO minor correct exceptionally obtain
-                return null;
+                throw new RuntimeException("EXCEPTION DURING FUTURE");
             });
         } else {
             String response;
@@ -61,5 +60,4 @@ public class ExecuteVoicePromptCommand extends PromptCommand {
             bot.execute(edit);
         }
     }
-
 }

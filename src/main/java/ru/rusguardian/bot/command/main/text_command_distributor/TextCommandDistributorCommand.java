@@ -1,4 +1,4 @@
-package ru.rusguardian.bot.command.main.text_command;
+package ru.rusguardian.bot.command.main.text_command_distributor;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -35,6 +35,10 @@ public class TextCommandDistributorCommand extends Command {
         }
         if (command.contains("/img")) {
             commandContainerService.getCommand(CommandName.OBTAIN_IMAGE_PROMPT_VIEW_D).execute(update);
+            return;
+        }
+        if (command.contains("/vision")) {
+            commandContainerService.getCommand(CommandName.OBTAIN_VISION_PROMPT_VIEW_D).execute(update);
             return;
         }
         if (command.equals("/role")) {

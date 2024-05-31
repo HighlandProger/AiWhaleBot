@@ -24,4 +24,10 @@ public class ChatCompletionMessage {
     @Enumerated(EnumType.STRING)
     private Role role;
     private String message;
+
+    public ChatCompletionMessage(Chat chat, Role role, String message) {
+        this.chat = chat;
+        this.role = role;
+        this.message = message;
+    }
 }

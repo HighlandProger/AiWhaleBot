@@ -15,7 +15,7 @@ import java.util.List;
 public class OpenAiTextRequestDto {
 
     //TODO minor add all types by documentation
-    private List<MessageDto> messages;
+    private List<RequestMessageDto> messages;
     private String model;
     @JsonProperty("max_tokens")
     private Integer maxTokens;

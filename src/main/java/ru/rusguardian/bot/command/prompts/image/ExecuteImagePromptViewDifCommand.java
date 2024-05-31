@@ -15,7 +15,7 @@ import ru.rusguardian.bot.command.service.CommandName;
 import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.service.ai.constant.AIModel;
 import ru.rusguardian.service.process.get.ProcessGetTextLimitExpired;
-import ru.rusguardian.service.process.prompt.ProcessPromptImage;
+import ru.rusguardian.service.process.prompt.ProcessPromptText2Image;
 import ru.rusguardian.telegram.bot.util.util.TelegramCallbackUtils;
 import ru.rusguardian.telegram.bot.util.util.telegram_message.InputFileUtil;
 
@@ -27,7 +27,7 @@ import static ru.rusguardian.bot.command.service.CommandName.OBTAIN_IMAGE_PROMPT
 @Slf4j
 public class ExecuteImagePromptViewDifCommand extends PromptCommand {
 
-    private final ProcessPromptImage processPromptImage;
+    private final ProcessPromptText2Image processPromptText2Image;
     private final ProcessGetTextLimitExpired getTextLimitExpired;
 
     private static final String PREPARING_INFO_FILE_PATH = "text/prompt/image/image_preparing/";
@@ -49,10 +49,10 @@ public class ExecuteImagePromptViewDifCommand extends PromptCommand {
         boolean isChatLimitExpired = isChatLimitExpired(chat, model);
 
         if (!isChatLimitExpired) {
-            processPromptImage.processUrl(chat, model, prompt).thenAccept(url ->
+            processPromptText2Image.processUrl(chat, model, prompt).thenAccept(url ->
                     sendResponseToUser(url, chat.getId(), model.getModelName(), prompt)
             ).exceptionally(ex -> {
-                log.error("EXCEPTION DURING EXECUTING ProcessPromptImage. Model: {}, prompt: {}, ExMessage: {}", model, prompt, ex.getMessage());
+                log.error("EXCEPTION DURING EXECUTING ProcessPromptText2Image. Model: {}, prompt: {}, ExMessage: {}", model, prompt, ex.getMessage());
                 errorCommand.execute(update);
                 throw new RuntimeException(ex);
             });
