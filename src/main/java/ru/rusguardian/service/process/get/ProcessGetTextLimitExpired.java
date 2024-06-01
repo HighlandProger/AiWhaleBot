@@ -18,9 +18,9 @@ public class ProcessGetTextLimitExpired {
     public String get(Chat chat, AIModel model) {
         AIModel.BalanceType balanceType = model.getBalanceType();
         if (balanceType == AIModel.BalanceType.GPT_3 && !checkChatChannelsSubscription.check(chat)) {
-            return ResourceTextUtil.getTextFromFileByChatLanguage(LIMIT_EXPIRED_FREE_NO_SUBSCRIPTION, chat);
+            return ResourceTextUtil.getTextByViewDataAndChatLanguage(LIMIT_EXPIRED_FREE_NO_SUBSCRIPTION, chat);
         } else {
-            return ResourceTextUtil.getTextFromFileByChatLanguage(LIMIT_EXPIRED, chat);
+            return ResourceTextUtil.getTextByViewDataAndChatLanguage(LIMIT_EXPIRED, chat);
         }
     }
 }

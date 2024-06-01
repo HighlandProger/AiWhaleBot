@@ -21,8 +21,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ObtainImagePromptViewDifCommand extends Command {
 
-    private static final String INSTRUCTION_FILE_PATH = "text/prompt/image/image_instruction/";
-    private static final String CHOOSE_MODEL_FILE_PATH = "text/prompt/image/choose_model/";
+    private static final String IMAGE_INSTRUCTION = "IMAGE_INSTRUCTION";
+    private static final String CHOOSE_IMAGE_MODEL = "CHOOSE_IMAGE_MODEL";
 
 
     @Override
@@ -39,7 +39,7 @@ public class ObtainImagePromptViewDifCommand extends Command {
             bot.execute(SendMessage.builder()
                     .chatId(chat.getId())
                     .replyToMessageId(TelegramUtils.getMessageId(update))
-                    .text(getTextFromFileByChatLanguage(INSTRUCTION_FILE_PATH, chat))
+                    .text(getTextByViewDataAndChatLanguage(IMAGE_INSTRUCTION, chat.getAiSettingsEmbedded().getAiLanguage()))
                     .build());
             return;
         }
@@ -47,7 +47,7 @@ public class ObtainImagePromptViewDifCommand extends Command {
         bot.execute(SendMessage.builder()
                 .chatId(chat.getId())
                 .replyToMessageId(TelegramUtils.getMessageId(update))
-                .text(getTextFromFileByChatLanguage(CHOOSE_MODEL_FILE_PATH, chat))
+                .text(getTextByViewDataAndChatLanguage(CHOOSE_IMAGE_MODEL, chat.getAiSettingsEmbedded().getAiLanguage()))
                 .replyMarkup(getKeyboard())
                 .build());
 

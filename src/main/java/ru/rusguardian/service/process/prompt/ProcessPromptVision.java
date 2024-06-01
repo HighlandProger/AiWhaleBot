@@ -42,7 +42,7 @@ public class ProcessPromptVision {
         OpenAiTextRequestDto dto = new OpenAiTextRequestDto();
         dto.setModel(AIModel.GPT_4_OMNI.getModelName());
         dto.setMaxTokens(ChatUtil.getChatMaxTokens(chat));
-        dto.setTemperature(chat.getAiSettingsEmbedded().getTemperature());
+        dto.setTemperature(chat.getAiSettingsEmbedded().getTemperature().getValue());
         dto.setMessages(getChatMessages(chat, imageUrl, prompt));
         dto.setUser((String.valueOf(chat.getId())));
 

@@ -25,7 +25,7 @@ public class WelcomeCommand extends Command {
     }
 
     public String getText(Chat chat) {
-        return getTextFromFileByChatLanguage("text/welcome/", chat);
+        return getTextByViewDataAndChatLanguage(getType().name(), chat.getAiSettingsEmbedded().getAiLanguage());
     }
 
     private ReplyKeyboard getMainKeyboard() {

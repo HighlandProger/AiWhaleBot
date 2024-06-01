@@ -19,7 +19,7 @@ import static ru.rusguardian.bot.command.service.CommandName.*;
 @RequiredArgsConstructor
 public class MyAccountCommand extends Command {
 
-    private static final String FILE_PATH = "text/my_account/";
+    private static final String VIEW_DATA = "MY_ACCOUNT";
 
     private final ProcessGetTextUserAccount getUserAccountTextService;
 
@@ -37,7 +37,7 @@ public class MyAccountCommand extends Command {
 
     private String getText(Update update) {
         Chat chat = getChat(update);
-        String textPattern = getTextFromFileByChatLanguage(FILE_PATH, chat);
+        String textPattern = getTextByViewDataAndChatLanguage(VIEW_DATA, chat.getAiSettingsEmbedded().getAiLanguage());
         return getUserAccountTextService.get(chat, textPattern);
     }
 

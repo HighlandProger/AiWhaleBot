@@ -12,7 +12,7 @@ import ru.rusguardian.util.ChoosePurchaseCountKeyboardUtil;
 @Component
 @RequiredArgsConstructor
 public class BuyImageCommand extends Command {
-    private static final String FILE_PATH = "text/subscription/buy_separate/image/";
+    private static final String BUY_IMAGE = "BUY_IMAGE";
 
     @Override
     public CommandName getType() {
@@ -21,7 +21,7 @@ public class BuyImageCommand extends Command {
 
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
-        editMessage(update, getTextFromFileByChatLanguage(FILE_PATH, getChat(update)),
+        editMessage(update, getTextByViewDataAndChatLanguage(BUY_IMAGE, getChat(update).getAiSettingsEmbedded().getAiLanguage()),
                 ChoosePurchaseCountKeyboardUtil.getKeyboard(AIModel.BalanceType.IMAGE));
     }
 }

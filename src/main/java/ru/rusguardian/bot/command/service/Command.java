@@ -12,19 +12,19 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageTe
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.rusguardian.bot.command.service.commands.ErrorCommand;
+import ru.rusguardian.constant.ai.AILanguage;
 import ru.rusguardian.domain.LogEvent;
 import ru.rusguardian.domain.Task;
 import ru.rusguardian.domain.user.Chat;
-import ru.rusguardian.service.data.ChatService;
-import ru.rusguardian.service.data.LogEventService;
-import ru.rusguardian.service.data.SubscriptionInfoService;
-import ru.rusguardian.service.data.TaskService;
+import ru.rusguardian.service.data.*;
 import ru.rusguardian.telegram.bot.service.BotService;
 import ru.rusguardian.telegram.bot.service.task.TaskCommandService;
 import ru.rusguardian.telegram.bot.util.util.FileUtils;
 import ru.rusguardian.telegram.bot.util.util.TelegramUtils;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 
 @Slf4j
 public abstract class Command implements BotService<CommandName> {
@@ -57,6 +57,9 @@ public abstract class Command implements BotService<CommandName> {
 
     @Autowired
     protected TaskService taskService;
+
+    @Autowired
+    private ViewDataService viewDataService;
 
     @Override
     public boolean hasEvent(Update update, CommandName event) {
@@ -114,6 +117,14 @@ public abstract class Command implements BotService<CommandName> {
     protected String getTextFromFileByChatLanguage(String filePath, Chat chat) {
         String path = "/" + filePath + chat.getAiSettingsEmbedded().getAiLanguage().getValue() + ".txt";
         return FileUtils.getTextFromFileInResources(this, path);
+    }
+
+    protected String getTextByViewDataAndChatLanguage(String viewDataName, AILanguage language){
+        return viewDataService.getViewByNameAndLanguage(viewDataName, language);
+    }
+
+    protected List<String> getButtonViewsByViewDataAndChatLanguage(String viewDataName, AILanguage language){
+        return Arrays.stream(viewDataService.getViewByNameAndLanguage(viewDataName, language).split("\n")).toList();
     }
 
     protected void edit(EditMessageText editText) throws TelegramApiException {

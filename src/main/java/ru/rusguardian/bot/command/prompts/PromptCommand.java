@@ -22,8 +22,8 @@ import ru.rusguardian.telegram.bot.util.util.telegram_message.SendMessageUtil;
 @Component
 public class PromptCommand extends Command {
 
-    protected static final String LIMIT_EXPIRED_FREE = "text/limit_expired_no_subscription/";
-    protected static final String LIMIT_EXPIRED = "text/limit_expired/";
+    protected static final String LIMIT_EXPIRED_FREE = "LIMIT_EXPIRED_FREE";
+    protected static final String LIMIT_EXPIRED = "LIMIT_EXPIRED";
     @Autowired
     private ProcessCheckChatRequestLimit checkChatRequestLimit;
     @Autowired

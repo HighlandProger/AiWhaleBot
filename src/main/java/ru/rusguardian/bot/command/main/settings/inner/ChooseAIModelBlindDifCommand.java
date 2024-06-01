@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 //TODO refactor
 public class ChooseAIModelBlindDifCommand extends Command {
 
-    private static final String FILE_PATH = "text/settings/choose_ai_model/";
+    private static final String SETTINGS_CHOOSE_AI_MODEL = "SETTINGS_CHOOSE_AI_MODEL";
 
     @Override
     public CommandName getType() {
@@ -44,7 +44,7 @@ public class ChooseAIModelBlindDifCommand extends Command {
     }
 
     private String getText(Chat chat) {
-        return MessageFormat.format(getTextFromFileByChatLanguage(FILE_PATH, chat)
+        return MessageFormat.format(getTextByViewDataAndChatLanguage(SETTINGS_CHOOSE_AI_MODEL, chat.getAiSettingsEmbedded().getAiLanguage())
                 , chat.getAiSettingsEmbedded().getAiActiveModel().getModelName());
     }
 

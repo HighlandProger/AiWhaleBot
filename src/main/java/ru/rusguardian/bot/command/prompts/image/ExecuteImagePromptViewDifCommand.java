@@ -30,7 +30,7 @@ public class ExecuteImagePromptViewDifCommand extends PromptCommand {
     private final ProcessPromptText2Image processPromptText2Image;
     private final ProcessGetTextLimitExpired getTextLimitExpired;
 
-    private static final String PREPARING_INFO_FILE_PATH = "text/prompt/image/image_preparing/";
+    private static final String IMAGE_PREPARING = "IMAGE_PREPARING";
 
     @Override
     public CommandName getType() {
@@ -71,7 +71,7 @@ public class ExecuteImagePromptViewDifCommand extends PromptCommand {
     private String getQuickResponse(Chat chat, AIModel model, boolean isChatLimitExpired) {
         return isChatLimitExpired
                 ? getTextLimitExpired.get(chat, model)
-                : getTextFromFileByChatLanguage(PREPARING_INFO_FILE_PATH, chat);
+                : getTextByViewDataAndChatLanguage(IMAGE_PREPARING, chat.getAiSettingsEmbedded().getAiLanguage());
     }
 
     //TODO minor refactor

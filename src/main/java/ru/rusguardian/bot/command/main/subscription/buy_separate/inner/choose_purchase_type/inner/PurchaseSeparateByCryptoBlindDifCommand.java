@@ -23,7 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PurchaseSeparateByCryptoBlindDifCommand extends Command {
 
-    private static final String FILE_PATH = "text/subscription/purchase/info_separate/";
+    private static final String SEPARATE_PURCHASE_INFO = "SEPARATE_PURCHASE_INFO";
     private final ProcessCreateInvoice createSeparateInvoice;
 
     @Override
@@ -44,7 +44,7 @@ public class PurchaseSeparateByCryptoBlindDifCommand extends Command {
 
     private String getText(Update update, SeparatePurchase separatePurchase) {
         Chat chat = getChat(update);
-        return MessageFormat.format(getTextFromFileByChatLanguage(FILE_PATH, chat), separatePurchase.getBalanceType().name());
+        return MessageFormat.format(getTextByViewDataAndChatLanguage(SEPARATE_PURCHASE_INFO, chat.getAiSettingsEmbedded().getAiLanguage()), separatePurchase.getBalanceType().name());
     }
 
     private InlineKeyboardMarkup getKeyboard(Chat chat, SeparatePurchase separatePurchase) {

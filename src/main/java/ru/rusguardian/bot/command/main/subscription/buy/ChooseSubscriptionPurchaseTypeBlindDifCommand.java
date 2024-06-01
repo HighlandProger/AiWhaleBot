@@ -20,7 +20,7 @@ import static ru.rusguardian.bot.command.service.CommandName.*;
 public class ChooseSubscriptionPurchaseTypeBlindDifCommand extends Command {
 
     //TODO minor refactor name
-    private static final String FILE_PATH = "text/subscription/purchase/";
+    private static final String SUBSCRIPTION_PURCHASING_INFO = "SUBSCRIPTION_PURCHASING_INFO";
 
     @Override
     public CommandName getType() {
@@ -30,7 +30,7 @@ public class ChooseSubscriptionPurchaseTypeBlindDifCommand extends Command {
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
 
-        EditMessageText edit = EditMessageUtil.getMessageText(update, getTextFromFileByChatLanguage(FILE_PATH, getChat(update)));
+        EditMessageText edit = EditMessageUtil.getMessageText(update, getTextByViewDataAndChatLanguage(SUBSCRIPTION_PURCHASING_INFO, getChat(update).getAiSettingsEmbedded().getAiLanguage()));
         edit.setReplyMarkup(getKeyboard(update));
         bot.executeAsync(edit);
     }
@@ -49,6 +49,4 @@ public class ChooseSubscriptionPurchaseTypeBlindDifCommand extends Command {
     private String getCallback(CommandName commandName, SubscriptionType subscriptionType) {
         return TelegramCallbackUtils.getCallbackWithArgs(commandName.name(), subscriptionType.name());
     }
-
-
 }

@@ -64,9 +64,9 @@ public class ExecuteTextPromptCommand extends PromptCommand {
         } else {
             String response;
             if (chat.getSubscriptionEmbedded().getSubscriptionInfo().getType() == SubscriptionType.FREE) {
-                response = getTextFromFileByChatLanguage(LIMIT_EXPIRED_FREE, chat);
+                response = getTextByViewDataAndChatLanguage(LIMIT_EXPIRED_FREE, chat.getAiSettingsEmbedded().getAiLanguage());
             } else {
-                response = getTextFromFileByChatLanguage(LIMIT_EXPIRED, chat);
+                response = getTextByViewDataAndChatLanguage(LIMIT_EXPIRED, chat.getAiSettingsEmbedded().getAiLanguage());
             }
             EditMessageText edit = getEditMessageWithResponse(chat.getId(), response, replyId);
             bot.execute(edit);

@@ -54,7 +54,7 @@ public class ProcessPromptVoice {
         return OpenAiTranscriptionRequestDto.builder()
                 .file(voiceFile)
                 .language(settings.getAiLanguage().getValue())
-                .temperature(settings.getTemperature())
+                .temperature(settings.getTemperature().getValue())
                 .model(AIModel.WHISPER.getModelName())
                 .build();
     }

@@ -14,7 +14,7 @@ import ru.rusguardian.telegram.bot.util.util.TelegramUtils;
 @RequiredArgsConstructor
 public class ObtainVisionPromptViewDifCommand extends Command {
 
-    private static final String INSTRUCTION_FILE_PATH = "text/prompt/vision/vision_instruction/";
+    private static final String VISION_INSTRUCTION = "VISION_INSTRUCTION";
 
     @Override
     public CommandName getType() {
@@ -29,7 +29,7 @@ public class ObtainVisionPromptViewDifCommand extends Command {
             bot.execute(SendMessage.builder()
                     .chatId(chat.getId())
                     .replyToMessageId(TelegramUtils.getMessageId(update))
-                    .text(getTextFromFileByChatLanguage(INSTRUCTION_FILE_PATH, chat))
+                    .text(getTextByViewDataAndChatLanguage(VISION_INSTRUCTION, chat.getAiSettingsEmbedded().getAiLanguage()))
                     .build());
             return;
         }

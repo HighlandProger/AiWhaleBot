@@ -20,7 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SubscriptionViewCommand extends Command {
 
-    private static final String FILE_PATH = "text/subscription/";
+    private static final String VIEW_DATA = "SUBSCRIPTION";
 
     @Override
     public CommandName getType() {
@@ -34,7 +34,7 @@ public class SubscriptionViewCommand extends Command {
         //TODO refactor
         List<SubscriptionInfo> subscriptionInfos = new ArrayList<>(subscriptionInfoService.getAll().stream().filter(e -> e.getType().getTimeType() == type).toList());
 
-        SendMessage message = SendMessageUtil.getSimple(update, getTextFromFileByChatLanguage(FILE_PATH, chat));
+        SendMessage message = SendMessageUtil.getSimple(update, getTextByViewDataAndChatLanguage(VIEW_DATA, chat.getAiSettingsEmbedded().getAiLanguage()));
         message.setReplyMarkup(SubscriptionsKeyboardUtil.getKeyboard(type, subscriptionInfos));
         message.setParseMode(ParseMode.MARKDOWN);
 

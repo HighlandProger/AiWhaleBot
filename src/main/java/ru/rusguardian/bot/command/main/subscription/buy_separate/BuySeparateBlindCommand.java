@@ -17,7 +17,7 @@ import static ru.rusguardian.bot.command.service.CommandName.*;
 @RequiredArgsConstructor
 public class BuySeparateBlindCommand extends Command {
 
-    private static final String FILE_PATH = "text/subscription/buy_separate/";
+    private static final String BUY_SEPARATE = "BUY_SEPARATE";
 
     @Override
     public CommandName getType() {
@@ -26,7 +26,7 @@ public class BuySeparateBlindCommand extends Command {
 
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
-        EditMessageText edit = EditMessageUtil.getMessageText(update, getTextFromFileByChatLanguage(FILE_PATH, getChat(update)));
+        EditMessageText edit = EditMessageUtil.getMessageText(update, getTextByViewDataAndChatLanguage(BUY_SEPARATE, getChat(update).getAiSettingsEmbedded().getAiLanguage()));
         edit.setReplyMarkup(ReplyMarkupUtil.getInlineKeyboard(getButtons()));
         edit.setParseMode(ParseMode.MARKDOWN);
 

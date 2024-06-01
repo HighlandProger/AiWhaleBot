@@ -24,7 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PurchaseSubscriptionByCryptoBlindDifCommand extends Command {
 
-    private static final String FILE_PATH = "text/subscription/purchase/info_subscription/";
+    private static final String SUBSCRIPTION_PURCHASING_INFO = "SUBSCRIPTION_PURCHASING_INFO";
     private final ProcessCreateInvoice createSeparateInvoice;
 
     @Override
@@ -45,7 +45,7 @@ public class PurchaseSubscriptionByCryptoBlindDifCommand extends Command {
 
     private String getText(Update update, PurchaseProvider provider) {
         Chat chat = getChat(update);
-        return MessageFormat.format(getTextFromFileByChatLanguage(FILE_PATH, chat), provider.getName());
+        return MessageFormat.format(getTextByViewDataAndChatLanguage(SUBSCRIPTION_PURCHASING_INFO, chat.getAiSettingsEmbedded().getAiLanguage()), provider.getName());
     }
 
     private InlineKeyboardMarkup getKeyboard(Chat chat, SubscriptionType subscriptionType) {

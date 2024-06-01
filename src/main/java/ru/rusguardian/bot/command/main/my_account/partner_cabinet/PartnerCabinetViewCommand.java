@@ -19,7 +19,7 @@ import static ru.rusguardian.bot.command.service.CommandName.*;
 @Component
 public class PartnerCabinetViewCommand extends Command {
 
-    private static final String FILE_PATH = "text/my_account/partner_cabinet/";
+    private static final String VIEW_DATA = "PARTNER_CABINET";
 
     private final ProcessGetTextPartner processGetTextPartner;
 
@@ -35,7 +35,7 @@ public class PartnerCabinetViewCommand extends Command {
     }
 
     private String getText(Chat chat) {
-        String textPattern = getTextFromFileByChatLanguage(FILE_PATH, chat);
+        String textPattern = getTextByViewDataAndChatLanguage(VIEW_DATA, chat.getAiSettingsEmbedded().getAiLanguage());
         return processGetTextPartner.get(chat, textPattern);
     }
 

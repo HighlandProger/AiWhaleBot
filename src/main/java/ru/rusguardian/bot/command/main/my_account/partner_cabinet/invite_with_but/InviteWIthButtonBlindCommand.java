@@ -19,7 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class InviteWIthButtonBlindCommand extends Command {
 
-    private static final String FILE_PATH = "text/my_account/partner_cabinet/message_with_invite/";
+    private static final String INVITE_MESSAGE = "INVITE_MESSAGE";
 
     @Override
     public CommandName getType() {
@@ -29,7 +29,7 @@ public class InviteWIthButtonBlindCommand extends Command {
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
         Chat chat = chatService.findById(TelegramUtils.getChatId(update));
-        SendMessage message = SendMessageUtil.getSimple(update, getTextFromFileByChatLanguage(FILE_PATH, chat));
+        SendMessage message = SendMessageUtil.getSimple(update, getTextByViewDataAndChatLanguage(INVITE_MESSAGE, chat.getAiSettingsEmbedded().getAiLanguage()));
         message.setReplyMarkup(getKeyboard(chat.getId()));
 
         bot.execute(message);

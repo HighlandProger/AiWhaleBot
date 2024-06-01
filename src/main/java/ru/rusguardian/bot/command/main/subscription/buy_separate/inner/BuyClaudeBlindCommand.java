@@ -12,7 +12,7 @@ import ru.rusguardian.util.ChoosePurchaseCountKeyboardUtil;
 @Component
 @RequiredArgsConstructor
 public class BuyClaudeBlindCommand extends Command {
-    private static final String FILE_PATH = "text/subscription/buy_separate/claude/";
+    private static final String BUY_SEPARATE_CLAUDE = "BUY_SEPARATE_CLAUDE";
 
     @Override
     public CommandName getType() {
@@ -21,7 +21,7 @@ public class BuyClaudeBlindCommand extends Command {
 
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
-        editMessage(update, getTextFromFileByChatLanguage(FILE_PATH, getChat(update)),
+        editMessage(update, getTextByViewDataAndChatLanguage(BUY_SEPARATE_CLAUDE, getChat(update).getAiSettingsEmbedded().getAiLanguage()),
                 ChoosePurchaseCountKeyboardUtil.getKeyboard(AIModel.BalanceType.CLAUDE));
     }
 }

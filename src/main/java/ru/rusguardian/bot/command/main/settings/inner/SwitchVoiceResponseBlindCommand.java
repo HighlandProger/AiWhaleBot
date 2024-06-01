@@ -16,7 +16,7 @@ import ru.rusguardian.telegram.bot.util.util.TelegramUtils;
 @Service
 public class SwitchVoiceResponseBlindCommand extends Command {
 
-    private final static String OPERATION_RESTRICTED = "text/settings/operation_restricted_for_free/";
+    private final static String OPERATION_RESTRICTED_FOR_FREE = "OPERATION_RESTRICTED_FOR_FREE";
 
     @Override
     public CommandName getType() {
@@ -45,7 +45,7 @@ public class SwitchVoiceResponseBlindCommand extends Command {
 
     private void sendOperationRestrictedToChat(Chat chat, Update update) throws TelegramApiException {
         AnswerCallbackQuery callbackQuery = new AnswerCallbackQuery();
-        callbackQuery.setText(getTextFromFileByChatLanguage(OPERATION_RESTRICTED, chat));
+        callbackQuery.setText(getTextByViewDataAndChatLanguage(OPERATION_RESTRICTED_FOR_FREE, chat.getAiSettingsEmbedded().getAiLanguage()));
         callbackQuery.setCallbackQueryId(TelegramUtils.getCallbackQueryId(update));
         callbackQuery.setShowAlert(true);
 

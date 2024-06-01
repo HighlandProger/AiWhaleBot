@@ -44,7 +44,7 @@ public class ProcessPromptText {
         OpenAiTextRequestDto dto = new OpenAiTextRequestDto();
         dto.setModel(chat.getAiSettingsEmbedded().getAiActiveModel().getModelName());
         dto.setMaxTokens(ChatUtil.getChatMaxTokens(chat));
-        dto.setTemperature(chat.getAiSettingsEmbedded().getTemperature());
+        dto.setTemperature(chat.getAiSettingsEmbedded().getTemperature().getValue());
         dto.setMessages(getChatMessages(chat, prompt));
         dto.setUser((String.valueOf(chat.getId())));
 

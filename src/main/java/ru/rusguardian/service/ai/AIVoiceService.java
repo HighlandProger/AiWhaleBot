@@ -23,6 +23,7 @@ import ru.rusguardian.telegram.bot.util.util.FileUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 @RequiredArgsConstructor
 @Service
@@ -94,6 +95,7 @@ public class AIVoiceService {
     }
 
     private String getErrorMessage(Throwable e) {
+        if (e instanceof CompletionException ex) {e = ex.getCause();}
         if (e instanceof WebClientResponseException ex) {
             try {
                 return ex.getResponseBodyAs(OpenAiErrorResponseDto.class).getError().getMessage();

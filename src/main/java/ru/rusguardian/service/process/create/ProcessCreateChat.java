@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import ru.rusguardian.constant.ai.AITemperature;
 import ru.rusguardian.constant.ai.AssistantRole;
 import ru.rusguardian.constant.user.SubscriptionType;
 import ru.rusguardian.domain.ChatCompletionMessage;
@@ -62,7 +63,7 @@ public class ProcessCreateChat {
         AISettingsEmbedded aiSettingsEmbedded = new AISettingsEmbedded();
         aiSettingsEmbedded.setAssistantRole(AssistantRole.USUAL);
         aiSettingsEmbedded.setAiActiveModel(AIModel.GPT_3_5_TURBO);
-        aiSettingsEmbedded.setTemperature(1.0f);
+        aiSettingsEmbedded.setTemperature(AITemperature.MIDDLE);
         aiSettingsEmbedded.setAiLanguage(RUSSIAN);
         aiSettingsEmbedded.setContextEnabled(true);
         aiSettingsEmbedded.setVoiceResponseEnabled(false);

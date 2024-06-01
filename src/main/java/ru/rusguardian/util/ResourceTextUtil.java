@@ -7,7 +7,7 @@ public class ResourceTextUtil {
 
     private ResourceTextUtil(){}
 
-    public static String getTextFromFileByChatLanguage(String filePath, Chat chat) {
+    public static String getTextByViewDataAndChatLanguage(String filePath, Chat chat) {
         String path = filePath + chat.getAiSettingsEmbedded().getAiLanguage().getValue() + ".txt";
         return FileUtils.getTextFromFile(FileUtils.getFileFromResources2(chat, path));
     }

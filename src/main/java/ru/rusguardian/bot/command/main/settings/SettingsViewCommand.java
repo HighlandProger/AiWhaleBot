@@ -16,7 +16,7 @@ import ru.rusguardian.telegram.bot.util.util.telegram_message.SendMessageUtil;
 @RequiredArgsConstructor
 public class SettingsViewCommand extends Command {
 
-    private static final String FILE_PATH = "text/settings/";
+    private static final String SETTINGS = "SETTINGS";
 
     @Override
     public CommandName getType() {
@@ -27,7 +27,7 @@ public class SettingsViewCommand extends Command {
     protected void mainExecute(Update update) throws TelegramApiException {
         Chat chat = getChat(update);
 
-        SendMessage message = SendMessageUtil.getSimple(update, getTextFromFileByChatLanguage(FILE_PATH, chat));
+        SendMessage message = SendMessageUtil.getSimple(update, getTextByViewDataAndChatLanguage(SETTINGS, chat.getAiSettingsEmbedded().getAiLanguage()));
         message.setReplyMarkup(ReplyMarkupUtil.getInlineKeyboard(getButtons(chat)));
 
         sendMessage(message);
@@ -42,10 +42,10 @@ public class SettingsViewCommand extends Command {
         return new String[][][]{
                 {{"\uD83E\uDD16 Выбрать модель GPT & Claude", CommandName.CHOOSE_AI_MODEL_BLIND_D.getBlindName()}},
                 {{"\uD83C\uDFAD Выбрать GPT - Роль", CommandName.CHOOSE_AI_ROLE_BLIND.getBlindName()}},
-                {{"\uD83C\uDFA8 Креативность ответов", CommandName.CHOOSE_TEMPERATURE_BLIND.getBlindName()}},
+                {{"\uD83C\uDFA8 Креативность ответов", CommandName.CHOOSE_TEMPERATURE_BLIND_D.getBlindName()}},
                 {{smileForContext + " Поддержка контекста", CommandName.SWITCH_CONTEXT_BLIND.getBlindName()}},
                 {{smileForVoice + " Голосовые ответы", CommandName.SWITCH_VOICE_RESPONSE_BLIND.getBlindName()}},
-                {{smileForLanguage + " Язык интерфейса", CommandName.INTERFACE_LANGUAGE_BLIND.getBlindName()}}
+                {{smileForLanguage + " Язык интерфейса", CommandName.CHOOSE_LANGUAGE_BLIND_D.getBlindName()}}
         };
     }
 }

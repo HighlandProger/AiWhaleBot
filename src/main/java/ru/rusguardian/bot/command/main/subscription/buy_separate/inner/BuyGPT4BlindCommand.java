@@ -12,7 +12,7 @@ import ru.rusguardian.util.ChoosePurchaseCountKeyboardUtil;
 @Component
 @RequiredArgsConstructor
 public class BuyGPT4BlindCommand extends Command {
-    private static final String FILE_PATH = "text/subscription/buy_separate/gpt4/";
+    private static final String BUY_SEPARATE_GPT4 = "BUY_SEPARATE_GPT4";
 
     @Override
     public CommandName getType() {
@@ -21,7 +21,7 @@ public class BuyGPT4BlindCommand extends Command {
 
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
-        editMessage(update, getTextFromFileByChatLanguage(FILE_PATH, getChat(update)),
+        editMessage(update, getTextByViewDataAndChatLanguage(BUY_SEPARATE_GPT4, getChat(update).getAiSettingsEmbedded().getAiLanguage()),
                 ChoosePurchaseCountKeyboardUtil.getKeyboard(AIModel.BalanceType.GPT_4));
     }
 }

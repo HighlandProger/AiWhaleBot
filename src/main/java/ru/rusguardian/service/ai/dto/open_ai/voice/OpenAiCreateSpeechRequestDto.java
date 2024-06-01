@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 public class OpenAiCreateSpeechRequestDto {
 
     private String model;
+    //TODO obtain ",{ symbols
     private String input;
     private String voice;
     @JsonProperty("response_format")
