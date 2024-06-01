@@ -7,6 +7,8 @@ import ru.rusguardian.domain.user.AISettingsEmbedded;
 import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.service.ai.AIVoiceService;
 import ru.rusguardian.service.ai.constant.AIModel;
+import ru.rusguardian.service.ai.constant.OpenAiVoiceType;
+import ru.rusguardian.service.ai.dto.open_ai.voice.OpenAiCreateSpeechRequestDto;
 import ru.rusguardian.service.ai.dto.open_ai.voice.OpenAiTranscriptionRequestDto;
 import ru.rusguardian.service.data.AIUserRequestService;
 
@@ -19,17 +21,33 @@ import java.util.concurrent.CompletableFuture;
 public class ProcessPromptVoice {
 
     private final AIVoiceService aiVoiceService;
-    private final ProcessPromptText processPromptText;
     private final AIUserRequestService aiUserRequestService;
 
-    public CompletableFuture<String> processTextResponse(Chat chat, File voiceFile) {
+    public CompletableFuture<String> processVoice2Text(Chat chat, File voiceFile) {
         AISettingsEmbedded settings = chat.getAiSettingsEmbedded();
 
         return aiVoiceService.getSpeechToText(getRequestDto(settings, voiceFile))
-                .thenCompose(resp -> {
-                    addAIUserVoiceRequestToDatabase(chat);
-                    return processPromptText.process(chat, resp);
+                .thenApply(resp -> {
+                    addAIUserVoice2TextRequestToDatabase(chat);
+                    return resp;
                 });
+    }
+
+    public CompletableFuture<File> processText2Voice(Chat chat, String text){
+        AIModel model = AIModel.TTS;
+        return aiVoiceService.getTextToSpeech(getText2VoiceRequestDto(model, text)).thenApply(file ->{
+            addAIUserText2VoiceRequestToDatabase(chat, model);
+            return file;
+        });
+    }
+
+    private OpenAiCreateSpeechRequestDto getText2VoiceRequestDto(AIModel model, String text){
+        OpenAiCreateSpeechRequestDto dto = new OpenAiCreateSpeechRequestDto();
+        //TODO middle functionality get from AISettings
+        dto.setVoice(OpenAiVoiceType.SHIMMER.getValue());
+        dto.setModel(model.getModelName());
+        dto.setInput(text);
+        return dto;
     }
 
     private OpenAiTranscriptionRequestDto getRequestDto(AISettingsEmbedded settings, File voiceFile) {
@@ -41,11 +59,20 @@ public class ProcessPromptVoice {
                 .build();
     }
 
-    private void addAIUserVoiceRequestToDatabase(Chat chat) {
+    private void addAIUserVoice2TextRequestToDatabase(Chat chat) {
         AIUserRequest request = new AIUserRequest();
         request.setRequestTime(LocalDateTime.now());
         request.setChat(chat);
         request.setAiModel(AIModel.WHISPER);
+
+        aiUserRequestService.save(request);
+    }
+
+    private void addAIUserText2VoiceRequestToDatabase(Chat chat, AIModel model) {
+        AIUserRequest request = new AIUserRequest();
+        request.setRequestTime(LocalDateTime.now());
+        request.setChat(chat);
+        request.setAiModel(model);
 
         aiUserRequestService.save(request);
     }

@@ -3,7 +3,9 @@ package ru.rusguardian.bot.command.prompts.voice;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.send.SendVoice;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.rusguardian.bot.command.prompts.PromptCommand;
@@ -11,6 +13,7 @@ import ru.rusguardian.bot.command.service.CommandName;
 import ru.rusguardian.constant.user.SubscriptionType;
 import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.service.ai.constant.AIModel;
+import ru.rusguardian.service.process.prompt.ProcessPromptText;
 import ru.rusguardian.service.process.prompt.ProcessPromptVoice;
 import ru.rusguardian.telegram.bot.util.util.FileUtils;
 
@@ -22,6 +25,7 @@ import java.io.File;
 public class ExecuteVoicePromptCommand extends PromptCommand {
 
     private final ProcessPromptVoice processPromptVoice;
+    private final ProcessPromptText processPromptText;
 
     @Override
     public CommandName getType() {
@@ -37,13 +41,25 @@ public class ExecuteVoicePromptCommand extends PromptCommand {
         File voiceFile = FileUtils.getFileFromUpdate(update, bot);
 
         if (!isChatLimitExpired(chat, model)) {
-            //TODO functional. Voice response support
-            processPromptVoice.processTextResponse(chat, voiceFile).thenAccept(response -> {
-                try {
-                    bot.execute(getEditMessageWithResponse(chat.getId(), response, replyId));
-                } catch (TelegramApiException e) {
-                    throw new RuntimeException(e);
-                }
+            processPromptVoice.processVoice2Text(chat, voiceFile).thenAccept(transcription -> {
+                processPromptText.process(chat, transcription).thenAccept(response ->{
+                    if (!chat.getAiSettingsEmbedded().isVoiceResponseEnabled()) {
+                        try {
+                            bot.execute(getEditMessageWithResponse(chat.getId(), response, replyId));
+                        } catch (TelegramApiException e) {
+                            throw new RuntimeException(e);
+                        }
+                        return;
+                    }
+                    processPromptVoice.processText2Voice(chat, response).thenAccept(voiceFileResponse ->{
+                        SendVoice voice = SendVoice.builder().voice(new InputFile(voiceFileResponse)).replyToMessageId(replyId).chatId(chat.getId()).build();
+                        try {
+                            bot.execute(voice);
+                        } catch (TelegramApiException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+                });
             }).exceptionally(e -> {
                 log.error(e.getMessage());
                 commandContainerService.getCommand(CommandName.ERROR).execute(update);

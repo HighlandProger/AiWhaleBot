@@ -1,6 +1,7 @@
 package ru.rusguardian.service.ai;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -11,9 +12,12 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+import ru.rusguardian.service.ai.dto.open_ai.text.OpenAiErrorResponseDto;
 import ru.rusguardian.service.ai.dto.open_ai.voice.OpenAiCreateSpeechRequestDto;
 import ru.rusguardian.service.ai.dto.open_ai.voice.OpenAiTranscriptionRequestDto;
 import ru.rusguardian.service.ai.dto.open_ai.voice.OpenAiTranscriptionResponseDto;
+import ru.rusguardian.service.ai.exception.OpenAiRequestException;
 import ru.rusguardian.telegram.bot.util.util.FileUtils;
 
 import java.io.File;
@@ -22,6 +26,7 @@ import java.util.concurrent.CompletableFuture;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class AIVoiceService {
 
     private static final String TRANSCRIPTIONS_URL = "https://api.openai.com/v1/audio/transcriptions";
@@ -81,6 +86,21 @@ public class AIVoiceService {
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
+                }).exceptionally(e ->{
+                    String errorMessage = getErrorMessage(e);
+                    log.error(errorMessage);
+                    throw new OpenAiRequestException(errorMessage, e);
                 });
+    }
+
+    private String getErrorMessage(Throwable e) {
+        if (e instanceof WebClientResponseException ex) {
+            try {
+                return ex.getResponseBodyAs(OpenAiErrorResponseDto.class).getError().getMessage();
+            } catch (Exception exc) {
+                log.error(exc.getMessage());
+            }
+        }
+        return e.getMessage();
     }
 }
