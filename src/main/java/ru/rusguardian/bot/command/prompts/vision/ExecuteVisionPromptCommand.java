@@ -15,6 +15,8 @@ import ru.rusguardian.service.process.prompt.ProcessPromptVision;
 import ru.rusguardian.telegram.bot.util.util.FileUtils;
 import ru.rusguardian.telegram.bot.util.util.TelegramUtils;
 
+import java.net.URL;
+
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -31,14 +33,14 @@ public class ExecuteVisionPromptCommand extends PromptCommand {
     protected void mainExecute(Update update) throws TelegramApiException {
         int replyId = sendQuickReply(update);
 
-        String imageUrl = FileUtils.getFileDownloadLink(TelegramUtils.getFileDownloadPath(update, bot), bot.getBotToken());
+        URL imageUrl = FileUtils.getFileUrlFromUpdate(update, bot);
         String prompt = TelegramUtils.getTextMessage(update).substring(CommandName.OBTAIN_VISION_PROMPT_VIEW_D.getViewName().length()).trim();
 
         Chat chat = getChat(update);
         AIModel model = AIModel.GPT_4_OMNI;
 
         if (!isChatLimitExpired(chat, model)) {
-            processPromptVision.process(chat, imageUrl, prompt).thenAccept(response -> {
+            processPromptVision.process(chat, imageUrl.toString(), prompt).thenAccept(response -> {
                 try {
                     bot.execute(getEditMessageWithResponse(chat.getId(), response, replyId));
                 } catch (TelegramApiException e) {
