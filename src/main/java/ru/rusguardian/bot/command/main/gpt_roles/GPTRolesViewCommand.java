@@ -13,7 +13,11 @@ import ru.rusguardian.telegram.bot.util.util.telegram_message.SendMessageUtil;
 import ru.rusguardian.util.GPTRolesInlineKeyboardUtil;
 
 @Component
-@CommandMapping(viewCommands = {"\uD83C\uDFAD GPT - Роли"})
+@CommandMapping(viewCommands = {
+        "\uD83C\uDFAD GPT - Роли",
+        "\uD83C\uDFAD GPT - Roles",
+        "\uD83C\uDFAD GPT - Rollen",
+        "\uD83C\uDFAD GPT - rollari"})
 public class GPTRolesViewCommand extends Command implements GPTRolesDescription {
     @Override
     public CommandName getType() {

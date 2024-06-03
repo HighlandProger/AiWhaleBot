@@ -7,6 +7,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.rusguardian.bot.command.service.Command;
+import ru.rusguardian.bot.command.service.CommandMapping;
 import ru.rusguardian.bot.command.service.CommandName;
 import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.service.process.get.ProcessGetTextUserAccount;
@@ -17,6 +18,11 @@ import static ru.rusguardian.bot.command.service.CommandName.*;
 
 @Component
 @RequiredArgsConstructor
+@CommandMapping(viewCommands = {
+        "\uD83D\uDC64 Мой аккаунт",
+        "\uD83D\uDC64 My account",
+        "\uD83D\uDC64 Mein Konto",
+        "\uD83D\uDC64 Mening hisobim"})
 public class MyAccountCommand extends Command {
 
     private static final String VIEW_DATA = "MY_ACCOUNT_VIEW";

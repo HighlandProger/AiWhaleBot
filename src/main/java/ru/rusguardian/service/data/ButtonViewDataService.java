@@ -15,6 +15,13 @@ public class ButtonViewDataService {
     private final ButtonViewDataRepository buttonViewDataRepository;
 
     public List<String> getByCommandNameAndLanguage(CommandName commandName, AILanguage language) {
-        return buttonViewDataRepository.findByCommandNameAndLanguage(commandName, language);
+        return switch (language) {
+            case RUSSIAN -> buttonViewDataRepository.findRussian(commandName);
+            case ENGLISH -> buttonViewDataRepository.findEnglish(commandName);
+            case GERMAN -> buttonViewDataRepository.findDeutsch(commandName);
+            case UZBEK -> buttonViewDataRepository.findUzbek(commandName);
+            default -> throw new IllegalArgumentException(language.toString());
+        };
     }
+
 }

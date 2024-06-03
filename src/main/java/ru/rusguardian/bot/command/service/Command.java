@@ -6,11 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-import org.springframework.transaction.annotation.Transactional;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.rusguardian.bot.command.service.commands.ErrorCommand;
 import ru.rusguardian.constant.ai.AILanguage;
@@ -22,6 +22,7 @@ import ru.rusguardian.telegram.bot.service.BotService;
 import ru.rusguardian.telegram.bot.service.task.TaskCommandService;
 import ru.rusguardian.telegram.bot.util.util.FileUtils;
 import ru.rusguardian.telegram.bot.util.util.TelegramUtils;
+import ru.rusguardian.telegram.bot.util.util.telegram_message.ReplyMarkupUtil;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -91,7 +92,6 @@ public abstract class Command implements BotService<CommandName> {
         }
     }
 
-    @Transactional
     protected Chat getChat(Update update) {
         return chatService.findById(TelegramUtils.getChatId(update));
     }
@@ -134,6 +134,16 @@ public abstract class Command implements BotService<CommandName> {
     protected void edit(EditMessageText editText) throws TelegramApiException {
         editText.setParseMode(ParseMode.HTML);
         bot.execute(editText);
+    }
+
+    protected ReplyKeyboard getMainKeyboard(AILanguage language) {
+
+        List<String> buttons = buttonViewDataService.getByCommandNameAndLanguage(CommandName.WELCOME, language);
+
+        return ReplyMarkupUtil.getReplyKeyboard(List.of(
+                List.of(buttons.get(0), buttons.get(1)),
+                List.of(buttons.get(2), buttons.get(3))
+        ));
     }
 
 }

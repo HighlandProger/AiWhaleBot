@@ -2,6 +2,8 @@ package ru.rusguardian.bot.command.service;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -11,6 +13,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CommandDispatcher {
 
     private final List<Command> commands;
@@ -22,16 +25,13 @@ public class CommandDispatcher {
     @PostConstruct
     private void init() {
         for (Command command : commands) {
-            CommandMapping commandMapping = command.getClass().getAnnotation(CommandMapping.class);
+            CommandMapping commandMapping = AopProxyUtils.ultimateTargetClass(command).getAnnotation(CommandMapping.class);
             initView(commandMapping, command);
             initBlind(commandMapping, command);
         }
     }
 
     private void initView(CommandMapping commandMapping, Command command) {
-        if (command.getType() == CommandName.START_VIEW_D) {
-            System.out.println("hi");
-        }
         if (commandMapping == null) return;
         for (String viewText : commandMapping.viewCommands()) {
             if (commandMapping.isViewVariable()) {
@@ -44,7 +44,7 @@ public class CommandDispatcher {
 
     private void initBlind(CommandMapping commandMapping, Command command) {
         String blindText = commandMapping == null || commandMapping.blindCommand().isEmpty() ? command.getType().name() : commandMapping.blindCommand();
-        if (commandMapping != null && commandMapping.isBlindVariable()) {
+        if (blindText.endsWith("BLIND_D")) {
             blindStartsWithMap.put(blindText, command.getType());
         } else {
             blindEqualsMap.put(blindText, command.getType());
@@ -77,6 +77,9 @@ public class CommandDispatcher {
     }
 
     public Optional<CommandName> getByBlindStatic(String blind) {
-        return Optional.of(blindEqualsMap.get(blind));
+        if (blindEqualsMap.containsKey(blind)) {
+            return Optional.of(blindEqualsMap.get(blind));
+        }
+        return Optional.empty();
     }
 }

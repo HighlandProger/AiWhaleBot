@@ -7,6 +7,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.rusguardian.bot.command.service.Command;
+import ru.rusguardian.bot.command.service.CommandMapping;
 import ru.rusguardian.bot.command.service.CommandName;
 import ru.rusguardian.domain.SubscriptionInfo;
 import ru.rusguardian.domain.user.Chat;
@@ -18,6 +19,11 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
+@CommandMapping(viewCommands = {
+        "\uD83D\uDE80 Премиум",
+        "\uD83D\uDE80 Premium",
+        "\uD83D\uDE80 Premium",
+        "\uD83D\uDE80 Premium"})
 public class SubscriptionViewCommand extends Command {
 
     private static final String VIEW_DATA = "SUBSCRIPTION";
