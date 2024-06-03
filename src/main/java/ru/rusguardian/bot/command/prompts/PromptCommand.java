@@ -49,7 +49,7 @@ public class PromptCommand extends Command {
         return checkChatRequestLimit.getTotalAllowedCount(chat, model) <= 0;
     }
 
-    protected int sendQuickReply(Update update) throws TelegramApiException{
+    protected int sendQuickReply(Update update) throws TelegramApiException {
         SendMessage reply = SendMessageUtil.getSimple(update, "Ответ обрабатывается");
         reply.setReplyToMessageId(TelegramUtils.getMessageId(update));
         return bot.execute(reply).getMessageId();

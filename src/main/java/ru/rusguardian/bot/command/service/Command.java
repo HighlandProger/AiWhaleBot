@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.transaction.annotation.Transactional;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
@@ -60,6 +61,8 @@ public abstract class Command implements BotService<CommandName> {
 
     @Autowired
     private ViewDataService viewDataService;
+    @Autowired
+    protected ButtonViewDataService buttonViewDataService;
 
     @Override
     public boolean hasEvent(Update update, CommandName event) {
@@ -88,6 +91,7 @@ public abstract class Command implements BotService<CommandName> {
         }
     }
 
+    @Transactional
     protected Chat getChat(Update update) {
         return chatService.findById(TelegramUtils.getChatId(update));
     }
@@ -119,11 +123,11 @@ public abstract class Command implements BotService<CommandName> {
         return FileUtils.getTextFromFileInResources(this, path);
     }
 
-    protected String getTextByViewDataAndChatLanguage(String viewDataName, AILanguage language){
+    protected String getTextByViewDataAndChatLanguage(String viewDataName, AILanguage language) {
         return viewDataService.getViewByNameAndLanguage(viewDataName, language);
     }
 
-    protected List<String> getButtonViewsByViewDataAndChatLanguage(String viewDataName, AILanguage language){
+    protected List<String> getButtonViewsByViewDataAndChatLanguage(String viewDataName, AILanguage language) {
         return Arrays.stream(viewDataService.getViewByNameAndLanguage(viewDataName, language).split("\n")).toList();
     }
 

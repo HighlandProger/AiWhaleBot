@@ -45,7 +45,7 @@ public class PartnerCabinetBlindCommand extends Command {
         InlineKeyboardButton button1 = InlineKeyboardButton.builder().text("\uD83D\uDCE2 Поделиться ссылкой").switchInlineQuery(getShareWithContactsLink(chat.getId())).build();
         InlineKeyboardButton button2 = InlineKeyboardButton.builder().text(INVITE_WITH_BUTTON_BLIND.getViewName()).callbackData(INVITE_WITH_BUTTON_BLIND.getBlindName()).build();
         InlineKeyboardButton button3 = InlineKeyboardButton.builder().text(CASH_OUT_BLIND.getViewName()).callbackData(CASH_OUT_BLIND.getBlindName()).build();
-        InlineKeyboardButton button4 = InlineKeyboardButton.builder().text(BACK.getViewName()).callbackData(MY_ACCOUNT.getBlindName()).build();
+        InlineKeyboardButton button4 = InlineKeyboardButton.builder().text(BACK.getViewName()).callbackData(MY_ACCOUNT_VIEW.getBlindName()).build();
 
         markup.setKeyboard(List.of(List.of(button1), List.of(button2), List.of(button3), List.of(button4)));
 

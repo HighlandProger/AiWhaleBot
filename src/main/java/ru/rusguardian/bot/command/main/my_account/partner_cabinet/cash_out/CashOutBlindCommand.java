@@ -42,11 +42,11 @@ public class CashOutBlindCommand extends Command {
         editMessage(update, getText(chat), getKeyboard());
     }
 
-    private String getText(Chat chat){
+    private String getText(Chat chat) {
         return getTextByViewDataAndChatLanguage(PARTNER_CASH_OUT, chat.getAiSettingsEmbedded().getAiLanguage());
     }
 
-    private InlineKeyboardMarkup getKeyboard(){
+    private InlineKeyboardMarkup getKeyboard() {
         InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
         InlineKeyboardButton button = InlineKeyboardButton.builder().text(CommandName.BACK.getViewName()).callbackData(CommandName.PARTNER_CABINET_BLIND.getBlindName()).build();
         markup.setKeyboard(List.of(List.of(button)));

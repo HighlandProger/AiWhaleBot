@@ -34,10 +34,12 @@ public class ChooseLanguageBlindDifCommand extends Command {
         String languageToChangeString = TelegramCallbackUtils.getArgFromCallback(update, 1);
 
         if (languageToChangeString != null) {
-            if (chat.getAiSettingsEmbedded().getAiLanguage() == AILanguage.valueOf(languageToChangeString)){return;}
+            if (chat.getAiSettingsEmbedded().getAiLanguage() == AILanguage.valueOf(languageToChangeString)) {
+                return;
+            }
             changeChatLanguage(chat, languageToChangeString);
         }
-        AILanguage currentLanguage = chat.getAiSettingsEmbedded().getAiLanguage();;
+        AILanguage currentLanguage = chat.getAiSettingsEmbedded().getAiLanguage();
         editMessage(update, getText(currentLanguage), getKeyboard(currentLanguage));
     }
 
@@ -49,11 +51,11 @@ public class ChooseLanguageBlindDifCommand extends Command {
         chatService.update(chat);
     }
 
-    private String getText(AILanguage currentLanguage){
+    private String getText(AILanguage currentLanguage) {
         return getTextByViewDataAndChatLanguage(VIEW_DATA, currentLanguage);
     }
 
-    private InlineKeyboardMarkup getKeyboard(AILanguage currentLanguage){
+    private InlineKeyboardMarkup getKeyboard(AILanguage currentLanguage) {
 
         InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
@@ -67,18 +69,19 @@ public class ChooseLanguageBlindDifCommand extends Command {
         return markup;
     }
 
-    private InlineKeyboardButton getButton(AILanguage language, AILanguage currentLanguage){
+    private InlineKeyboardButton getButton(AILanguage language, AILanguage currentLanguage) {
         return InlineKeyboardButton.builder()
                 .text(getViewTextForButton(language, currentLanguage))
                 .callbackData(getCallback(language))
                 .build();
     }
-    private String getViewTextForButton(AILanguage language, AILanguage currentLanguage){
+
+    private String getViewTextForButton(AILanguage language, AILanguage currentLanguage) {
         String smile = language == currentLanguage ? "✅" : "";
         return smile + " " + language.getSmile() + language.getDescription();
     }
 
-    private String getCallback(AILanguage language){
+    private String getCallback(AILanguage language) {
         return TelegramCallbackUtils.getCallbackWithArgs(CommandName.CHOOSE_LANGUAGE_BLIND_D.getBlindName(), language.name());
     }
 }

@@ -8,23 +8,35 @@ import java.util.Map;
 @Getter
 public enum CommandName {
 
-    START("/start"),
-    ADMIN("/admin"),
-    NOT_FOUND(null, "/notFound"),
-    EMPTY(null, "/empty"),
-    MAIN_MENU("\uD83C\uDFE0 В главное меню", "/mainMenu"),
-    ERROR("ERROR", "/error"),
+    START_VIEW_D("/start"),
+    ADMIN(),
+    NOT_FOUND(),
+    EMPTY(),
+    ERROR(),
     TEXT_COMMAND_DISTRIBUTOR(),
 
-    //START
+    //START_VIEW_D
     WELCOME(),
-    GPT_ROLES_VIEW("\uD83C\uDFAD GPT - Роли"),
+    GPT_ROLES_VIEW(),
     GPT_ROLES_BLIND_D(GPT_ROLES_VIEW.viewName),
-    MY_ACCOUNT("\uD83D\uDC64 Мой аккаунт"),
+    MY_ACCOUNT_VIEW("\uD83D\uDC64 Мой аккаунт"),
     SUBSCRIPTION_VIEW("\uD83D\uDE80 Премиум"),
     SUBSCRIPTION_BLIND_D(SUBSCRIPTION_VIEW.viewName),
     SETTINGS_VIEW("⚙\uFE0F Настройки"),
     SETTINGS_BLIND(SETTINGS_VIEW.viewName),
+
+    //MENU_COMMANDS
+    MIDJOURNEY("/midjourney"),
+    STABLE_DIFFUSION("/stablediffusion"),
+    CLAUDE("/claude"),
+    DELETE_CONTEXT("/deletecontext"),
+    GPT_PROMPTS("/gptprompts"),
+    MID_PROMPTS("/midprompts"),
+    SD_PROMPTS("/sddprompts"),
+    INFO("/info"),
+    HELP("/help"),
+    TERMS("/terms"),
+
 
     //SUBSCRIPTION
     BUY_SEPARATE_BLIND("⭐\uFE0F Купить запросы отдельно"),
@@ -54,14 +66,13 @@ public enum CommandName {
 
     //PURCHASE_TYPE
     PURCH_SEP_RUS_BLIND_D("\uD83C\uDDF7\uD83C\uDDFA \uD83D\uDCB3 РФ Банковские карты"),
-    PURCH_SEP_INTERN_BLIND_D("\uD83C\uDF0F \uD83D\uDCB3 Международные карты"),
     PURCH_SEP_CRYPTO_BLIND_D("\uD83D\uDD11 Криптовалюта"),
 
     PURCH_SUBS_RUS_BLIND_D("\uD83C\uDDF7\uD83C\uDDFA \uD83D\uDCB3 РФ Банковские карты"),
     PURCH_SUBS_INTERN_BLIND_D("\uD83C\uDF0F \uD83D\uDCB3 Международные карты"),
     PURCH_SUBS_CRYPTO_BLIND_D("\uD83D\uDD11 Криптовалюта"),
 
-    //MY_ACCOUNT
+    //MY_ACCOUNT_VIEW
     //SETTINGS(),
     PARTNER_CABINET_VIEW("\uD83D\uDCBC Кабинет Партнера"),
     PARTNER_CABINET_BLIND(PARTNER_CABINET_VIEW.viewName),

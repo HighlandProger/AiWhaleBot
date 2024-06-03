@@ -19,13 +19,13 @@ import static ru.rusguardian.bot.command.service.CommandName.*;
 @RequiredArgsConstructor
 public class MyAccountCommand extends Command {
 
-    private static final String VIEW_DATA = "MY_ACCOUNT";
+    private static final String VIEW_DATA = "MY_ACCOUNT_VIEW";
 
     private final ProcessGetTextUserAccount getUserAccountTextService;
 
     @Override
     public CommandName getType() {
-        return CommandName.MY_ACCOUNT;
+        return CommandName.MY_ACCOUNT_VIEW;
     }
 
     @Override

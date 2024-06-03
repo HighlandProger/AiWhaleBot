@@ -5,6 +5,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.rusguardian.bot.command.service.Command;
+import ru.rusguardian.bot.command.service.CommandMapping;
 import ru.rusguardian.bot.command.service.CommandName;
 import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.telegram.bot.util.util.TelegramUtils;
@@ -12,6 +13,7 @@ import ru.rusguardian.telegram.bot.util.util.telegram_message.SendMessageUtil;
 import ru.rusguardian.util.GPTRolesInlineKeyboardUtil;
 
 @Component
+@CommandMapping(viewCommands = {"\uD83C\uDFAD GPT - Роли"})
 public class GPTRolesViewCommand extends Command implements GPTRolesDescription {
     @Override
     public CommandName getType() {

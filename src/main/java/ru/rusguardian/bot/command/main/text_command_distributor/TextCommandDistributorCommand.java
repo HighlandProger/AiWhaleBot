@@ -11,6 +11,7 @@ import ru.rusguardian.telegram.bot.util.util.TelegramUtils;
 @Component
 @RequiredArgsConstructor
 public class TextCommandDistributorCommand extends Command {
+
     @Override
     public CommandName getType() {
         return CommandName.TEXT_COMMAND_DISTRIBUTOR;
@@ -20,24 +21,23 @@ public class TextCommandDistributorCommand extends Command {
     protected void mainExecute(Update update) throws TelegramApiException {
         String command = TelegramUtils.getTextMessage(update);
 
-
         if (command.startsWith("/start")) {
-            commandContainerService.getCommand(CommandName.START).execute(update);
+            commandContainerService.getCommand(CommandName.START_VIEW_D).execute(update);
             return;
         }
         if (command.equals("/account")) {
-            commandContainerService.getCommand(CommandName.MY_ACCOUNT).execute(update);
+            commandContainerService.getCommand(CommandName.MY_ACCOUNT_VIEW).execute(update);
             return;
         }
         if (command.equals("/premium")) {
             commandContainerService.getCommand(CommandName.SUBSCRIPTION_VIEW).execute(update);
             return;
         }
-        if (command.contains("/img")) {
+        if (command.startsWith("/img")) {
             commandContainerService.getCommand(CommandName.OBTAIN_IMAGE_PROMPT_VIEW_D).execute(update);
             return;
         }
-        if (command.contains("/vision")) {
+        if (command.startsWith("/vision")) {
             commandContainerService.getCommand(CommandName.OBTAIN_VISION_PROMPT_VIEW_D).execute(update);
             return;
         }

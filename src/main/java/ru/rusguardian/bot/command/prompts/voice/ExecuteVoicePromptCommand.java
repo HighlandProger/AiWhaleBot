@@ -42,7 +42,7 @@ public class ExecuteVoicePromptCommand extends PromptCommand {
 
         if (!isChatLimitExpired(chat, model)) {
             processPromptVoice.processVoice2Text(chat, voiceFile).thenAccept(transcription -> {
-                processPromptText.process(chat, transcription).thenAccept(response ->{
+                processPromptText.process(chat, transcription).thenAccept(response -> {
                     if (!chat.getAiSettingsEmbedded().isVoiceResponseEnabled()) {
                         try {
                             bot.execute(getEditMessageWithResponse(chat.getId(), response, replyId));
@@ -51,7 +51,7 @@ public class ExecuteVoicePromptCommand extends PromptCommand {
                         }
                         return;
                     }
-                    processPromptVoice.processText2Voice(chat, response).thenAccept(voiceFileResponse ->{
+                    processPromptVoice.processText2Voice(chat, response).thenAccept(voiceFileResponse -> {
                         SendVoice voice = SendVoice.builder().voice(new InputFile(voiceFileResponse)).replyToMessageId(replyId).chatId(chat.getId()).build();
                         try {
                             bot.execute(voice);

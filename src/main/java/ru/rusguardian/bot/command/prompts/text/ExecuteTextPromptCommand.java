@@ -40,7 +40,7 @@ public class ExecuteTextPromptCommand extends PromptCommand {
 
         if (!isChatLimitExpired(chat, model)) {
             processPromptText.process(chat, prompt).thenAccept(response -> {
-                if(!chat.getAiSettingsEmbedded().isVoiceResponseEnabled()) {
+                if (!chat.getAiSettingsEmbedded().isVoiceResponseEnabled()) {
                     try {
                         bot.execute(getEditMessageWithResponse(chat.getId(), response, replyId));
                     } catch (TelegramApiException e) {

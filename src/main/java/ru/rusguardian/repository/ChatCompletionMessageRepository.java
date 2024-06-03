@@ -20,4 +20,5 @@ public interface ChatCompletionMessageRepository extends JpaRepository<ChatCompl
     @Query("UPDATE ChatCompletionMessage c SET c.message = :message WHERE c.chat.id = :chatId AND c.role = 'SYSTEM'")
     void updateChatSystemMessage(@Param("chatId") Long chatId, @Param("message") String systemMessage);
 
+    void deleteByChatId(Long chatId);
 }

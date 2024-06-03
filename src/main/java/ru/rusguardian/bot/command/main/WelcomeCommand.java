@@ -6,6 +6,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.rusguardian.bot.command.service.Command;
 import ru.rusguardian.bot.command.service.CommandName;
+import ru.rusguardian.constant.ai.AILanguage;
 import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.telegram.bot.util.util.telegram_message.ReplyMarkupUtil;
 
@@ -21,17 +22,20 @@ public class WelcomeCommand extends Command {
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
         Chat chat = getChat(update);
-        sendMessage(update, getText(chat), getMainKeyboard());
+        sendMessage(update, getText(chat), getMainKeyboard(chat.getAiSettingsEmbedded().getAiLanguage()));
     }
 
     public String getText(Chat chat) {
         return getTextByViewDataAndChatLanguage(getType().name(), chat.getAiSettingsEmbedded().getAiLanguage());
     }
 
-    private ReplyKeyboard getMainKeyboard() {
+    private ReplyKeyboard getMainKeyboard(AILanguage language) {
+
+        List<String> buttons = buttonViewDataService.getByCommandNameAndLanguage(getType(), language);
+
         return ReplyMarkupUtil.getReplyKeyboard(List.of(
-                List.of(CommandName.GPT_ROLES_VIEW.getViewName(), CommandName.MY_ACCOUNT.getViewName()),
-                List.of(CommandName.SUBSCRIPTION_VIEW.getViewName(), CommandName.SETTINGS_VIEW.getViewName())
+                List.of(buttons.get(0), buttons.get(1)),
+                List.of(buttons.get(2), buttons.get(3))
         ));
     }
 

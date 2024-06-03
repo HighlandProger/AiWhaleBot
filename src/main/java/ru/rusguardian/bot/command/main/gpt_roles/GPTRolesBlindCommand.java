@@ -58,7 +58,6 @@ public class GPTRolesBlindCommand extends Command implements GPTRolesDescription
 
                 chat.getAiSettingsEmbedded().setAssistantRole(role);
                 chatService.update(chat);
-                chatCompletionMessageService.setSystemMessageForChat(chat.getId(), role.getDescription());
                 page = GPTRolesInlineKeyboardUtil.getPageNumberByAssistantRole(role);
             }
         }

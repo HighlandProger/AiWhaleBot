@@ -10,11 +10,9 @@ import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.service.data.ChatService;
 import ru.rusguardian.telegram.bot.util.util.TelegramUtils;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
-import static ru.rusguardian.bot.command.service.CommandName.*;
+import static ru.rusguardian.bot.command.service.CommandName.PROMPT;
 
 @Service
 @Slf4j
@@ -26,6 +24,9 @@ public class ProcessUpdateService {
     @Autowired
     @Lazy
     private CommandContainerService commandContainerService;
+
+    @Autowired
+    private CommandDispatcher commandDispatcher;
 
     public void process(Update update) {
         log.info(update.toString());
@@ -48,49 +49,18 @@ public class ProcessUpdateService {
         if (!update.hasCallbackQuery()) return Optional.empty();
         String callback = TelegramUtils.getCallbackQueryData(update);
 
-        Optional<CommandName> blindDifOptional = getByBlindDiff(callback);
-        if (blindDifOptional.isPresent()) {
-            return blindDifOptional;
-        }
-
-        return Arrays.stream(CommandName.values())
-                .filter(c -> c.getBlindName() != null)
-                .filter(c -> c.getBlindName().equals(callback))
-                .findFirst();
-    }
-
-    private Optional<CommandName> getByBlindDiff(String callback) {
-        List<CommandName> differableBlinds = Arrays.stream(values()).filter(c -> c.name().endsWith("BLIND_D")).toList();
-        return differableBlinds.stream().filter(d -> callback.startsWith(d.getBlindName())).findFirst();
+        return commandDispatcher.getByBlindStatic(callback).or(() -> commandDispatcher.getByBlindVariable(callback));
     }
 
     private Optional<CommandName> getByViewName(Update update) {
         if (!isUpdateHasViewText(update)) return Optional.empty();
         String text = TelegramUtils.getTextMessage(update);
 
-        Optional<CommandName> viewDifOptional = getByViewDiff(text);
-        if (viewDifOptional.isPresent()) {
-            return viewDifOptional;
-        }
-
-        if (update.getMessage().isCommand()) {
-            return Optional.of(TEXT_COMMAND_DISTRIBUTOR);
-        }
-
-        if (text.startsWith(START.getViewName())) return Optional.of(START);
-        return Arrays.stream(CommandName.values())
-                .filter(c -> c.getViewName() != null)
-                .filter(c -> c.getViewName().equals(text))
-                .findFirst();
+        return commandDispatcher.getByViewStatic(text).or(() -> commandDispatcher.getByViewVariable(text));
     }
 
     private boolean isUpdateHasViewText(Update update) {
         return update.hasMessage() && (update.getMessage().hasText() || update.getMessage().getCaption() != null);
-    }
-
-    private Optional<CommandName> getByViewDiff(String callback) {
-        List<CommandName> differableViews = Arrays.stream(values()).filter(c -> c.name().endsWith("VIEW_D")).toList();
-        return differableViews.stream().filter(d -> callback.startsWith(d.getViewName())).findFirst();
     }
 
     private Optional<CommandName> findCommandByNextCommand(Update update) {

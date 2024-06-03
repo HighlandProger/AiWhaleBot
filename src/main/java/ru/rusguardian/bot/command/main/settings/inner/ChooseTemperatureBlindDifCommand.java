@@ -48,7 +48,9 @@ public class ChooseTemperatureBlindDifCommand extends Command {
         }
 
         if (temperatureString != null) {
-            if (chat.getAiSettingsEmbedded().getTemperature() == AITemperature.valueOf(temperatureString)){return;}
+            if (chat.getAiSettingsEmbedded().getTemperature() == AITemperature.valueOf(temperatureString)) {
+                return;
+            }
             changeChatTemperature(chat, temperatureString);
         }
 
@@ -56,7 +58,7 @@ public class ChooseTemperatureBlindDifCommand extends Command {
         editMessage(update, getText(chat.getAiSettingsEmbedded().getAiLanguage()), getKeyboard(currentTemperature));
     }
 
-    private InlineKeyboardMarkup getKeyboard(AITemperature aiTemperature){
+    private InlineKeyboardMarkup getKeyboard(AITemperature aiTemperature) {
 
         InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
@@ -71,22 +73,23 @@ public class ChooseTemperatureBlindDifCommand extends Command {
         return markup;
     }
 
-    private InlineKeyboardButton getButton(AITemperature aiTemperature, AITemperature currentTemperature){
+    private InlineKeyboardButton getButton(AITemperature aiTemperature, AITemperature currentTemperature) {
         return InlineKeyboardButton.builder()
                 .text(getViewTextForButton(aiTemperature, currentTemperature))
                 .callbackData(getCallback(aiTemperature))
                 .build();
     }
-    private String getViewTextForButton(AITemperature aiTemperature, AITemperature currentTemperature){
+
+    private String getViewTextForButton(AITemperature aiTemperature, AITemperature currentTemperature) {
         String smile = aiTemperature == currentTemperature ? "✅" : "";
         return smile + " " + aiTemperature.getValue();
     }
 
-    private String getCallback(AITemperature aiTemperature){
+    private String getCallback(AITemperature aiTemperature) {
         return TelegramCallbackUtils.getCallbackWithArgs(CommandName.CHOOSE_TEMPERATURE_BLIND_D.getBlindName(), aiTemperature.name());
     }
 
-    private String getText(AILanguage aiLanguage){
+    private String getText(AILanguage aiLanguage) {
         return getTextByViewDataAndChatLanguage(SETTINGS_CHOOSE_TEMPERATURE, aiLanguage);
     }
 

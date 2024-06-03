@@ -30,7 +30,7 @@ public class ChatCompletionMessageService extends CrudService<ChatCompletionMess
         return repository.findByChatIdOrderByIdAsc(chatId);
     }
 
-    public void setSystemMessageForChat(Long chatId, String systemMessage) {
-        repository.updateChatSystemMessage(chatId, systemMessage);
+    public void deleteContext(Long chatId) {
+        repository.deleteByChatId(chatId);
     }
 }
