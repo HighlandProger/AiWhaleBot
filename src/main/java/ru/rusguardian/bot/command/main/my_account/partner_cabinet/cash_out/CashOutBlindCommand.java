@@ -48,7 +48,7 @@ public class CashOutBlindCommand extends Command {
 
     private InlineKeyboardMarkup getKeyboard() {
         InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
-        InlineKeyboardButton button = InlineKeyboardButton.builder().text(CommandName.BACK.getViewName()).callbackData(CommandName.PARTNER_CABINET_BLIND.getBlindName()).build();
+        InlineKeyboardButton button = InlineKeyboardButton.builder().text(CommandName.BACK.getViewName()).callbackData(CommandName.PARTNER_CABINET.getBlindName()).build();
         markup.setKeyboard(List.of(List.of(button)));
 
         return markup;

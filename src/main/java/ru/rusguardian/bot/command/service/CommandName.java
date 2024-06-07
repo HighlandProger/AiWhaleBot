@@ -19,11 +19,10 @@ public enum CommandName {
     WELCOME(),
     GPT_ROLES_VIEW(),
     GPT_ROLES_BLIND_D(GPT_ROLES_VIEW.viewName),
-    MY_ACCOUNT_VIEW("\uD83D\uDC64 Мой аккаунт"),
+    MY_ACCOUNT("\uD83D\uDC64 Мой аккаунт"),
     SUBSCRIPTION_VIEW("\uD83D\uDE80 Премиум"),
     SUBSCRIPTION_BLIND_D(SUBSCRIPTION_VIEW.viewName),
-    SETTINGS_VIEW("⚙\uFE0F Настройки"),
-    SETTINGS_BLIND(SETTINGS_VIEW.viewName),
+    SETTINGS(),
 
     //MENU_COMMANDS
     MIDJOURNEY("/midjourney"),
@@ -72,14 +71,13 @@ public enum CommandName {
     PURCH_SUBS_INTERN_BLIND_D("\uD83C\uDF0F \uD83D\uDCB3 Международные карты"),
     PURCH_SUBS_CRYPTO_BLIND_D("\uD83D\uDD11 Криптовалюта"),
 
-    //MY_ACCOUNT_VIEW
+    //MY_ACCOUNT
     //SETTINGS(),
-    PARTNER_CABINET_VIEW("\uD83D\uDCBC Кабинет Партнера"),
-    PARTNER_CABINET_BLIND(PARTNER_CABINET_VIEW.viewName),
+    PARTNER_CABINET(),
 
     //PARTNER
-    INVITE_WITH_BUTTON_BLIND("✉\uFE0F Приглашение с кнопкой"),
-    CASH_OUT_BLIND("\uD83D\uDCE5 Вывести"),
+    INVITE_WITH_BUTTON_BLIND(),
+    CASH_OUT_BLIND(),
 
     //SUPPORT_BUTTON(),
     BUY_PREMIUM("\uD83D\uDE80 Купить Премиум"),

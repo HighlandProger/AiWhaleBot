@@ -67,7 +67,7 @@ public class ChooseTemperatureBlindDifCommand extends Command {
         keyboard.add(List.of(getButton(AITemperature.MIDDLE, aiTemperature)));
         keyboard.add(List.of(getButton(AITemperature.LOW, aiTemperature)));
         keyboard.add(List.of(getButton(AITemperature.LOWEST, aiTemperature)));
-        keyboard.add(List.of(InlineKeyboardButton.builder().text(CommandName.BACK.getViewName()).callbackData(CommandName.SETTINGS_BLIND.getBlindName()).build()));
+        keyboard.add(List.of(InlineKeyboardButton.builder().text(CommandName.BACK.getViewName()).callbackData(CommandName.SETTINGS.getBlindName()).build()));
 
         markup.setKeyboard(keyboard);
         return markup;

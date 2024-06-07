@@ -9,6 +9,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.rusguardian.bot.command.service.Command;
 import ru.rusguardian.bot.command.service.CommandMapping;
 import ru.rusguardian.bot.command.service.CommandName;
+import ru.rusguardian.constant.ai.AILanguage;
 import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.service.process.get.ProcessGetTextUserAccount;
 
@@ -31,29 +32,31 @@ public class MyAccountCommand extends Command {
 
     @Override
     public CommandName getType() {
-        return CommandName.MY_ACCOUNT_VIEW;
+        return CommandName.MY_ACCOUNT;
     }
 
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
+        Chat chat = getChat(update);
         if (update.hasCallbackQuery()) {
-            editMessage(update, getText(update), getKeyboard());
-        } else sendMessage(update, getText(update), getKeyboard());
+            editMessage(update, getText(chat), getKeyboard(chat.getAiSettingsEmbedded().getAiLanguage()));
+        } else sendMessage(update, getText(chat), getKeyboard(chat.getAiSettingsEmbedded().getAiLanguage()));
     }
 
-    private String getText(Update update) {
-        Chat chat = getChat(update);
+    private String getText(Chat chat) {
         String textPattern = getTextByViewDataAndChatLanguage(VIEW_DATA, chat.getAiSettingsEmbedded().getAiLanguage());
         return getUserAccountTextService.get(chat, textPattern);
     }
 
-    private InlineKeyboardMarkup getKeyboard() {
+    private InlineKeyboardMarkup getKeyboard(AILanguage language) {
+
+        List<String> viewButtons = buttonViewDataService.getByNameAndLanguage(getType().name(), language);
 
         InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
-        InlineKeyboardButton button1 = InlineKeyboardButton.builder().text(SETTINGS_BLIND.getViewName()).callbackData(SETTINGS_BLIND.getBlindName()).build();
-        InlineKeyboardButton button2 = InlineKeyboardButton.builder().text(PARTNER_CABINET_BLIND.getViewName()).callbackData(PARTNER_CABINET_BLIND.getBlindName()).build();
-        InlineKeyboardButton button3 = InlineKeyboardButton.builder().text("\uD83D\uDC68\u200D\uD83D\uDD27 Техподдержка").url("https://t.me/freeeman98").build();
-        InlineKeyboardButton button4 = InlineKeyboardButton.builder().text(BUY_PREMIUM.getViewName()).callbackData(SUBSCRIPTION_BLIND_D.getBlindName()).build();
+        InlineKeyboardButton button1 = InlineKeyboardButton.builder().text(viewButtons.get(0)).callbackData(SETTINGS.getBlindName()).build();
+        InlineKeyboardButton button2 = InlineKeyboardButton.builder().text(viewButtons.get(1)).callbackData(PARTNER_CABINET.getBlindName()).build();
+        InlineKeyboardButton button3 = InlineKeyboardButton.builder().text(viewButtons.get(2)).url("https://t.me/freeeman98").build();
+        InlineKeyboardButton button4 = InlineKeyboardButton.builder().text(viewButtons.get(3)).callbackData(SUBSCRIPTION_BLIND_D.getBlindName()).build();
 
         markup.setKeyboard(List.of(List.of(button1), List.of(button2), List.of(button3), List.of(button4)));
 

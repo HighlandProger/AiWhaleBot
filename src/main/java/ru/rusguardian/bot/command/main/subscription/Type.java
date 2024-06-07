@@ -6,11 +6,6 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum Type {
-
-    MONTH("Месячная", "мес"),
-    YEAR("Годовая", "год");
-
-    private final String ruFull;
-    private final String ruShort;
-
+    MONTH,
+    YEAR
 }

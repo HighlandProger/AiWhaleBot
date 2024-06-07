@@ -1,8 +1,11 @@
 package ru.rusguardian.domain;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.*;
-import ru.rusguardian.bot.command.service.CommandName;
+import ru.rusguardian.constant.ai.AILanguage;
 
 @Entity
 @Table(schema = "ncs_bot", name = "button_view_data")
@@ -16,9 +19,8 @@ public class ButtonViewData {
 
     @Id
     private Long id;
-    @Enumerated(EnumType.STRING)
-    @Column(name = "command_name")
-    private CommandName commandName;
+    @Column(name = "name")
+    private String name;
     @Column(name = "button_number")
     private int buttonNumber;
     @Column(name = "ru_value")
@@ -29,4 +31,13 @@ public class ButtonViewData {
     private String deValue;
     @Column(name = "uz_value")
     private String uzValue;
+
+    public String getValueByLanguage(AILanguage language) {
+        return switch (language) {
+            case RUSSIAN -> ruValue;
+            case ENGLISH -> enValue;
+            case GERMAN -> deValue;
+            case UZBEK -> uzValue;
+        };
+    }
 }

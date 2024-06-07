@@ -68,7 +68,7 @@ public class ChooseAIModelBlindDifCommand extends Command {
         });
         InlineKeyboardButton backButton = InlineKeyboardButton.builder()
                 .text(CommandName.BACK.getViewName())
-                .callbackData(CommandName.SETTINGS_BLIND.getBlindName())
+                .callbackData(CommandName.SETTINGS.getBlindName())
                 .build();
         buttonLines.add(List.of(backButton));
         markup.setKeyboard(buttonLines);

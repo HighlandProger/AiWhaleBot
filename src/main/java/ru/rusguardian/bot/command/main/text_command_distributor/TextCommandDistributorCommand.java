@@ -26,7 +26,7 @@ public class TextCommandDistributorCommand extends Command {
             return;
         }
         if (command.equals("/account")) {
-            commandContainerService.getCommand(CommandName.MY_ACCOUNT_VIEW).execute(update);
+            commandContainerService.getCommand(CommandName.MY_ACCOUNT).execute(update);
             return;
         }
         if (command.equals("/premium")) {
@@ -46,11 +46,11 @@ public class TextCommandDistributorCommand extends Command {
             return;
         }
         if (command.equals("/settings")) {
-            commandContainerService.getCommand(CommandName.SETTINGS_VIEW).execute(update);
+            commandContainerService.getCommand(CommandName.SETTINGS).execute(update);
             return;
         }
         if (command.equals("/partner")) {
-            commandContainerService.getCommand(CommandName.PARTNER_CABINET_VIEW).execute(update);
+            commandContainerService.getCommand(CommandName.PARTNER_CABINET).execute(update);
             return;
         }
 

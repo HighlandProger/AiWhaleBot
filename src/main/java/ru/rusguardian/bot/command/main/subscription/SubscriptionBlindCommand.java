@@ -6,12 +6,12 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageRe
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import ru.rusguardian.bot.command.main.subscription.service.SubscriptionsKeyboardService;
 import ru.rusguardian.bot.command.service.Command;
 import ru.rusguardian.bot.command.service.CommandName;
 import ru.rusguardian.domain.SubscriptionInfo;
 import ru.rusguardian.telegram.bot.util.util.TelegramCallbackUtils;
 import ru.rusguardian.telegram.bot.util.util.telegram_message.EditMarkupUtil;
-import ru.rusguardian.util.SubscriptionsKeyboardUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +19,8 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class SubscriptionBlindCommand extends Command {
+
+    private final SubscriptionsKeyboardService subscriptionsKeyboardService;
 
     @Override
     public CommandName getType() {
@@ -34,7 +36,7 @@ public class SubscriptionBlindCommand extends Command {
         Type type = Type.valueOf(typeString);
         List<SubscriptionInfo> subscriptionInfos = new ArrayList<>(subscriptionInfoService.getAll().stream().filter(e -> e.getType().getTimeType() == type).toList());
 
-        InlineKeyboardMarkup markup = SubscriptionsKeyboardUtil.getKeyboard(type, subscriptionInfos);
+        InlineKeyboardMarkup markup = subscriptionsKeyboardService.getKeyboard(type, subscriptionInfos, getChat(update).getAiSettingsEmbedded().getAiLanguage());
 
         EditMessageReplyMarkup edit = EditMarkupUtil.getSimple(update, markup);
 

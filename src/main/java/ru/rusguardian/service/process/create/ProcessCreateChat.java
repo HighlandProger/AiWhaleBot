@@ -6,13 +6,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.rusguardian.constant.ai.AITemperature;
-import ru.rusguardian.constant.ai.AssistantRole;
 import ru.rusguardian.constant.user.SubscriptionType;
+import ru.rusguardian.domain.AssistantRoleData;
 import ru.rusguardian.domain.ChatCompletionMessage;
 import ru.rusguardian.domain.SubscriptionInfo;
 import ru.rusguardian.domain.user.*;
 import ru.rusguardian.service.ai.constant.AIModel;
 import ru.rusguardian.service.ai.constant.Role;
+import ru.rusguardian.service.data.AssistantRoleDataService;
 import ru.rusguardian.service.data.ChatCompletionMessageService;
 import ru.rusguardian.service.data.ChatService;
 import ru.rusguardian.service.data.SubscriptionInfoService;
@@ -33,6 +34,7 @@ public class ProcessCreateChat {
     private final SubscriptionInfoService subscriptionInfoService;
     private final ChatService chatService;
     private final ChatCompletionMessageService chatCompletionMessageService;
+    private final AssistantRoleDataService assistantRoleDataService;
 
     @Transactional
     public Chat process(Update update) {
@@ -61,7 +63,7 @@ public class ProcessCreateChat {
 
     private AISettingsEmbedded getAiSetting() {
         AISettingsEmbedded aiSettingsEmbedded = new AISettingsEmbedded();
-        aiSettingsEmbedded.setAssistantRole(AssistantRole.USUAL);
+        aiSettingsEmbedded.setAssistantRole(assistantRoleDataService.getByNameAndLanguage("USUAL", RUSSIAN));
         aiSettingsEmbedded.setAiActiveModel(AIModel.GPT_3_5_TURBO);
         aiSettingsEmbedded.setTemperature(AITemperature.MIDDLE);
         aiSettingsEmbedded.setAiLanguage(RUSSIAN);
@@ -118,10 +120,10 @@ public class ProcessCreateChat {
     }
 
     private void createSystemCompletionMessage(Chat chat) {
-        AssistantRole assistantRole = AssistantRole.USUAL;
+        AssistantRoleData role = chat.getAiSettingsEmbedded().getAssistantRole();
         ChatCompletionMessage message = new ChatCompletionMessage();
         message.setChat(chat);
-        message.setMessage(assistantRole.getDescription());
+        message.setMessage(role.getDescription());
         message.setRole(Role.SYSTEM);
         chatCompletionMessageService.save(message);
     }

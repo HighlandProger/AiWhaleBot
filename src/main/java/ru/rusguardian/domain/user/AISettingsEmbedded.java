@@ -1,22 +1,19 @@
 package ru.rusguardian.domain.user;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.*;
 import lombok.Data;
 import ru.rusguardian.constant.ai.AILanguage;
 import ru.rusguardian.constant.ai.AITemperature;
-import ru.rusguardian.constant.ai.AssistantRole;
+import ru.rusguardian.domain.AssistantRoleData;
 import ru.rusguardian.service.ai.constant.AIModel;
 
 @Embeddable
 @Data
 public class AISettingsEmbedded {
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "assistant_role")
-    private AssistantRole assistantRole;
+    @ManyToOne
+    @JoinColumn(name = "assistant_role_id")
+    private AssistantRoleData assistantRole;
     @Enumerated(EnumType.STRING)
     @Column(name = "ai_language")
     private AILanguage aiLanguage;

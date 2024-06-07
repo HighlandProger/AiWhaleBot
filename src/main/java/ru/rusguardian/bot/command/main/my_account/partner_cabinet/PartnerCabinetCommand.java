@@ -17,7 +17,7 @@ import static ru.rusguardian.bot.command.service.CommandName.*;
 
 @RequiredArgsConstructor
 @Component
-public class PartnerCabinetBlindCommand extends Command {
+public class PartnerCabinetCommand extends Command {
 
     private static final String VIEW_DATA = "PARTNER_CABINET";
 
@@ -25,13 +25,15 @@ public class PartnerCabinetBlindCommand extends Command {
 
     @Override
     public CommandName getType() {
-        return CommandName.PARTNER_CABINET_BLIND;
+        return CommandName.PARTNER_CABINET;
     }
 
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
         Chat chat = getChat(update);
-        editMessage(update, getText(chat), getKeyboard(chat));
+        if (update.hasCallbackQuery()) {
+            editMessage(update, getText(chat), getKeyboard(chat));
+        } else sendMessage(update, getText(chat), getKeyboard(chat));
     }
 
     private String getText(Chat chat) {
@@ -41,11 +43,13 @@ public class PartnerCabinetBlindCommand extends Command {
 
     private InlineKeyboardMarkup getKeyboard(Chat chat) {
 
+        List<String> buttonViews = buttonViewDataService.getByNameAndLanguage(getType().name(), chat.getAiSettingsEmbedded().getAiLanguage());
+
         InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
-        InlineKeyboardButton button1 = InlineKeyboardButton.builder().text("\uD83D\uDCE2 Поделиться ссылкой").switchInlineQuery(getShareWithContactsLink(chat.getId())).build();
-        InlineKeyboardButton button2 = InlineKeyboardButton.builder().text(INVITE_WITH_BUTTON_BLIND.getViewName()).callbackData(INVITE_WITH_BUTTON_BLIND.getBlindName()).build();
-        InlineKeyboardButton button3 = InlineKeyboardButton.builder().text(CASH_OUT_BLIND.getViewName()).callbackData(CASH_OUT_BLIND.getBlindName()).build();
-        InlineKeyboardButton button4 = InlineKeyboardButton.builder().text(BACK.getViewName()).callbackData(MY_ACCOUNT_VIEW.getBlindName()).build();
+        InlineKeyboardButton button1 = InlineKeyboardButton.builder().text(buttonViews.get(0)).switchInlineQuery(getShareWithContactsLink(chat.getId())).build();
+        InlineKeyboardButton button2 = InlineKeyboardButton.builder().text(buttonViews.get(1)).callbackData(INVITE_WITH_BUTTON_BLIND.getBlindName()).build();
+        InlineKeyboardButton button3 = InlineKeyboardButton.builder().text(buttonViews.get(2)).callbackData(CASH_OUT_BLIND.getBlindName()).build();
+        InlineKeyboardButton button4 = InlineKeyboardButton.builder().text(buttonViews.get(3)).callbackData(MY_ACCOUNT.getBlindName()).build();
 
         markup.setKeyboard(List.of(List.of(button1), List.of(button2), List.of(button3), List.of(button4)));
 

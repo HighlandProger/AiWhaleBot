@@ -62,6 +62,10 @@ public abstract class Command implements BotService<CommandName> {
 
     @Autowired
     private ViewDataService viewDataService;
+
+    @Autowired
+    protected AssistantRoleDataService assistantRoleDataService;
+
     @Autowired
     protected ButtonViewDataService buttonViewDataService;
 
@@ -138,7 +142,7 @@ public abstract class Command implements BotService<CommandName> {
 
     protected ReplyKeyboard getMainKeyboard(AILanguage language) {
 
-        List<String> buttons = buttonViewDataService.getByCommandNameAndLanguage(CommandName.WELCOME, language);
+        List<String> buttons = buttonViewDataService.getByNameAndLanguage(CommandName.WELCOME.name(), language);
 
         return ReplyMarkupUtil.getReplyKeyboard(List.of(
                 List.of(buttons.get(0), buttons.get(1)),

@@ -24,6 +24,6 @@ public class SwitchContextBlindCommand extends Command {
         settings.setContextEnabled(!settings.isContextEnabled());
         chatService.update(chat);
 
-        commandContainerService.getCommand(CommandName.SETTINGS_BLIND).execute(update);
+        commandContainerService.getCommand(CommandName.SETTINGS).execute(update);
     }
 }

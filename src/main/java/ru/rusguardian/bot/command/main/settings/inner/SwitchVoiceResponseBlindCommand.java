@@ -36,7 +36,7 @@ public class SwitchVoiceResponseBlindCommand extends Command {
         chat.setAiSettingsEmbedded(settings);
         chatService.update(chat);
 
-        commandContainerService.getCommand(CommandName.SETTINGS_BLIND).execute(update);
+        commandContainerService.getCommand(CommandName.SETTINGS).execute(update);
     }
 
     private boolean isFreeSubscription(Chat chat) {

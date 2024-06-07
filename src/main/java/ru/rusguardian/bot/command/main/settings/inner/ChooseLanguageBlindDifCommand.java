@@ -21,6 +21,7 @@ import java.util.List;
 public class ChooseLanguageBlindDifCommand extends Command {
 
     private static final String VIEW_DATA = "CHOOSE_LANGUAGE";
+    private static final String BACK_VIEW_DATA = "BACK";
 
     @Override
     public CommandName getType() {
@@ -64,7 +65,7 @@ public class ChooseLanguageBlindDifCommand extends Command {
         keyboard.add(List.of(getButton(AILanguage.ENGLISH, currentLanguage)));
         keyboard.add(List.of(getButton(AILanguage.GERMAN, currentLanguage)));
         keyboard.add(List.of(getButton(AILanguage.UZBEK, currentLanguage)));
-        keyboard.add(List.of(InlineKeyboardButton.builder().text(CommandName.BACK.getViewName()).callbackData(CommandName.SETTINGS_BLIND.getBlindName()).build()));
+        keyboard.add(List.of(InlineKeyboardButton.builder().text(getTextByViewDataAndChatLanguage(BACK_VIEW_DATA, currentLanguage)).callbackData(CommandName.SETTINGS.getBlindName()).build()));
 
         markup.setKeyboard(keyboard);
         return markup;

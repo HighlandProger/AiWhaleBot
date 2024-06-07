@@ -1,6 +1,6 @@
 package ru.rusguardian.util;
 
-import ru.rusguardian.constant.ai.AssistantRole;
+import ru.rusguardian.domain.AssistantRoleData;
 import ru.rusguardian.domain.ChatCompletionMessage;
 import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.service.ai.constant.AIRequestSetting;
@@ -12,7 +12,8 @@ import java.util.List;
 
 public class ChatUtil {
 
-    private ChatUtil(){}
+    private ChatUtil() {
+    }
 
     public static int getChatMaxTokens(Chat chat) {
         return chat.getSubscriptionEmbedded().getSubscriptionInfo().getContextAndTokensXSize() * AIRequestSetting.TOKEN_SIZE.getValue();
@@ -26,8 +27,8 @@ public class ChatUtil {
     }
 
     private static List<ChatCompletionMessage> getChatSystemMessage(Chat chat) {
-        AssistantRole assistantRole = chat.getAiSettingsEmbedded().getAssistantRole();
-        return List.of(new ChatCompletionMessage(chat, Role.SYSTEM, assistantRole.getDescription()));
+        AssistantRoleData role = chat.getAiSettingsEmbedded().getAssistantRole();
+        return List.of(new ChatCompletionMessage(chat, Role.SYSTEM, role.getDescription()));
     }
 
     private static List<ChatCompletionMessage> getPreviousChatCompletionMessages(Chat chat, ChatCompletionMessageService chatCompletionMessageService) {
