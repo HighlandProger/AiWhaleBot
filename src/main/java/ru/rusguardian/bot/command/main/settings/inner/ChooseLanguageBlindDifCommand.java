@@ -38,10 +38,10 @@ public class ChooseLanguageBlindDifCommand extends Command {
                 return;
             }
             changeChatLanguage(chat, languageToChangeString);
+            sendMessage(update, "Ok", getMainKeyboard(chat.getAiSettingsEmbedded().getAiLanguage()));
         }
         AILanguage currentLanguage = chat.getAiSettingsEmbedded().getAiLanguage();
         editMessage(update, getText(currentLanguage), getKeyboard(currentLanguage));
-        sendMessage(update, "Ok", getMainKeyboard(currentLanguage));
     }
 
     private void changeChatLanguage(Chat chat, String languageString) {

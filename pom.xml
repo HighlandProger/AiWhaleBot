@@ -115,7 +115,7 @@
                 <version>2.5.4</version>
                 <configuration>
                     <jvmArguments>
-                        -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005
+                        -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005,logLevel=info
                     </jvmArguments>
                 </configuration>
             </plugin>

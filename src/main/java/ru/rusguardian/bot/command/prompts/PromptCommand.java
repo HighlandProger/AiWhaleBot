@@ -60,7 +60,7 @@ public class PromptCommand extends Command {
         edit.setChatId(chatId);
         edit.setMessageId(messageId);
         edit.setText(text);
-        edit.setParseMode(ParseMode.MARKDOWN);
+        edit.setParseMode(ParseMode.HTML);
 
         return edit;
     }

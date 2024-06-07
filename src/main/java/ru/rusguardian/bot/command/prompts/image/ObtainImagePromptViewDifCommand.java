@@ -8,6 +8,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.rusguardian.bot.command.service.Command;
+import ru.rusguardian.bot.command.service.CommandMapping;
 import ru.rusguardian.bot.command.service.CommandName;
 import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.service.ai.constant.AIModel;
@@ -19,6 +20,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
+@CommandMapping(viewCommands = {"/img"}, isViewVariable = true)
 public class ObtainImagePromptViewDifCommand extends Command {
 
     private static final String IMAGE_INSTRUCTION = "IMAGE_INSTRUCTION";

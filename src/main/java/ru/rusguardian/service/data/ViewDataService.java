@@ -3,7 +3,10 @@ package ru.rusguardian.service.data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.rusguardian.constant.ai.AILanguage;
+import ru.rusguardian.domain.ViewData;
 import ru.rusguardian.repository.ViewDataRepository;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -19,4 +22,16 @@ public class ViewDataService {
         throw new IllegalArgumentException(language.name());
     }
 
+    public ViewData findByName(String name){
+        return viewDataRepository.findById(name).orElseThrow();
+    }
+
+    public ViewData updateViewData(ViewData viewData){
+        findByName(viewData.getName());
+        return viewDataRepository.save(viewData);
+    }
+
+    public List<ViewData> findAll(){
+        return viewDataRepository.findAll();
+    }
 }

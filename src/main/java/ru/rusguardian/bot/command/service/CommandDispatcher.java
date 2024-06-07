@@ -34,7 +34,7 @@ public class CommandDispatcher {
     private void initView(CommandMapping commandMapping, Command command) {
         if (commandMapping == null) return;
         for (String viewText : commandMapping.viewCommands()) {
-            if (commandMapping.isViewVariable()) {
+            if (commandMapping.isViewVariable() || command.getType().name().endsWith("VIEW_D")) {
                 viewStartsWithMap.put(viewText, command.getType());
             } else {
                 viewEqualsMap.put(viewText, command.getType());

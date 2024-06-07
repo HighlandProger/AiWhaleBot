@@ -19,6 +19,8 @@ import ru.rusguardian.service.process.prompt.ProcessPromptText2Image;
 import ru.rusguardian.telegram.bot.util.util.TelegramCallbackUtils;
 import ru.rusguardian.telegram.bot.util.util.telegram_message.InputFileUtil;
 
+import java.text.MessageFormat;
+
 import static ru.rusguardian.bot.command.service.CommandName.EXECUTE_IMAGE_PROMPT_BLIND_D;
 import static ru.rusguardian.bot.command.service.CommandName.OBTAIN_IMAGE_PROMPT_VIEW_D;
 
@@ -31,6 +33,7 @@ public class ExecuteImagePromptViewDifCommand extends PromptCommand {
     private final ProcessGetTextLimitExpired getTextLimitExpired;
 
     private static final String IMAGE_PREPARING = "IMAGE_PREPARING";
+    private static final String IMAGE_READY_PATTERN = "IMAGE_READY";
 
     @Override
     public CommandName getType() {
@@ -50,7 +53,7 @@ public class ExecuteImagePromptViewDifCommand extends PromptCommand {
 
         if (!isChatLimitExpired) {
             processPromptText2Image.processUrl(chat, model, prompt).thenAccept(url ->
-                    sendResponseToUser(url, chat.getId(), model.getModelName(), prompt)
+                    sendResponseToUser(url, chat, model.getModelName(), prompt)
             ).exceptionally(ex -> {
                 log.error("EXCEPTION DURING EXECUTING ProcessPromptText2Image. Model: {}, prompt: {}, ExMessage: {}", model, prompt, ex.getMessage());
                 errorCommand.execute(update);
@@ -74,10 +77,9 @@ public class ExecuteImagePromptViewDifCommand extends PromptCommand {
                 : getTextByViewDataAndChatLanguage(IMAGE_PREPARING, chat.getAiSettingsEmbedded().getAiLanguage());
     }
 
-    //TODO minor refactor
-    private void sendResponseToUser(String fileUrl, Long chatId, String model, String prompt) {
+    private void sendResponseToUser(String fileUrl, Chat chat, String model, String prompt) {
         InputFile file = InputFileUtil.getInputFileFromURL(fileUrl);
-        SendPhoto photo = SendPhoto.builder().photo(file).chatId(chatId).caption(getCaption(model, prompt)).parseMode(ParseMode.MARKDOWN).build();
+        SendPhoto photo = SendPhoto.builder().photo(file).chatId(chat.getId()).caption(getCaption(chat, model, prompt)).parseMode(ParseMode.HTML).build();
         try {
             bot.execute(photo);
         } catch (TelegramApiException e) {
@@ -85,16 +87,8 @@ public class ExecuteImagePromptViewDifCommand extends PromptCommand {
         }
     }
 
-    //TODO minor 1)add language support 2)move to txt file
-    private String getCaption(String model, String prompt) {
-        return String.format("""
-                🖼️ Формат: 1024x1024
-                🤖 Модель: %s
-                🧮 Количество изображений: 1
-                🏛 Промпт: %s
-                                
-                [ChatGPT 4.0 | Telegram Bot](https://t.me/ChatGPT_Midjourney_PRO_bot)
-                """, model, prompt);
+    private String getCaption(Chat chat, String model, String prompt) {
+        return MessageFormat.format(getTextByViewDataAndChatLanguage(IMAGE_READY_PATTERN, chat.getAiSettingsEmbedded().getAiLanguage()), model, prompt);
     }
 
 }

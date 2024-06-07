@@ -25,7 +25,7 @@ import static ru.rusguardian.bot.command.service.CommandName.*;
         "\uD83D\uDC64 Mening hisobim"})
 public class MyAccountCommand extends Command {
 
-    private static final String VIEW_DATA = "MY_ACCOUNT_VIEW";
+    private static final String VIEW_DATA = "MY_ACCOUNT";
 
     private final ProcessGetTextUserAccount getUserAccountTextService;
 
