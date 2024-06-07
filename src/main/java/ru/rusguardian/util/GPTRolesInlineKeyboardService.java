@@ -34,12 +34,12 @@ public class GPTRolesInlineKeyboardService {
     private static final String BACK_VIEW_DATA = "BACK";
     private static final String GPT_ROLES_PREFIX = CommandName.GPT_ROLES_BLIND_D.getBlindName();
 
-    public InlineKeyboardMarkup getKeyboard(int page, AssistantRoleData type, AILanguage language) {
+    public InlineKeyboardMarkup getKeyboard(int page, AssistantRoleData role, AILanguage language) {
 
         InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
         rows.addAll(getActionButtons(page).getKeyboard());
-        rows.addAll(getAssistantTypeButtons(page, type, language).getKeyboard());
+        rows.addAll(getAssistantTypeButtons(page, role, language).getKeyboard());
         rows.addAll(getBackButton(language).getKeyboard());
 
         markup.setKeyboard(rows);

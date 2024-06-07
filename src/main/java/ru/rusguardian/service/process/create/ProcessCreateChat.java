@@ -63,7 +63,7 @@ public class ProcessCreateChat {
 
     private AISettingsEmbedded getAiSetting() {
         AISettingsEmbedded aiSettingsEmbedded = new AISettingsEmbedded();
-        aiSettingsEmbedded.setAssistantRole(assistantRoleDataService.getByNameAndLanguage("USUAL", RUSSIAN));
+        aiSettingsEmbedded.setAssistantRoleName("USUAL");
         aiSettingsEmbedded.setAiActiveModel(AIModel.GPT_3_5_TURBO);
         aiSettingsEmbedded.setTemperature(AITemperature.MIDDLE);
         aiSettingsEmbedded.setAiLanguage(RUSSIAN);
@@ -120,7 +120,7 @@ public class ProcessCreateChat {
     }
 
     private void createSystemCompletionMessage(Chat chat) {
-        AssistantRoleData role = chat.getAiSettingsEmbedded().getAssistantRole();
+        AssistantRoleData role = assistantRoleDataService.getByChat(chat);
         ChatCompletionMessage message = new ChatCompletionMessage();
         message.setChat(chat);
         message.setMessage(role.getDescription());

@@ -63,20 +63,21 @@ public class GPTRolesBlindCommand extends Command {
                     return;
                 }
 
-                chat.getAiSettingsEmbedded().setAssistantRole(role);
+                chat.getAiSettingsEmbedded().setAssistantRoleName(role.getName());
                 chatService.update(chat);
                 page = keyboardService.getPageNumberByAssistantRoleAndLanguage(role, language);
             }
         }
+        AssistantRoleData currentRole = assistantRoleDataService.getByChat(chat);
 
-        EditMessageText edit = EditMessageUtil.getMessageText(update, getDescriptionText(chat.getAiSettingsEmbedded().getAssistantRole(), language));
-        edit.setReplyMarkup(keyboardService.getKeyboard(page, chat.getAiSettingsEmbedded().getAssistantRole(), language));
+        EditMessageText edit = EditMessageUtil.getMessageText(update, getDescriptionText(currentRole, language));
+        edit.setReplyMarkup(keyboardService.getKeyboard(page, currentRole, language));
 
         bot.execute(edit);
     }
 
     private boolean isRoleNotChanged(Chat chat, AssistantRoleData role) {
-        return chat.getAiSettingsEmbedded().getAssistantRole() == role;
+        return chat.getAiSettingsEmbedded().getAssistantRoleName().equals(role.getName());
     }
 
     private boolean isFreeSubscription(Chat chat) {

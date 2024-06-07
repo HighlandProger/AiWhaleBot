@@ -53,7 +53,7 @@ public class SettingsCommand extends Command {
 
         return new String[][][]{
                 {{buttonsView.get(0), CommandName.CHOOSE_AI_MODEL_BLIND_D.getBlindName()}},
-                {{buttonsView.get(1), CommandName.CHOOSE_AI_ROLE_BLIND.getBlindName()}},
+                {{buttonsView.get(1), CommandName.GPT_ROLES_BLIND_D.getBlindName()}},
                 {{buttonsView.get(2), CommandName.CHOOSE_TEMPERATURE_BLIND_D.getBlindName()}},
                 {{smileForContext + buttonsView.get(3), CommandName.SWITCH_CONTEXT_BLIND.getBlindName()}},
                 {{smileForVoice + buttonsView.get(4), CommandName.SWITCH_VOICE_RESPONSE_BLIND.getBlindName()}},

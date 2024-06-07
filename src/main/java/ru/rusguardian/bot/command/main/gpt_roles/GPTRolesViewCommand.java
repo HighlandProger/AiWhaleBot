@@ -38,7 +38,7 @@ public class GPTRolesViewCommand extends Command {
 
         Chat chat = chatService.findById(TelegramUtils.getChatId(update));
         AILanguage language = chat.getAiSettingsEmbedded().getAiLanguage();
-        AssistantRoleData role = chat.getAiSettingsEmbedded().getAssistantRole();
+        AssistantRoleData role = assistantRoleDataService.getByChat(chat);
 
         SendMessage message = SendMessageUtil.getSimpleWithReplyOnLastUserMessage(update, getDescriptionText(role, language));
         message.setReplyMarkup(keyboardService.getKeyboard(0, role, language));

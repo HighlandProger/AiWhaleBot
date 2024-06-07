@@ -47,7 +47,6 @@ public enum CommandName {
 
     //SETTINGS
     CHOOSE_AI_MODEL_BLIND_D(null),
-    CHOOSE_AI_ROLE_BLIND(null),
     CHOOSE_TEMPERATURE_BLIND_D(null),
     SWITCH_CONTEXT_BLIND(null),
     SWITCH_VOICE_RESPONSE_BLIND(null),

@@ -45,10 +45,10 @@ public class ProcessGetTextUserAccount {
                 userBalance.getExtraImageRequests(),
                 //----------------------------------------------------------
                 aiSettings.getAiActiveModel(),
-                aiSettings.getAssistantRole().getName(),
+                aiSettings.getAssistantRoleName(),
                 aiSettings.getTemperature(),
-                aiSettings.isContextEnabled() ? "✅ Вкл" : "❌ Выкл",
-                aiSettings.isVoiceResponseEnabled() ? "✅ Вкл" : "❌ Выкл",
+                aiSettings.isContextEnabled() ? "✅" : "❌",
+                aiSettings.isVoiceResponseEnabled() ? "✅" : "❌",
 
                 getHoursAndMinsOfDayRemaining());
     }
@@ -62,15 +62,11 @@ public class ProcessGetTextUserAccount {
         return userRequestService.getDayRequestsCountByChatIdAndModels(chatId, models);
     }
 
-    private String getAllowedImageCount(Chat chat){
+    private String getAllowedImageCount(Chat chat) {
         int dayLimit = chat.getSubscriptionEmbedded().getSubscriptionInfo().getImageDayLimit();
         if (dayLimit == -1) return "+";
         return String.valueOf(chat.getSubscriptionEmbedded().getSubscriptionInfo().getImageDayLimit()
                 - getModelsPerDayUsage(chat.getId(), AIModel.getByBalanceType(AIModel.BalanceType.IMAGE)));
-    }
-
-    private int getSongMonthRequests(Chat chat) {
-        return userRequestService.getInSubscriptionUsedCount(chat, AIModel.BalanceType.MUSIC);
     }
 
     private String getHoursAndMinsOfDayRemaining() {

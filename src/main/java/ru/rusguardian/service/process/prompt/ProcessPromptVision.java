@@ -3,6 +3,7 @@ package ru.rusguardian.service.process.prompt;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import ru.rusguardian.domain.AssistantRoleData;
 import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.service.ai.AITextService;
 import ru.rusguardian.service.ai.constant.AIModel;
@@ -11,6 +12,7 @@ import ru.rusguardian.service.ai.dto.open_ai.text.ContentDto;
 import ru.rusguardian.service.ai.dto.open_ai.text.ImageUrlDto;
 import ru.rusguardian.service.ai.dto.open_ai.text.OpenAiTextRequestDto;
 import ru.rusguardian.service.ai.dto.open_ai.text.RequestMessageDto;
+import ru.rusguardian.service.data.AssistantRoleDataService;
 import ru.rusguardian.service.data.ChatCompletionMessageService;
 import ru.rusguardian.service.process.transactional.ProcessTransactionalAITextRequestUpdate;
 import ru.rusguardian.util.ChatUtil;
@@ -26,6 +28,7 @@ public class ProcessPromptVision {
     private final ProcessTransactionalAITextRequestUpdate transactionalAITextRequestUpdate;
     private final AITextService aiTextService;
     private final ChatCompletionMessageService chatCompletionMessageService;
+    private final AssistantRoleDataService assistantRoleDataService;
 
     @Async
     public CompletableFuture<String> process(Chat chat, String imageUrl, String prompt) {
@@ -50,8 +53,9 @@ public class ProcessPromptVision {
     }
 
     private List<RequestMessageDto> getChatMessages(Chat chat, String imageUrl, String prompt) {
+        AssistantRoleData role = assistantRoleDataService.getByChat(chat);
         List<RequestMessageDto> chatMessages = new ArrayList<>();
-        chatMessages.addAll(ChatUtil.getLeadingChatCompletionMessages(chat, chatCompletionMessageService).stream().map(RequestMessageDto::new).toList());
+        chatMessages.addAll(ChatUtil.getLeadingChatCompletionMessages(chat, chatCompletionMessageService, role).stream().map(RequestMessageDto::new).toList());
         chatMessages.add((getImageRequestMessageDto(imageUrl, prompt)));
 
         return chatMessages;

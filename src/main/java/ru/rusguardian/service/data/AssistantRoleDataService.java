@@ -5,6 +5,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.rusguardian.constant.ai.AILanguage;
 import ru.rusguardian.domain.AssistantRoleData;
+import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.repository.AssistantRoleDataRepository;
 
 import java.util.List;
@@ -21,6 +22,12 @@ public class AssistantRoleDataService {
 
     public AssistantRoleData getByNameAndLanguage(String name, AILanguage language) {
         return assistantRoleDataRepository.findByNameAndLanguage(name, language);
+    }
+
+    public AssistantRoleData getByChat(Chat chat) {
+        String roleName = chat.getAiSettingsEmbedded().getAssistantRoleName();
+        AILanguage language = chat.getAiSettingsEmbedded().getAiLanguage();
+        return assistantRoleDataRepository.findByNameAndLanguage(roleName, language);
     }
 
     public List<AssistantRoleData> saveAll(List<AssistantRoleData> dataList) {

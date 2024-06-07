@@ -19,15 +19,14 @@ public class ChatUtil {
         return chat.getSubscriptionEmbedded().getSubscriptionInfo().getContextAndTokensXSize() * AIRequestSetting.TOKEN_SIZE.getValue();
     }
 
-    public static List<ChatCompletionMessage> getLeadingChatCompletionMessages(Chat chat, ChatCompletionMessageService chatCompletionMessageService) {
+    public static List<ChatCompletionMessage> getLeadingChatCompletionMessages(Chat chat, ChatCompletionMessageService chatCompletionMessageService, AssistantRoleData role) {
         List<ChatCompletionMessage> messages = new ArrayList<>();
-        messages.addAll(getChatSystemMessage(chat));
+        messages.addAll(getChatSystemMessage(chat, role));
         messages.addAll(getPreviousChatCompletionMessages(chat, chatCompletionMessageService));
         return messages;
     }
 
-    private static List<ChatCompletionMessage> getChatSystemMessage(Chat chat) {
-        AssistantRoleData role = chat.getAiSettingsEmbedded().getAssistantRole();
+    private static List<ChatCompletionMessage> getChatSystemMessage(Chat chat, AssistantRoleData role) {
         return List.of(new ChatCompletionMessage(chat, Role.SYSTEM, role.getDescription()));
     }
 

@@ -4,11 +4,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import ru.rusguardian.domain.AssistantRoleData;
 import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.service.ai.AITextService;
 import ru.rusguardian.service.ai.constant.Role;
 import ru.rusguardian.service.ai.dto.open_ai.text.OpenAiTextRequestDto;
 import ru.rusguardian.service.ai.dto.open_ai.text.RequestMessageDto;
+import ru.rusguardian.service.data.AssistantRoleDataService;
 import ru.rusguardian.service.data.ChatCompletionMessageService;
 import ru.rusguardian.service.process.transactional.ProcessTransactionalAITextRequestUpdate;
 import ru.rusguardian.util.ChatUtil;
@@ -25,6 +27,7 @@ public class ProcessPromptText {
     private final AITextService aiTextService;
     private final ProcessTransactionalAITextRequestUpdate transactionalAITextRequestUpdate;
     private final ChatCompletionMessageService chatCompletionMessageService;
+    private final AssistantRoleDataService assistantRoleDataService;
 
     @Async
     public CompletableFuture<String> process(Chat chat, String prompt) {
@@ -52,8 +55,9 @@ public class ProcessPromptText {
     }
 
     private List<RequestMessageDto> getChatMessages(Chat chat, String prompt) {
+        AssistantRoleData role = assistantRoleDataService.getByChat(chat);
         List<RequestMessageDto> chatMessages = new ArrayList<>();
-        chatMessages.addAll(ChatUtil.getLeadingChatCompletionMessages(chat, chatCompletionMessageService).stream().map(RequestMessageDto::new).toList());
+        chatMessages.addAll(ChatUtil.getLeadingChatCompletionMessages(chat, chatCompletionMessageService, role).stream().map(RequestMessageDto::new).toList());
         chatMessages.add((new RequestMessageDto(prompt, Role.USER.getValue())));
 
         return chatMessages;
