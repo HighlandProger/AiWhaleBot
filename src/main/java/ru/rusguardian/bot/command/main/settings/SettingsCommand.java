@@ -2,7 +2,6 @@ package ru.rusguardian.bot.command.main.settings;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.rusguardian.bot.command.service.Command;
@@ -11,13 +10,13 @@ import ru.rusguardian.bot.command.service.CommandName;
 import ru.rusguardian.constant.ai.AILanguage;
 import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.telegram.bot.util.util.telegram_message.ReplyMarkupUtil;
-import ru.rusguardian.telegram.bot.util.util.telegram_message.SendMessageUtil;
 
 import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 @CommandMapping(viewCommands = {
+        "/settings",
         "⚙\uFE0F Настройки",
         "⚙\uFE0F Settings",
         "⚙\uFE0F Einstellungen",
@@ -34,15 +33,9 @@ public class SettingsCommand extends Command {
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
         Chat chat = getChatOwner(update);
-        if (update.hasCallbackQuery()) {
-            editMessage(update, getTextByViewDataAndChatLanguage(SETTINGS, chat.getAiSettingsEmbedded().getAiLanguage()), ReplyMarkupUtil.getInlineKeyboard(getButtons(chat)));
-        } else {
-            SendMessage message = SendMessageUtil.getSimple(update, getTextByViewDataAndChatLanguage(SETTINGS, chat.getAiSettingsEmbedded().getAiLanguage()));
-            message.setReplyMarkup(ReplyMarkupUtil.getInlineKeyboard(getButtons(chat)));
-            sendMessage(message);
-        }
+        AILanguage language = chat.getAiSettingsEmbedded().getAiLanguage();
+        editOrSend(update, getTextByViewDataAndChatLanguage(SETTINGS, language), ReplyMarkupUtil.getInlineKeyboard(getButtons(chat)));
     }
-
 
     private String[][][] getButtons(Chat chat) {
         AILanguage language = chat.getAiSettingsEmbedded().getAiLanguage();

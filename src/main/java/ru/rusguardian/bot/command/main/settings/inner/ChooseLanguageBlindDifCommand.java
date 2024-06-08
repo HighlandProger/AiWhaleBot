@@ -7,6 +7,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.rusguardian.bot.command.service.Command;
+import ru.rusguardian.bot.command.service.CommandMapping;
 import ru.rusguardian.bot.command.service.CommandName;
 import ru.rusguardian.constant.ai.AILanguage;
 import ru.rusguardian.domain.user.AISettingsEmbedded;
@@ -18,6 +19,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Service
+@CommandMapping(viewCommands = "/language")
 public class ChooseLanguageBlindDifCommand extends Command {
 
     private static final String VIEW_DATA = "CHOOSE_LANGUAGE";
@@ -32,7 +34,7 @@ public class ChooseLanguageBlindDifCommand extends Command {
     protected void mainExecute(Update update) throws TelegramApiException {
 
         Chat chat = getChatOwner(update);
-        String languageToChangeString = TelegramCallbackUtils.getArgFromCallback(update, 1);
+        String languageToChangeString = update.hasCallbackQuery() ? TelegramCallbackUtils.getArgFromCallback(update, 1) : null;
 
         if (languageToChangeString != null) {
             if (chat.getAiSettingsEmbedded().getAiLanguage() == AILanguage.valueOf(languageToChangeString)) {
@@ -42,7 +44,7 @@ public class ChooseLanguageBlindDifCommand extends Command {
             sendMessage(update, "Ok", getMainKeyboard(chat.getAiSettingsEmbedded().getAiLanguage()));
         }
         AILanguage currentLanguage = chat.getAiSettingsEmbedded().getAiLanguage();
-        editMessage(update, getText(currentLanguage), getKeyboard(currentLanguage));
+        editOrSend(update, getText(currentLanguage), getKeyboard(currentLanguage));
     }
 
     private void changeChatLanguage(Chat chat, String languageString) {

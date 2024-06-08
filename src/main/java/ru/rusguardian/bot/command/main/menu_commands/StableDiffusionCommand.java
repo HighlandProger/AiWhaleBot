@@ -5,10 +5,12 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.rusguardian.bot.command.service.Command;
+import ru.rusguardian.bot.command.service.CommandMapping;
 import ru.rusguardian.bot.command.service.CommandName;
 
 @Component
 @RequiredArgsConstructor
+@CommandMapping(viewCommands = "/stablediffusion")
 public class StableDiffusionCommand extends Command {
 
     private static final String VIEW_DATA = "STABLE_DIFFUSION";

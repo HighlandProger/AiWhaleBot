@@ -12,6 +12,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendVoice;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.rusguardian.bot.command.service.commands.ErrorCommand;
@@ -93,7 +94,9 @@ public abstract class Command implements BotService<CommandName> {
         log.debug("Executing command: " + this.getClass().getSimpleName());
         try {
             mainExecute(update);
-            if(this.getType() == CommandName.EMPTY) {return;}
+            if (this.getType() == CommandName.EMPTY) {
+                return;
+            }
             addLogEvent(update, this.getType().name());
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -105,15 +108,19 @@ public abstract class Command implements BotService<CommandName> {
 
     protected Chat getChatOwner(Update update) {
         ChatType chatType = TelegramUtils.getChatType(update);
-        if(chatType == ChatType.PRIVATE){return chatService.findById(TelegramUtils.getChatId(update));}
+        if (chatType == ChatType.PRIVATE) {
+            return chatService.findById(TelegramUtils.getChatId(update));
+        }
 
         Long chatOwnerId = TelegramUtils.getChatOwnerId(TelegramUtils.getChatIdString(update), bot);
         Optional<Chat> chatOwner = chatService.findByIdOptional(chatOwnerId);
-        if(chatOwner.isEmpty()) {sendChatOwnerNotFoundErrorMessage(TelegramUtils.getChatIdString(update));}
+        if (chatOwner.isEmpty()) {
+            sendChatOwnerNotFoundErrorMessage(TelegramUtils.getChatIdString(update));
+        }
         return chatOwner.get();
     }
 
-    private void sendChatOwnerNotFoundErrorMessage(String chatId){
+    private void sendChatOwnerNotFoundErrorMessage(String chatId) {
         SendMessage message = SendMessage.builder().chatId(chatId).text("Владелец группы не зарегистирован в боте").build();
         try {
             bot.execute(message);
@@ -143,11 +150,6 @@ public abstract class Command implements BotService<CommandName> {
         return FileUtils.getTextFromFile(FileUtils.getFileFromResources2(this, fileName));
     }
 
-    protected String getTextFromFileByChatLanguage(String filePath, Chat chat) {
-        String path = "/" + filePath + chat.getAiSettingsEmbedded().getAiLanguage().getValue() + ".txt";
-        return FileUtils.getTextFromFileInResources(this, path);
-    }
-
     protected String getTextByViewDataAndChatLanguage(String viewDataName, AILanguage language) {
         return viewDataService.getViewByNameAndLanguage(viewDataName, language);
     }
@@ -166,18 +168,22 @@ public abstract class Command implements BotService<CommandName> {
         ));
     }
 
-    protected String getViewTextMessage(Update update){
+    protected String getViewTextMessage(Update update) {
         String viewText = TelegramUtils.getViewTextMessage(update).orElseThrow();
-        if(TelegramUtils.getChatType(update) == ChatType.PRIVATE) {return viewText;}
-        if(!viewText.startsWith(ASK_COMMAND)) {throw new RuntimeException("Сюда не должно было дойти. Фильтр в ProcessUpdate");}
+        if (TelegramUtils.getChatType(update) == ChatType.PRIVATE) {
+            return viewText;
+        }
+        if (!viewText.startsWith(ASK_COMMAND)) {
+            throw new RuntimeException("Сюда не должно было дойти. Фильтр в ProcessUpdate");
+        }
         return viewText.substring(ASK_COMMAND.length()).trim();
     }
 
-    protected Long getInitialChatId(Update update){
+    protected Long getInitialChatId(Update update) {
         return TelegramUtils.getChatId(update);
     }
 
-    protected void sendVoice(SendVoice voice){
+    protected void sendVoice(SendVoice voice) {
         bot.executeAsync(voice).exceptionally(e -> {
             log.error(e.getMessage());
             throw new RuntimeException(e);
@@ -187,5 +193,13 @@ public abstract class Command implements BotService<CommandName> {
     protected void edit(EditMessageText edit) throws TelegramApiException {
         edit.setParseMode(ParseMode.HTML);
         bot.execute(edit);
+    }
+
+    protected void editOrSend(Update update, String text, InlineKeyboardMarkup keyboard) throws TelegramApiException {
+        if (update.hasCallbackQuery()) {
+            editMessage(update, text, keyboard);
+            return;
+        }
+        sendMessage(update, text, keyboard);
     }
 }

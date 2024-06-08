@@ -20,6 +20,7 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 @CommandMapping(viewCommands = {
+        "/subscription",
         "\uD83D\uDE80 Премиум",
         "\uD83D\uDE80 Premium",
         "\uD83D\uDE80 Premium",

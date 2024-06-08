@@ -7,6 +7,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.rusguardian.bot.command.service.Command;
+import ru.rusguardian.bot.command.service.CommandMapping;
 import ru.rusguardian.bot.command.service.CommandName;
 import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.service.process.get.ProcessGetTextPartner;
@@ -17,6 +18,7 @@ import static ru.rusguardian.bot.command.service.CommandName.*;
 
 @RequiredArgsConstructor
 @Component
+@CommandMapping(viewCommands = "/partner")
 public class PartnerCabinetCommand extends Command {
 
     private static final String VIEW_DATA = "PARTNER_CABINET";

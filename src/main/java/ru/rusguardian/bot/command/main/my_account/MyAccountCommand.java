@@ -20,6 +20,7 @@ import static ru.rusguardian.bot.command.service.CommandName.*;
 @Component
 @RequiredArgsConstructor
 @CommandMapping(viewCommands = {
+        "/account",
         "\uD83D\uDC64 Мой аккаунт",
         "\uD83D\uDC64 My account",
         "\uD83D\uDC64 Mein Konto",
@@ -38,9 +39,7 @@ public class MyAccountCommand extends Command {
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
         Chat chat = getChatOwner(update);
-        if (update.hasCallbackQuery()) {
-            editMessage(update, getText(chat), getKeyboard(chat.getAiSettingsEmbedded().getAiLanguage()));
-        } else sendMessage(update, getText(chat), getKeyboard(chat.getAiSettingsEmbedded().getAiLanguage()));
+        editOrSend(update, getText(chat), getKeyboard(chat.getAiSettingsEmbedded().getAiLanguage()));
     }
 
     private String getText(Chat chat) {
