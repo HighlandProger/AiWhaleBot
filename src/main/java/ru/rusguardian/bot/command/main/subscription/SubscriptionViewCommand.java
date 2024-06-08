@@ -37,7 +37,7 @@ public class SubscriptionViewCommand extends Command {
 
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
-        Chat chat = getChat(update);
+        Chat chat = getChatOwner(update);
         Type type = Type.MONTH;
         List<SubscriptionInfo> subscriptionInfos = new ArrayList<>(subscriptionInfoService.getAll().stream().filter(e -> e.getType().getTimeType() == type).toList());
 

@@ -35,6 +35,8 @@ public class Chat {
     private String trafficLink;
     @Column(name = "campaign")
     private String campaign;
+    @Column(name = "is_banned")
+    private boolean isBanned;
 
     @Embedded
     private SubscriptionEmbedded subscriptionEmbedded;

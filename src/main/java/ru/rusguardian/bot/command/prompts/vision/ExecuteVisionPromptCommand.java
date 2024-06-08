@@ -3,7 +3,6 @@ package ru.rusguardian.bot.command.prompts.vision;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.rusguardian.bot.command.prompts.PromptCommand;
@@ -13,7 +12,6 @@ import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.service.ai.constant.AIModel;
 import ru.rusguardian.service.process.prompt.ProcessPromptVision;
 import ru.rusguardian.telegram.bot.util.util.FileUtils;
-import ru.rusguardian.telegram.bot.util.util.TelegramUtils;
 
 import java.net.URL;
 
@@ -34,18 +32,15 @@ public class ExecuteVisionPromptCommand extends PromptCommand {
         int replyId = sendQuickReply(update);
 
         URL imageUrl = FileUtils.getFileUrlFromUpdate(update, bot);
-        String prompt = TelegramUtils.getTextMessage(update).substring(CommandName.OBTAIN_VISION_PROMPT_VIEW_D.getViewName().length()).trim();
+        String prompt = getViewTextMessage(update).substring(CommandName.OBTAIN_VISION_PROMPT_VIEW_D.getViewName().length()).trim();
 
-        Chat chat = getChat(update);
+        Chat chat = getChatOwner(update);
+        Long initialChatId = getInitialChatId(update);
         AIModel model = AIModel.GPT_4_OMNI;
 
         if (!isChatLimitExpired(chat, model)) {
             processPromptVision.process(chat, imageUrl.toString(), prompt).thenAccept(response -> {
-                try {
-                    bot.execute(getEditMessageWithResponse(chat.getId(), response, replyId));
-                } catch (TelegramApiException e) {
-                    throw new RuntimeException(e);
-                }
+                editForPrompt(getEditMessageWithResponse(chat.getId(), response, replyId));
             }).exceptionally(e -> {
                 log.error(e.getMessage());
                 commandContainerService.getCommand(CommandName.ERROR).execute(update);
@@ -58,8 +53,7 @@ public class ExecuteVisionPromptCommand extends PromptCommand {
             } else {
                 response = getTextByViewDataAndChatLanguage(LIMIT_EXPIRED, chat.getAiSettingsEmbedded().getAiLanguage());
             }
-            EditMessageText edit = getEditMessageWithResponse(chat.getId(), response, replyId);
-            bot.execute(edit);
+            editForPrompt(getEditMessageWithResponse(initialChatId, response, replyId));
         }
     }
 }

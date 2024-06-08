@@ -24,7 +24,7 @@ public class DeleteContextCommand extends Command {
 
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
-        Chat chat = getChat(update);
+        Chat chat = getChatOwner(update);
         chatCompletionMessageService.deleteContext(chat.getId());
         sendMessage(update, getTextByViewDataAndChatLanguage(VIEW_DATA, chat.getAiSettingsEmbedded().getAiLanguage()));
     }

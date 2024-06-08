@@ -1,6 +1,7 @@
 package ru.rusguardian.bot.command.prompts;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
@@ -20,6 +21,7 @@ import ru.rusguardian.telegram.bot.util.util.telegram_message.SendMessageUtil;
 
 @RequiredArgsConstructor
 @Component
+@Slf4j
 public class PromptCommand extends Command {
 
     protected static final String LIMIT_EXPIRED_FREE = "LIMIT_EXPIRED_FREE";
@@ -63,5 +65,14 @@ public class PromptCommand extends Command {
         edit.setParseMode(ParseMode.HTML);
 
         return edit;
+    }
+
+    protected void editForPrompt(EditMessageText editText) {
+        editText.setParseMode(ParseMode.MARKDOWN);
+        try {
+            bot.execute(editText);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

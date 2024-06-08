@@ -37,7 +37,7 @@ public class MyAccountCommand extends Command {
 
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
-        Chat chat = getChat(update);
+        Chat chat = getChatOwner(update);
         if (update.hasCallbackQuery()) {
             editMessage(update, getText(chat), getKeyboard(chat.getAiSettingsEmbedded().getAiLanguage()));
         } else sendMessage(update, getText(chat), getKeyboard(chat.getAiSettingsEmbedded().getAiLanguage()));

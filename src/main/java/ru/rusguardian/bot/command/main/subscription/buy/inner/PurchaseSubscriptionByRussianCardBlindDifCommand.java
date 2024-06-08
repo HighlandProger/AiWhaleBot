@@ -37,14 +37,14 @@ public class PurchaseSubscriptionByRussianCardBlindDifCommand extends Command {
         SubscriptionType subscriptionType = SubscriptionType.valueOf(TelegramCallbackUtils.getArgFromCallback(update, 1));
 
         EditMessageText edit = EditMessageUtil.getMessageText(update, getText(update));
-        edit.setReplyMarkup(getKeyboard(getChat(update), subscriptionType));
+        edit.setReplyMarkup(getKeyboard(getChatOwner(update), subscriptionType));
         edit.setParseMode(ParseMode.HTML);
 
         bot.execute(edit);
     }
 
     private String getText(Update update) {
-        Chat chat = getChat(update);
+        Chat chat = getChatOwner(update);
         return MessageFormat.format(getTextByViewDataAndChatLanguage(SUBSCRIPTION_PURCHASING_INFO, chat.getAiSettingsEmbedded().getAiLanguage()), PurchaseProvider.ROBOKASSA.getName());
     }
 

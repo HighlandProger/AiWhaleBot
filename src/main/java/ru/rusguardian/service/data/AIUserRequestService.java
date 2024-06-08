@@ -28,7 +28,7 @@ public class AIUserRequestService {
     }
 
     public int getDayRequestsCountByChatIdAndModels(Long chatId, List<AIModel> models) {
-        log.info("Request to {} for subscription used count for chatId {} with {}", this, chatId, models);
+        log.debug("Request to {} for subscription used count for chatId {} with {}", this, chatId, models);
         LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
         LocalDateTime endOfDay = LocalDateTime.of(LocalDate.now(), LocalTime.MAX);
         return repository.getDayRequestsCountByChatIdAndModels(chatId, models, startOfDay, endOfDay);
@@ -36,7 +36,7 @@ public class AIUserRequestService {
 
     //MAY RETURN (CLAUDE TOKENS) OR (SONGS MONTH COUNT)
     public int getInSubscriptionUsedCount(Chat chat, AIModel.BalanceType balanceType) {
-        log.info("Request to {} for subscription used count for {} with {}", this, chat.getSubscriptionEmbedded(), balanceType);
+        log.debug("Request to {} for subscription used count for {} with {}", this, chat.getSubscriptionEmbedded(), balanceType);
         if (chat.getSubscriptionEmbedded().getSubscriptionInfo().getType() == SubscriptionType.FREE) {
             return 0;
         }
@@ -49,7 +49,7 @@ public class AIUserRequestService {
     }
 
     public AIUserRequest save(AIUserRequest request) {
-        log.info("Saving {}", request);
+        log.debug("Saving {}", request);
         return repository.save(request);
     }
 

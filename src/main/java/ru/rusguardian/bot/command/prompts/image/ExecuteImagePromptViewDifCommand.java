@@ -12,6 +12,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.rusguardian.bot.command.prompts.PromptCommand;
 import ru.rusguardian.bot.command.service.CommandName;
+import ru.rusguardian.constant.ai.AILanguage;
 import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.service.ai.constant.AIModel;
 import ru.rusguardian.service.process.get.ProcessGetTextLimitExpired;
@@ -34,6 +35,7 @@ public class ExecuteImagePromptViewDifCommand extends PromptCommand {
 
     private static final String IMAGE_PREPARING = "IMAGE_PREPARING";
     private static final String IMAGE_READY_PATTERN = "IMAGE_READY";
+    private static final String IMG_PREFIX ="/img";
 
     @Override
     public CommandName getType() {
@@ -43,17 +45,18 @@ public class ExecuteImagePromptViewDifCommand extends PromptCommand {
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
 
-        Chat chat = getChat(update);
+        Chat chatOwner = getChatOwner(update);
+        Long initialChatId = getInitialChatId(update);
         AIModel model = AIModel.valueOf(TelegramCallbackUtils.getArgFromCallback(update, 1));
 
         Message lastBotMessage = (Message) update.getCallbackQuery().getMessage();
         String reply = lastBotMessage.getReplyToMessage().getText();
-        String prompt = reply.substring(OBTAIN_IMAGE_PROMPT_VIEW_D.getViewName().length()).trim();
-        boolean isChatLimitExpired = isChatLimitExpired(chat, model);
+        String prompt = reply.substring(IMG_PREFIX.length()).trim();
+        boolean isChatLimitExpired = isChatLimitExpired(chatOwner, model);
 
         if (!isChatLimitExpired) {
-            processPromptText2Image.processUrl(chat, model, prompt).thenAccept(url ->
-                    sendResponseToUser(url, chat, model.getModelName(), prompt)
+            processPromptText2Image.processUrl(chatOwner, model, prompt).thenAccept(url ->
+                    sendResponseToUser(url, initialChatId, chatOwner.getAiSettingsEmbedded().getAiLanguage(), model.getModelName(), prompt)
             ).exceptionally(ex -> {
                 log.error("EXCEPTION DURING EXECUTING ProcessPromptText2Image. Model: {}, prompt: {}, ExMessage: {}", model, prompt, ex.getMessage());
                 errorCommand.execute(update);
@@ -61,14 +64,12 @@ public class ExecuteImagePromptViewDifCommand extends PromptCommand {
             });
         }
 
-        String quickResponse = getQuickResponse(chat, model, isChatLimitExpired);
-        EditMessageText edit = EditMessageText.builder()
-                .chatId(chat.getId())
+        String quickResponse = getQuickResponse(chatOwner, model, isChatLimitExpired);
+        edit(EditMessageText.builder()
+                .chatId(initialChatId)
                 .text(quickResponse)
                 .messageId(lastBotMessage.getMessageId())
-                .build();
-
-        bot.execute(edit);
+                .build());
     }
 
     private String getQuickResponse(Chat chat, AIModel model, boolean isChatLimitExpired) {
@@ -77,18 +78,13 @@ public class ExecuteImagePromptViewDifCommand extends PromptCommand {
                 : getTextByViewDataAndChatLanguage(IMAGE_PREPARING, chat.getAiSettingsEmbedded().getAiLanguage());
     }
 
-    private void sendResponseToUser(String fileUrl, Chat chat, String model, String prompt) {
+    private void sendResponseToUser(String fileUrl, Long chatId, AILanguage language, String model, String prompt) {
         InputFile file = InputFileUtil.getInputFileFromURL(fileUrl);
-        SendPhoto photo = SendPhoto.builder().photo(file).chatId(chat.getId()).caption(getCaption(chat, model, prompt)).parseMode(ParseMode.HTML).build();
-        try {
-            bot.execute(photo);
-        } catch (TelegramApiException e) {
-            throw new RuntimeException(e);
-        }
+        sendPhoto(SendPhoto.builder().photo(file).chatId(chatId).caption(getCaption(language, model, prompt)).parseMode(ParseMode.HTML).build());
     }
 
-    private String getCaption(Chat chat, String model, String prompt) {
-        return MessageFormat.format(getTextByViewDataAndChatLanguage(IMAGE_READY_PATTERN, chat.getAiSettingsEmbedded().getAiLanguage()), model, prompt);
+    private String getCaption(AILanguage language, String model, String prompt) {
+        return MessageFormat.format(getTextByViewDataAndChatLanguage(IMAGE_READY_PATTERN, language), model, prompt);
     }
 
 }

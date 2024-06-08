@@ -36,14 +36,14 @@ public class PurchaseSeparateByCryptoBlindDifCommand extends Command {
         SeparatePurchase separatePurchase = SeparatePurchase.valueOf(TelegramCallbackUtils.getArgFromCallback(update, 1));
 
         EditMessageText edit = EditMessageUtil.getMessageText(update, getText(update, separatePurchase));
-        edit.setReplyMarkup(getKeyboard(getChat(update), separatePurchase));
+        edit.setReplyMarkup(getKeyboard(getChatOwner(update), separatePurchase));
         edit.setParseMode(ParseMode.HTML);
 
         bot.execute(edit);
     }
 
     private String getText(Update update, SeparatePurchase separatePurchase) {
-        Chat chat = getChat(update);
+        Chat chat = getChatOwner(update);
         return MessageFormat.format(getTextByViewDataAndChatLanguage(SEPARATE_PURCHASE_INFO, chat.getAiSettingsEmbedded().getAiLanguage()), separatePurchase.getBalanceType().name());
     }
 

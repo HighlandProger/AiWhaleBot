@@ -16,7 +16,7 @@ public class WelcomeCommand extends Command {
 
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
-        Chat chat = getChat(update);
+        Chat chat = getChatOwner(update);
         sendMessage(update, getText(chat), getMainKeyboard(chat.getAiSettingsEmbedded().getAiLanguage()));
     }
 

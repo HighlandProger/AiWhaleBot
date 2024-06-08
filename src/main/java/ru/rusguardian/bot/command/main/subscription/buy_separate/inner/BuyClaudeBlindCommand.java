@@ -21,7 +21,7 @@ public class BuyClaudeBlindCommand extends Command {
 
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
-        editMessage(update, getTextByViewDataAndChatLanguage(BUY_SEPARATE_CLAUDE, getChat(update).getAiSettingsEmbedded().getAiLanguage()),
+        editMessage(update, getTextByViewDataAndChatLanguage(BUY_SEPARATE_CLAUDE, getChatOwner(update).getAiSettingsEmbedded().getAiLanguage()),
                 ChoosePurchaseCountKeyboardUtil.getKeyboard(AIModel.BalanceType.CLAUDE));
     }
 }

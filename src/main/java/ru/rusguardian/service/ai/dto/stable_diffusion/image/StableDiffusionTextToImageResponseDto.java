@@ -19,6 +19,8 @@ public class StableDiffusionTextToImageResponseDto {
     private List<String> proxyLinks;
     private MetaDto meta;
 
+    @Data
+    @NoArgsConstructor
     public static class MetaDto {
         private String base64;
         @JsonProperty("enhance_prompt")
@@ -41,7 +43,7 @@ public class StableDiffusionTextToImageResponseDto {
         private String safetyChecker;
         @JsonProperty("safety_checker_type")
         private String safetyCheckerType;
-        private Integer seed;
+        private Long seed;
         private String temp;
 
     }

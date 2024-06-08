@@ -26,7 +26,6 @@ public class ObtainImagePromptViewDifCommand extends Command {
     private static final String IMAGE_INSTRUCTION = "IMAGE_INSTRUCTION";
     private static final String CHOOSE_IMAGE_MODEL = "CHOOSE_IMAGE_MODEL";
 
-
     @Override
     public CommandName getType() {
         return CommandName.OBTAIN_IMAGE_PROMPT_VIEW_D;
@@ -35,21 +34,22 @@ public class ObtainImagePromptViewDifCommand extends Command {
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
 
-        String prompt = TelegramUtils.getTextMessage(update).substring(CommandName.OBTAIN_IMAGE_PROMPT_VIEW_D.getViewName().length()).trim();
-        Chat chat = getChat(update);
+        String prompt = getViewTextMessage(update).substring(CommandName.OBTAIN_IMAGE_PROMPT_VIEW_D.getViewName().length()).trim();
+        Chat chatOwner = getChatOwner(update);
+        Long initialChatId = getInitialChatId(update);
         if (prompt.isEmpty()) {
-            bot.execute(SendMessage.builder()
-                    .chatId(chat.getId())
+            sendMessage(SendMessage.builder()
+                    .chatId(initialChatId)
                     .replyToMessageId(TelegramUtils.getMessageId(update))
-                    .text(getTextByViewDataAndChatLanguage(IMAGE_INSTRUCTION, chat.getAiSettingsEmbedded().getAiLanguage()))
+                    .text(getTextByViewDataAndChatLanguage(IMAGE_INSTRUCTION, chatOwner.getAiSettingsEmbedded().getAiLanguage()))
                     .build());
             return;
         }
 
-        bot.execute(SendMessage.builder()
-                .chatId(chat.getId())
+        sendMessage(SendMessage.builder()
+                .chatId(initialChatId)
                 .replyToMessageId(TelegramUtils.getMessageId(update))
-                .text(getTextByViewDataAndChatLanguage(CHOOSE_IMAGE_MODEL, chat.getAiSettingsEmbedded().getAiLanguage()))
+                .text(getTextByViewDataAndChatLanguage(CHOOSE_IMAGE_MODEL, chatOwner.getAiSettingsEmbedded().getAiLanguage()))
                 .replyMarkup(getKeyboard())
                 .build());
 

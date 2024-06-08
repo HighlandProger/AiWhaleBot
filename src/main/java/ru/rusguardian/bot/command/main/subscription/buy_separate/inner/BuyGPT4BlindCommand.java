@@ -21,7 +21,7 @@ public class BuyGPT4BlindCommand extends Command {
 
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
-        editMessage(update, getTextByViewDataAndChatLanguage(BUY_SEPARATE_GPT4, getChat(update).getAiSettingsEmbedded().getAiLanguage()),
+        editMessage(update, getTextByViewDataAndChatLanguage(BUY_SEPARATE_GPT4, getChatOwner(update).getAiSettingsEmbedded().getAiLanguage()),
                 ChoosePurchaseCountKeyboardUtil.getKeyboard(AIModel.BalanceType.GPT_4));
     }
 }

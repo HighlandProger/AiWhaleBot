@@ -39,7 +39,7 @@ public class GPTRolesBlindCommand extends Command {
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
 
-        Chat chat = getChat(update);
+        Chat chat = getChatOwner(update);
         AILanguage language = chat.getAiSettingsEmbedded().getAiLanguage();
         int page = 0;
         if (TelegramCallbackUtils.hasAction(update)) {

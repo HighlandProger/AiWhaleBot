@@ -8,6 +8,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendVoice;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
@@ -20,6 +22,7 @@ import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.service.data.*;
 import ru.rusguardian.telegram.bot.service.BotService;
 import ru.rusguardian.telegram.bot.service.task.TaskCommandService;
+import ru.rusguardian.telegram.bot.util.constants.ChatType;
 import ru.rusguardian.telegram.bot.util.util.FileUtils;
 import ru.rusguardian.telegram.bot.util.util.TelegramUtils;
 import ru.rusguardian.telegram.bot.util.util.telegram_message.ReplyMarkupUtil;
@@ -27,6 +30,9 @@ import ru.rusguardian.telegram.bot.util.util.telegram_message.ReplyMarkupUtil;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+
+import static ru.rusguardian.bot.command.service.ProcessUpdateService.ASK_COMMAND;
 
 @Slf4j
 public abstract class Command implements BotService<CommandName> {
@@ -87,6 +93,7 @@ public abstract class Command implements BotService<CommandName> {
         log.debug("Executing command: " + this.getClass().getSimpleName());
         try {
             mainExecute(update);
+            if(this.getType() == CommandName.EMPTY) {return;}
             addLogEvent(update, this.getType().name());
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -96,13 +103,27 @@ public abstract class Command implements BotService<CommandName> {
         }
     }
 
-    protected Chat getChat(Update update) {
-        return chatService.findById(TelegramUtils.getChatId(update));
+    protected Chat getChatOwner(Update update) {
+        ChatType chatType = TelegramUtils.getChatType(update);
+        if(chatType == ChatType.PRIVATE){return chatService.findById(TelegramUtils.getChatId(update));}
+
+        Long chatOwnerId = TelegramUtils.getChatOwnerId(TelegramUtils.getChatIdString(update), bot);
+        Optional<Chat> chatOwner = chatService.findByIdOptional(chatOwnerId);
+        if(chatOwner.isEmpty()) {sendChatOwnerNotFoundErrorMessage(TelegramUtils.getChatIdString(update));}
+        return chatOwner.get();
+    }
+
+    private void sendChatOwnerNotFoundErrorMessage(String chatId){
+        SendMessage message = SendMessage.builder().chatId(chatId).text("Владелец группы не зарегистирован в боте").build();
+        try {
+            bot.execute(message);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     protected void addLogEvent(Update update, String event) {
-        Long chatId = TelegramUtils.getChatId(update);
-        Chat chat = chatService.findById(chatId);
+        Chat chat = getChatOwner(update);
         logEventService.create(new LogEvent(chat, LocalDateTime.now(), event));
     }
 
@@ -135,11 +156,6 @@ public abstract class Command implements BotService<CommandName> {
         return Arrays.stream(viewDataService.getViewByNameAndLanguage(viewDataName, language).split("\n")).toList();
     }
 
-    protected void edit(EditMessageText editText) throws TelegramApiException {
-        editText.setParseMode(ParseMode.HTML);
-        bot.execute(editText);
-    }
-
     protected ReplyKeyboard getMainKeyboard(AILanguage language) {
 
         List<String> buttons = buttonViewDataService.getByNameAndLanguage(CommandName.WELCOME.name(), language);
@@ -150,4 +166,26 @@ public abstract class Command implements BotService<CommandName> {
         ));
     }
 
+    protected String getViewTextMessage(Update update){
+        String viewText = TelegramUtils.getViewTextMessage(update).orElseThrow();
+        if(TelegramUtils.getChatType(update) == ChatType.PRIVATE) {return viewText;}
+        if(!viewText.startsWith(ASK_COMMAND)) {throw new RuntimeException("Сюда не должно было дойти. Фильтр в ProcessUpdate");}
+        return viewText.substring(ASK_COMMAND.length()).trim();
+    }
+
+    protected Long getInitialChatId(Update update){
+        return TelegramUtils.getChatId(update);
+    }
+
+    protected void sendVoice(SendVoice voice){
+        bot.executeAsync(voice).exceptionally(e -> {
+            log.error(e.getMessage());
+            throw new RuntimeException(e);
+        });
+    }
+
+    protected void edit(EditMessageText edit) throws TelegramApiException {
+        edit.setParseMode(ParseMode.HTML);
+        bot.execute(edit);
+    }
 }

@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendVoice;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -15,7 +14,6 @@ import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.service.ai.constant.AIModel;
 import ru.rusguardian.service.process.prompt.ProcessPromptText;
 import ru.rusguardian.service.process.prompt.ProcessPromptVoice;
-import ru.rusguardian.telegram.bot.util.util.TelegramUtils;
 
 @Component
 @RequiredArgsConstructor
@@ -34,27 +32,19 @@ public class ExecuteTextPromptCommand extends PromptCommand {
     protected void mainExecute(Update update) throws TelegramApiException {
         int replyId = sendQuickReply(update);
 
-        Chat chat = getChat(update);
-        AIModel model = chat.getAiSettingsEmbedded().getAiActiveModel();
-        String prompt = TelegramUtils.getTextMessage(update);
+        Chat chatOwner = getChatOwner(update);
+        Long initialChatId = getInitialChatId(update);
+        AIModel model = chatOwner.getAiSettingsEmbedded().getAiActiveModel();
+        String prompt = getViewTextMessage(update);
 
-        if (!isChatLimitExpired(chat, model)) {
-            processPromptText.process(chat, prompt).thenAccept(response -> {
-                if (!chat.getAiSettingsEmbedded().isVoiceResponseEnabled()) {
-                    try {
-                        bot.execute(getEditMessageWithResponse(chat.getId(), response, replyId));
-                    } catch (TelegramApiException e) {
-                        throw new RuntimeException(e);
-                    }
+        if (!isChatLimitExpired(chatOwner, model)) {
+            processPromptText.process(chatOwner, prompt).thenAccept(response -> {
+                if (!chatOwner.getAiSettingsEmbedded().isVoiceResponseEnabled()) {
+                    editForPrompt(getEditMessageWithResponse(initialChatId, response, replyId));
                     return;
                 }
-                processPromptVoice.processText2Voice(chat, response).thenAccept(voiceResponse -> {
-                    SendVoice voice = SendVoice.builder().voice(new InputFile(voiceResponse)).chatId(chat.getId()).replyToMessageId(replyId).build();
-                    try {
-                        bot.execute(voice);
-                    } catch (TelegramApiException e) {
-                        throw new RuntimeException(e);
-                    }
+                processPromptVoice.processText2Voice(chatOwner, response).thenAccept(voiceResponse -> {
+                    sendVoice(SendVoice.builder().voice(new InputFile(voiceResponse)).chatId(initialChatId).replyToMessageId(replyId).build());
                 });
             }).exceptionally(e -> {
                 log.error(e.getMessage());
@@ -63,13 +53,12 @@ public class ExecuteTextPromptCommand extends PromptCommand {
             });
         } else {
             String response;
-            if (chat.getSubscriptionEmbedded().getSubscriptionInfo().getType() == SubscriptionType.FREE) {
-                response = getTextByViewDataAndChatLanguage(LIMIT_EXPIRED_FREE, chat.getAiSettingsEmbedded().getAiLanguage());
+            if (chatOwner.getSubscriptionEmbedded().getSubscriptionInfo().getType() == SubscriptionType.FREE) {
+                response = getTextByViewDataAndChatLanguage(LIMIT_EXPIRED_FREE, chatOwner.getAiSettingsEmbedded().getAiLanguage());
             } else {
-                response = getTextByViewDataAndChatLanguage(LIMIT_EXPIRED, chat.getAiSettingsEmbedded().getAiLanguage());
+                response = getTextByViewDataAndChatLanguage(LIMIT_EXPIRED, chatOwner.getAiSettingsEmbedded().getAiLanguage());
             }
-            EditMessageText edit = getEditMessageWithResponse(chat.getId(), response, replyId);
-            bot.execute(edit);
+            editForPrompt(getEditMessageWithResponse(initialChatId, response, replyId));
         }
     }
 

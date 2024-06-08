@@ -13,6 +13,8 @@ public enum CommandName {
     NOT_FOUND(),
     EMPTY(),
     ERROR(),
+    USER_BANNED(),
+    GROUP_OWNER_NOT_FOUND(),
     TEXT_COMMAND_DISTRIBUTOR(),
 
     //START_VIEW_D

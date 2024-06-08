@@ -26,7 +26,7 @@ public class BuySeparateBlindCommand extends Command {
 
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
-        EditMessageText edit = EditMessageUtil.getMessageText(update, getTextByViewDataAndChatLanguage(BUY_SEPARATE, getChat(update).getAiSettingsEmbedded().getAiLanguage()));
+        EditMessageText edit = EditMessageUtil.getMessageText(update, getTextByViewDataAndChatLanguage(BUY_SEPARATE, getChatOwner(update).getAiSettingsEmbedded().getAiLanguage()));
         edit.setReplyMarkup(ReplyMarkupUtil.getInlineKeyboard(getButtons()));
         edit.setParseMode(ParseMode.MARKDOWN);
 

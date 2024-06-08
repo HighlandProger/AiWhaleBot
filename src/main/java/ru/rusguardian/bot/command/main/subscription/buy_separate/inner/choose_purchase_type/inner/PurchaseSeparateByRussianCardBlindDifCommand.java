@@ -34,7 +34,7 @@ public class PurchaseSeparateByRussianCardBlindDifCommand extends Command {
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
         SeparatePurchase separatePurchase = SeparatePurchase.valueOf(TelegramCallbackUtils.getArgFromCallback(update, 1));
-        Chat chat = getChat(update);
+        Chat chat = getChatOwner(update);
 
         EditMessageText edit = EditMessageUtil.getMessageText(update, getText(chat, separatePurchase));
         edit.setReplyMarkup(getKeyboard(chat, separatePurchase));

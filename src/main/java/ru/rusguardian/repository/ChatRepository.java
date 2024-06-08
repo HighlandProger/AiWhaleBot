@@ -31,4 +31,7 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
 
     @Query("SELECT c FROM Chat c WHERE c.partnerEmbeddedInfo.invitedBy.id = :invitedById")
     List<Chat> findByInvitedBy(@Param("invitedById") Long id);
+
+    @Query("SELECT isBanned FROM Chat c WHERE c.id = :id")
+    Boolean isChatBanned(Long id);
 }

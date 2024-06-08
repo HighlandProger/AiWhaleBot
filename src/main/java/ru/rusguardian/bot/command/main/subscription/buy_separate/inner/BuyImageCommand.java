@@ -21,7 +21,7 @@ public class BuyImageCommand extends Command {
 
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
-        editMessage(update, getTextByViewDataAndChatLanguage(BUY_IMAGE, getChat(update).getAiSettingsEmbedded().getAiLanguage()),
+        editMessage(update, getTextByViewDataAndChatLanguage(BUY_IMAGE, getChatOwner(update).getAiSettingsEmbedded().getAiLanguage()),
                 ChoosePurchaseCountKeyboardUtil.getKeyboard(AIModel.BalanceType.IMAGE));
     }
 }

@@ -19,7 +19,7 @@ public class SwitchContextBlindCommand extends Command {
 
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
-        Chat chat = getChat(update);
+        Chat chat = getChatOwner(update);
         AISettingsEmbedded settings = chat.getAiSettingsEmbedded();
         settings.setContextEnabled(!settings.isContextEnabled());
         chatService.update(chat);

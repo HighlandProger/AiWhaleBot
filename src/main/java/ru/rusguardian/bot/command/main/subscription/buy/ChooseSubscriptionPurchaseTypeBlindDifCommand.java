@@ -30,7 +30,7 @@ public class ChooseSubscriptionPurchaseTypeBlindDifCommand extends Command {
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
 
-        EditMessageText edit = EditMessageUtil.getMessageText(update, getTextByViewDataAndChatLanguage(SUBSCRIPTION_PURCHASING_INFO, getChat(update).getAiSettingsEmbedded().getAiLanguage()));
+        EditMessageText edit = EditMessageUtil.getMessageText(update, getTextByViewDataAndChatLanguage(SUBSCRIPTION_PURCHASING_INFO, getChatOwner(update).getAiSettingsEmbedded().getAiLanguage()));
         edit.setReplyMarkup(getKeyboard(update));
         bot.executeAsync(edit);
     }

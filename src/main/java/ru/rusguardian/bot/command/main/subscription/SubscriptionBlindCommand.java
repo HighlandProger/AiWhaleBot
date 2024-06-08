@@ -36,7 +36,7 @@ public class SubscriptionBlindCommand extends Command {
         Type type = Type.valueOf(typeString);
         List<SubscriptionInfo> subscriptionInfos = new ArrayList<>(subscriptionInfoService.getAll().stream().filter(e -> e.getType().getTimeType() == type).toList());
 
-        InlineKeyboardMarkup markup = subscriptionsKeyboardService.getKeyboard(type, subscriptionInfos, getChat(update).getAiSettingsEmbedded().getAiLanguage());
+        InlineKeyboardMarkup markup = subscriptionsKeyboardService.getKeyboard(type, subscriptionInfos, getChatOwner(update).getAiSettingsEmbedded().getAiLanguage());
 
         EditMessageReplyMarkup edit = EditMarkupUtil.getSimple(update, markup);
 

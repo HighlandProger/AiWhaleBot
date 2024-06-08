@@ -20,6 +20,6 @@ public class SDPromptsCommand extends Command {
 
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
-        sendMessage(update, getTextByViewDataAndChatLanguage(VIEW_DATA, getChat(update).getAiSettingsEmbedded().getAiLanguage()));
+        sendMessage(update, getTextByViewDataAndChatLanguage(VIEW_DATA, getChatOwner(update).getAiSettingsEmbedded().getAiLanguage()));
     }
 }

@@ -26,7 +26,7 @@ public class SwitchVoiceResponseBlindCommand extends Command {
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
 
-        Chat chat = getChat(update);
+        Chat chat = getChatOwner(update);
         if (isFreeSubscription(chat)) {
             sendOperationRestrictedToChat(chat, update);
             return;

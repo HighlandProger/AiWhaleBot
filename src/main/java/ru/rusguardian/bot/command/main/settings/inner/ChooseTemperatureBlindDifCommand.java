@@ -35,7 +35,7 @@ public class ChooseTemperatureBlindDifCommand extends Command {
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
 
-        Chat chat = getChat(update);
+        Chat chat = getChatOwner(update);
         String temperatureString = TelegramCallbackUtils.getArgFromCallback(update, 1);
 
         if (chat.getSubscriptionEmbedded().getSubscriptionInfo().getType() == SubscriptionType.FREE) {

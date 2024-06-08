@@ -41,4 +41,9 @@ public class ChatService extends CrudService<Chat, Long> {
     public List<Chat> findAllReferrals(Long chatId) {
         return chatRepository.findByInvitedBy(chatId);
     }
+
+    public boolean isUserBanned(Long userId){
+        Boolean isBanned = chatRepository.isChatBanned(userId);
+        return isBanned != null && isBanned;
+    }
 }

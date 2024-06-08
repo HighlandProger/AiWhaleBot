@@ -33,7 +33,7 @@ public class SettingsCommand extends Command {
 
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
-        Chat chat = getChat(update);
+        Chat chat = getChatOwner(update);
         if (update.hasCallbackQuery()) {
             editMessage(update, getTextByViewDataAndChatLanguage(SETTINGS, chat.getAiSettingsEmbedded().getAiLanguage()), ReplyMarkupUtil.getInlineKeyboard(getButtons(chat)));
         } else {

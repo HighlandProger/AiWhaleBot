@@ -23,11 +23,12 @@ public class ObtainVisionPromptViewDifCommand extends Command {
 
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
-        String prompt = TelegramUtils.getTextMessage(update).substring(CommandName.OBTAIN_VISION_PROMPT_VIEW_D.getViewName().length()).trim();
-        Chat chat = getChat(update);
+        String prompt = getViewTextMessage(update).substring(CommandName.OBTAIN_VISION_PROMPT_VIEW_D.getViewName().length()).trim();
+        Chat chat = getChatOwner(update);
+        Long initialChatId = getInitialChatId(update);
         if (prompt.isEmpty()) {
             bot.execute(SendMessage.builder()
-                    .chatId(chat.getId())
+                    .chatId(initialChatId)
                     .replyToMessageId(TelegramUtils.getMessageId(update))
                     .text(getTextByViewDataAndChatLanguage(VISION_INSTRUCTION, chat.getAiSettingsEmbedded().getAiLanguage()))
                     .build());

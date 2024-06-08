@@ -28,7 +28,7 @@ public class CashOutBlindCommand extends Command {
 
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
-        Chat chat = getChat(update);
+        Chat chat = getChatOwner(update);
         if (chat.getPartnerEmbeddedInfo().getBalance() < 50) {
             AnswerCallbackQuery answer = AnswerCallbackQuery.builder()
                     .text(getTextByViewDataAndChatLanguage(PARTNER_CASH_OUT_ERROR, chat.getAiSettingsEmbedded().getAiLanguage()))

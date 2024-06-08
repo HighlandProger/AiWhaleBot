@@ -31,7 +31,7 @@ public class ChooseLanguageBlindDifCommand extends Command {
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
 
-        Chat chat = getChat(update);
+        Chat chat = getChatOwner(update);
         String languageToChangeString = TelegramCallbackUtils.getArgFromCallback(update, 1);
 
         if (languageToChangeString != null) {

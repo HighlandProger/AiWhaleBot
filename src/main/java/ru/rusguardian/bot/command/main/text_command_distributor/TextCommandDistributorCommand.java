@@ -6,7 +6,6 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.rusguardian.bot.command.service.Command;
 import ru.rusguardian.bot.command.service.CommandName;
-import ru.rusguardian.telegram.bot.util.util.TelegramUtils;
 
 @Component
 @RequiredArgsConstructor
@@ -19,7 +18,7 @@ public class TextCommandDistributorCommand extends Command {
 
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
-        String command = TelegramUtils.getTextMessage(update);
+        String command = getViewTextMessage(update);
 
         if (command.startsWith("/start")) {
             commandContainerService.getCommand(CommandName.START_VIEW_D).execute(update);
