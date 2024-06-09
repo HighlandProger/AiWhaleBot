@@ -22,25 +22,28 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class PurchaseSubscriptionByRussianCardBlindDifCommand extends Command {
+public class PurchaseSubscriptionBlindDifCommand extends Command {
 
     private static final String SUBSCRIPTION_PURCHASING_INFO = "SUBSCRIPTION_PURCHASING_INFO";
+    private static final String BUTTON_VIEW_DATA = "PAY";
+
     private final ProcessCreateInvoice createSeparateInvoice;
 
     @Override
     public CommandName getType() {
-        return CommandName.PURCH_SUBS_RUS_BLIND_D;
+        return CommandName.PURCH_SUBS_BLIND_D;
     }
 
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
         SubscriptionType subscriptionType = SubscriptionType.valueOf(TelegramCallbackUtils.getArgFromCallback(update, 1));
+        PurchaseProvider provider = PurchaseProvider.valueOf(TelegramCallbackUtils.getArgFromCallback(update, 2));
 
         EditMessageText edit = EditMessageUtil.getMessageText(update, getText(update));
-        edit.setReplyMarkup(getKeyboard(getChatOwner(update), subscriptionType));
+        edit.setReplyMarkup(getKeyboard(getChatOwner(update), subscriptionType, provider));
         edit.setParseMode(ParseMode.HTML);
 
-        bot.execute(edit);
+        edit(edit);
     }
 
     private String getText(Update update) {
@@ -48,11 +51,20 @@ public class PurchaseSubscriptionByRussianCardBlindDifCommand extends Command {
         return MessageFormat.format(getTextByViewDataAndChatLanguage(SUBSCRIPTION_PURCHASING_INFO, chat.getAiSettingsEmbedded().getAiLanguage()), PurchaseProvider.ROBOKASSA.getName());
     }
 
-    private InlineKeyboardMarkup getKeyboard(Chat chat, SubscriptionType subscriptionType) {
+    private InlineKeyboardMarkup getKeyboard(Chat chat, SubscriptionType subscriptionType, PurchaseProvider provider) {
+
+        String url = switch (provider) {
+            case ROBOKASSA -> createSeparateInvoice.getRobokassaInvoiceUrl(chat, subscriptionType).toString();
+            case CRYPTOCLOUD -> createSeparateInvoice.getCryptocloudInvoiceUrl(chat, subscriptionType).toString();
+            default -> throw new UnsupportedOperationException(provider.getName());
+        };
+
+        String viewButton = buttonViewDataService.getByNameLanguageAndButtonNumber(BUTTON_VIEW_DATA, chat.getAiSettingsEmbedded().getAiLanguage(), 1);
+
         InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
         InlineKeyboardButton button = new InlineKeyboardButton();
-        button.setText("Перейти к оплате");
-        button.setUrl(createSeparateInvoice.getRobokassaInvoiceUrl(chat, subscriptionType).toString());
+        button.setText(viewButton);
+        button.setUrl(url);
         keyboard.setKeyboard(List.of(List.of(button)));
         return keyboard;
     }

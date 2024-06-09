@@ -20,10 +20,9 @@ public enum CommandName {
     //START_VIEW_D
     WELCOME(),
     GPT_ROLES_VIEW(),
-    GPT_ROLES_BLIND_D(GPT_ROLES_VIEW.viewName),
-    MY_ACCOUNT("\uD83D\uDC64 Мой аккаунт"),
-    SUBSCRIPTION_VIEW("\uD83D\uDE80 Премиум"),
-    SUBSCRIPTION_BLIND_D(SUBSCRIPTION_VIEW.viewName),
+    GPT_ROLES_BLIND_D(),
+    MY_ACCOUNT(),
+    SUBSCRIPTION(),
     SETTINGS(),
 
     //MENU_COMMANDS
@@ -65,12 +64,10 @@ public enum CommandName {
     CHANGE_AI_MODEL_BLIND(),
 
     //PURCHASE_TYPE
-    PURCH_SEP_RUS_BLIND_D("\uD83C\uDDF7\uD83C\uDDFA \uD83D\uDCB3 РФ Банковские карты"),
-    PURCH_SEP_CRYPTO_BLIND_D("\uD83D\uDD11 Криптовалюта"),
+    PURCH_SEP_BLIND_D(),
 
-    PURCH_SUBS_RUS_BLIND_D("\uD83C\uDDF7\uD83C\uDDFA \uD83D\uDCB3 РФ Банковские карты"),
-    PURCH_SUBS_INTERN_BLIND_D("\uD83C\uDF0F \uD83D\uDCB3 Международные карты"),
-    PURCH_SUBS_CRYPTO_BLIND_D("\uD83D\uDD11 Криптовалюта"),
+    PURCH_SUBS_BLIND_D(),
+    PURCH_SUBS_CRYPTO_BLIND_D(),
 
     //MY_ACCOUNT
     //SETTINGS(),

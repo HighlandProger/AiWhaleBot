@@ -8,18 +8,25 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.rusguardian.bot.command.service.Command;
 import ru.rusguardian.bot.command.service.CommandName;
+import ru.rusguardian.constant.ai.AILanguage;
+import ru.rusguardian.constant.purchase.PurchaseProvider;
 import ru.rusguardian.constant.purchase.SeparatePurchase;
+import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.telegram.bot.util.util.TelegramCallbackUtils;
 import ru.rusguardian.telegram.bot.util.util.telegram_message.EditMessageUtil;
 import ru.rusguardian.telegram.bot.util.util.telegram_message.ReplyMarkupUtil;
 
-import static ru.rusguardian.bot.command.service.CommandName.*;
+import java.util.List;
+
+import static ru.rusguardian.bot.command.service.CommandName.BUY_SEPARATE_BLIND;
+import static ru.rusguardian.bot.command.service.CommandName.PURCH_SEP_BLIND_D;
 
 @Component
 @RequiredArgsConstructor
 public class ChooseSeparatePurchaseTypeBlindDifCommand extends Command {
 
-    private static final String CHOOSE_PURCHASE_TYPE = "CHOOSE_PURCHASE_TYPE";
+    private static final String VIEW_DATA = "CHOOSE_PURCHASE_TYPE";
+    private static final String BUTTON_VIEW_DATA = "CHOOSE_PURCHASE_TYPE";
 
     @Override
     public CommandName getType() {
@@ -29,25 +36,25 @@ public class ChooseSeparatePurchaseTypeBlindDifCommand extends Command {
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
 
-        EditMessageText edit = EditMessageUtil.getMessageText(update, getTextByViewDataAndChatLanguage(CHOOSE_PURCHASE_TYPE, getChatOwner(update).getAiSettingsEmbedded().getAiLanguage()));
-        edit.setReplyMarkup(getKeyboard(update));
+        Chat chat = getChatOwner(update);
+        EditMessageText edit = EditMessageUtil.getMessageText(update, getTextByViewDataAndChatLanguage(VIEW_DATA, getChatOwner(update).getAiSettingsEmbedded().getAiLanguage()));
+        edit.setReplyMarkup(getKeyboard(update, chat.getAiSettingsEmbedded().getAiLanguage()));
 
         bot.executeAsync(edit);
     }
 
-    private InlineKeyboardMarkup getKeyboard(Update update) {
+    private InlineKeyboardMarkup getKeyboard(Update update, AILanguage language) {
         SeparatePurchase separatePurchase = SeparatePurchase.valueOf(TelegramCallbackUtils.getArgFromCallback(update, 1));
-
+        List<String> viewButtons = buttonViewDataService.getByNameAndLanguage(BUTTON_VIEW_DATA, language);
         return ReplyMarkupUtil.getInlineKeyboard(new String[][][]{
-                {{PURCH_SEP_RUS_BLIND_D.getViewName(), getCallback(PURCH_SEP_RUS_BLIND_D, separatePurchase)}},
-//                {{PURCH_SEP_INTERN_BLIND_D.getViewName(), getCallback(PURCH_SEP_INTERN_BLIND_D, separatePurchase)}},
-                {{PURCH_SEP_CRYPTO_BLIND_D.getViewName(), getCallback(PURCH_SEP_CRYPTO_BLIND_D, separatePurchase)}},
-                {{BACK.getViewName(), BUY_SEPARATE_BLIND.getBlindName()}},
+                {{viewButtons.get(0), getCallback(PURCH_SEP_BLIND_D, separatePurchase, PurchaseProvider.ROBOKASSA)}},
+                {{viewButtons.get(1), getCallback(PURCH_SEP_BLIND_D, separatePurchase, PurchaseProvider.CRYPTOCLOUD)}},
+                {{viewButtons.get(2), BUY_SEPARATE_BLIND.getBlindName()}},
         });
     }
 
-    private String getCallback(CommandName commandName, SeparatePurchase separatePurchase) {
-        return TelegramCallbackUtils.getCallbackWithArgs(commandName.name(), separatePurchase.name());
+    private String getCallback(CommandName commandName, SeparatePurchase separatePurchase, PurchaseProvider provider) {
+        return TelegramCallbackUtils.getCallbackWithArgs(commandName.name(), separatePurchase.name(), provider.name());
     }
 
 }

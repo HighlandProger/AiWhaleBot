@@ -45,9 +45,9 @@ public class SubscriptionsKeyboardService {
 
         String currentSmile = "\uD83D\uDFE2";
         String month = monthViewData.getValueByLanguage(language);
-        String monthBlind = Type.MONTH == currentType ? EMPTY.name() : String.join(Callback.ARGS_DELIMITER.getValue(), SUBSCRIPTION_BLIND_D.getBlindName(), Type.MONTH.name());
+        String monthBlind = Type.MONTH == currentType ? EMPTY.name() : String.join(Callback.ARGS_DELIMITER.getValue(), SUBSCRIPTION.getBlindName(), Type.MONTH.name());
         String year = yearViewData.getValueByLanguage(language);
-        String yearBlind = Type.YEAR == currentType ? EMPTY.name() : String.join(Callback.ARGS_DELIMITER.getValue(), SUBSCRIPTION_BLIND_D.getBlindName(), Type.YEAR.name());
+        String yearBlind = Type.YEAR == currentType ? EMPTY.name() : String.join(Callback.ARGS_DELIMITER.getValue(), SUBSCRIPTION.getBlindName(), Type.YEAR.name());
 
         if (currentType == Type.MONTH) {
             month = currentSmile + month;

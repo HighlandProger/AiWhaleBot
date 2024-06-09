@@ -10,7 +10,7 @@ import ru.rusguardian.bot.command.service.CommandName;
 
 @Component
 @RequiredArgsConstructor
-@CommandMapping(viewCommands = "/sddprompts")
+@CommandMapping(viewCommands = "/sdprompts")
 public class SDPromptsCommand extends Command {
 
     private static final String VIEW_DATA = "SD_PROMPTS";

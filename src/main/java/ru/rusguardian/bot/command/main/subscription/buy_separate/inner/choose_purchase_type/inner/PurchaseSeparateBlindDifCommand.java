@@ -10,6 +10,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.rusguardian.bot.command.service.Command;
 import ru.rusguardian.bot.command.service.CommandName;
+import ru.rusguardian.constant.purchase.PurchaseProvider;
 import ru.rusguardian.constant.purchase.SeparatePurchase;
 import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.service.process.create.ProcessCreateInvoice;
@@ -21,37 +22,47 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class PurchaseSeparateByCryptoBlindDifCommand extends Command {
+public class PurchaseSeparateBlindDifCommand extends Command {
 
-    private static final String SEPARATE_PURCHASE_INFO = "SEPARATE_PURCHASE_INFO";
+    private static final String VIEW_DATA = "SEPARATE_PURCHASE_INFO";
+    private static final String BUTTON_VIEW_DATA = "PAY";
     private final ProcessCreateInvoice createSeparateInvoice;
 
     @Override
     public CommandName getType() {
-        return CommandName.PURCH_SEP_CRYPTO_BLIND_D;
+        return CommandName.PURCH_SEP_BLIND_D;
     }
 
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
         SeparatePurchase separatePurchase = SeparatePurchase.valueOf(TelegramCallbackUtils.getArgFromCallback(update, 1));
+        PurchaseProvider provider = PurchaseProvider.valueOf(TelegramCallbackUtils.getArgFromCallback(update, 2));
+        Chat chat = getChatOwner(update);
 
-        EditMessageText edit = EditMessageUtil.getMessageText(update, getText(update, separatePurchase));
-        edit.setReplyMarkup(getKeyboard(getChatOwner(update), separatePurchase));
+        EditMessageText edit = EditMessageUtil.getMessageText(update, getText(chat, separatePurchase));
+        edit.setReplyMarkup(getKeyboard(chat, separatePurchase, provider));
         edit.setParseMode(ParseMode.HTML);
 
-        bot.execute(edit);
+        edit(edit);
     }
 
-    private String getText(Update update, SeparatePurchase separatePurchase) {
-        Chat chat = getChatOwner(update);
-        return MessageFormat.format(getTextByViewDataAndChatLanguage(SEPARATE_PURCHASE_INFO, chat.getAiSettingsEmbedded().getAiLanguage()), separatePurchase.getBalanceType().name());
+    private String getText(Chat chat, SeparatePurchase separatePurchase) {
+        return MessageFormat.format(getTextByViewDataAndChatLanguage(VIEW_DATA, chat.getAiSettingsEmbedded().getAiLanguage()), separatePurchase.getBalanceType().name());
     }
 
-    private InlineKeyboardMarkup getKeyboard(Chat chat, SeparatePurchase separatePurchase) {
+    private InlineKeyboardMarkup getKeyboard(Chat chat, SeparatePurchase separatePurchase, PurchaseProvider provider) {
+
+        String url = switch (provider) {
+            case ROBOKASSA -> createSeparateInvoice.getRobokassaInvoiceUrl(chat, separatePurchase).toString();
+            case CRYPTOCLOUD -> createSeparateInvoice.getCryptocloudInvoiceUrl(chat, separatePurchase).toString();
+            default -> throw new UnsupportedOperationException(provider.getName());
+        };
+
+        String viewButton = buttonViewDataService.getByNameLanguageAndButtonNumber(BUTTON_VIEW_DATA, chat.getAiSettingsEmbedded().getAiLanguage(), 1);
         InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
         InlineKeyboardButton button = new InlineKeyboardButton();
-        button.setText("Перейти к оплате");
-        button.setUrl(createSeparateInvoice.getCryptocloudInvoiceUrl(chat, separatePurchase).toString());
+        button.setText(viewButton);
+        button.setUrl(url);
         keyboard.setKeyboard(List.of(List.of(button)));
         return keyboard;
     }

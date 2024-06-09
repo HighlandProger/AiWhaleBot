@@ -55,7 +55,7 @@ public class MyAccountCommand extends Command {
         InlineKeyboardButton button1 = InlineKeyboardButton.builder().text(viewButtons.get(0)).callbackData(SETTINGS.getBlindName()).build();
         InlineKeyboardButton button2 = InlineKeyboardButton.builder().text(viewButtons.get(1)).callbackData(PARTNER_CABINET.getBlindName()).build();
         InlineKeyboardButton button3 = InlineKeyboardButton.builder().text(viewButtons.get(2)).url("https://t.me/freeeman98").build();
-        InlineKeyboardButton button4 = InlineKeyboardButton.builder().text(viewButtons.get(3)).callbackData(SUBSCRIPTION_BLIND_D.getBlindName()).build();
+        InlineKeyboardButton button4 = InlineKeyboardButton.builder().text(viewButtons.get(3)).callbackData(SUBSCRIPTION.getBlindName()).build();
 
         markup.setKeyboard(List.of(List.of(button1), List.of(button2), List.of(button3), List.of(button4)));
 

@@ -29,7 +29,7 @@ public class TextCommandDistributorCommand extends Command {
             return;
         }
         if (command.equals("/premium")) {
-            commandContainerService.getCommand(CommandName.SUBSCRIPTION_VIEW).execute(update);
+            commandContainerService.getCommand(CommandName.SUBSCRIPTION).execute(update);
             return;
         }
         if (command.startsWith("/img")) {
