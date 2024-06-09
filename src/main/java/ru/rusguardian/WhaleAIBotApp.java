@@ -16,9 +16,7 @@ public class WhaleAIBotApp {
         -! add Midjourney integration
         - add Gemini integration
 
-        - add translation for stable diffusion
         -! add function for image redaction
-        -! add feature for work in channel
 
         - change voice response for user
 

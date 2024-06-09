@@ -38,7 +38,7 @@ public class ProcessPromptVoice {
         return aiVoiceService.getTextToSpeech(getText2VoiceRequestDto(model, text)).thenApply(file ->{
             addAIUserText2VoiceRequestToDatabase(chat, model);
             return file;
-        });
+        }).exceptionally(e -> {throw new RuntimeException(e);});
     }
 
     private OpenAiCreateSpeechRequestDto getText2VoiceRequestDto(AIModel model, String text){
