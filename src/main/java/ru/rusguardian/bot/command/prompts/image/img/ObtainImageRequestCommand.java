@@ -19,6 +19,10 @@ public class ObtainImageRequestCommand extends PromptCommand {
     protected void mainExecute(Update update) throws TelegramApiException {
         if(!(update.hasMessage() && update.getMessage().hasPhoto())) throw new RuntimeException();
 
-        sendMessage(update, "Функционал в разработке");
+        sendQuickReply(update);
+    }
+
+    private void sendQuickImageReply(){
+
     }
 }

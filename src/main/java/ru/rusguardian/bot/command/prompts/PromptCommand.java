@@ -72,6 +72,7 @@ public class PromptCommand extends Command {
         try {
             bot.execute(editText);
         } catch (TelegramApiException e) {
+            log.error("Error editing message to {}", editText);
             throw new RuntimeException(e);
         }
     }
