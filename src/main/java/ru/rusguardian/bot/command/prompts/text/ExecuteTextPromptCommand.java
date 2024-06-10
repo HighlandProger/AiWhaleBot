@@ -58,7 +58,7 @@ public class ExecuteTextPromptCommand extends PromptCommand {
             } else {
                 response = getTextByViewDataAndChatLanguage(LIMIT_EXPIRED, chatOwner.getAiSettingsEmbedded().getAiLanguage());
             }
-            editForPrompt(getEditMessageWithResponse(initialChatId, response, replyId));
+            edit(getEditMessageWithResponse(initialChatId, response, replyId));
         }
     }
 
