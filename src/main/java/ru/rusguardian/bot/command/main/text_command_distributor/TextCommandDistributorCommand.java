@@ -33,7 +33,7 @@ public class TextCommandDistributorCommand extends Command {
             return;
         }
         if (command.startsWith("/img")) {
-            commandContainerService.getCommand(CommandName.OBTAIN_IMAGE_PROMPT_VIEW_D).execute(update);
+            commandContainerService.getCommand(CommandName.OBTAIN_TEXT_2_IMAGE_PROMPT_VIEW_D).execute(update);
             return;
         }
         if (command.startsWith("/vision")) {

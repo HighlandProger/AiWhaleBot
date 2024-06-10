@@ -36,30 +36,46 @@ public class ProcessUpdateService {
     private TelegramLongPollingBot bot;
 
     public void process(Update update) {
-        log.info(update.toString());
+        log.info(getUpdateMessage(update));
+        log.debug(update.toString());
         CommandName commandName = getCommandName(update);
         Command command = commandContainerService.getCommand(commandName);
         command.execute(update);
+    }
+    private String getUpdateMessage(Update update){
+        String viewOrBlind = TelegramUtils.getViewTextMessage(update).orElse(TelegramUtils.getCallbackQueryData(update));
+        return String.format("Message from %s : %s", viewOrBlind, TelegramUtils.getUserId(update));
     }
 
     private CommandName getCommandName(Update update) {
         if (chatService.isUserBanned(TelegramUtils.getUserId(update))) {
             return USER_BANNED;
         }
-        Optional<String> viewText = TelegramUtils.getViewTextMessage(update);
-        Optional<String> callback = TelegramUtils.getCallback(update);
-        if (isPublicMessage(update)) {
-            if (isGroupOwnerNotFound(update)) {
-                return GROUP_OWNER_NOT_FOUND;
-            }
-            if (!(viewText.isPresent() && viewText.get().startsWith(ASK_COMMAND) || update.hasCallbackQuery())) {
-                return EMPTY;
-            }
-            viewText = getTrimmedViewTextOptional(viewText);
-        }
 
-        return getCommandNameByMessage(viewText, callback)
-                .or(() -> findCommandByNextCommand(update)).orElse(PROMPT);
+        return getByCallback(update)
+                .or(() -> getByMessage(update))
+                .or(() -> findCommandByNextCommand(update))
+                .orElse(PROMPT);
+    }
+
+    private Optional<CommandName> getByMessage(Update update){
+        if(update.hasMessage() && update.getMessage().hasPhoto()) {return Optional.of(OBTAIN_IMAGE_REQUEST);}
+
+        Optional<String> viewTextOptional = TelegramUtils.getViewTextMessage(update);
+        if (viewTextOptional.isEmpty()){return Optional.empty();}
+        if (isPublicMessage(update)) {return getForPublic(update);}
+        return getByTextMessage(viewTextOptional);
+    }
+
+    private Optional<CommandName> getForPublic(Update update){
+        Optional<String> viewTextOptional = TelegramUtils.getViewTextMessage(update);
+        if (isGroupOwnerNotFound(update)) {
+            return Optional.of(GROUP_OWNER_NOT_FOUND);
+        }
+        if (!(viewTextOptional.isPresent() && viewTextOptional.get().startsWith(ASK_COMMAND) || update.hasCallbackQuery())) {
+            return Optional.of(EMPTY);
+        }
+        return getByTextMessage(getTrimmedViewTextOptional(viewTextOptional));
     }
 
     private boolean isPublicMessage(Update update) {
@@ -79,23 +95,19 @@ public class ProcessUpdateService {
         return chatOwner.isEmpty();
     }
 
-    private Optional<CommandName> getCommandNameByMessage(Optional<String> viewText, Optional<String> callback) {
-        return getByBlindName(callback)
-                .or(() -> getByViewName(viewText));
-    }
-
-    private Optional<CommandName> getByBlindName(Optional<String> callback) {
+    private Optional<CommandName> getByCallback(Update update) {
+        Optional<String> callback = TelegramUtils.getCallback(update);
         if (callback.isEmpty()) {
             return Optional.empty();
         }
         return commandDispatcher.getByBlindStatic(callback.get()).or(() -> commandDispatcher.getByBlindVariable(callback.get()));
     }
 
-    private Optional<CommandName> getByViewName(Optional<String> viewText) {
-        if (viewText.isEmpty()) {
+    private Optional<CommandName> getByTextMessage(Optional<String> viewTextOptional) {
+        if (viewTextOptional.isEmpty()) {
             return Optional.empty();
         }
-        return commandDispatcher.getByViewStatic(viewText.get()).or(() -> commandDispatcher.getByViewVariable(viewText.get()));
+        return commandDispatcher.getByViewStatic(viewTextOptional.get()).or(() -> commandDispatcher.getByViewVariable(viewTextOptional.get()));
     }
 
     private Optional<CommandName> findCommandByNextCommand(Update update) {

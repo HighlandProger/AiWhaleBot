@@ -1,4 +1,4 @@
-package ru.rusguardian.bot.command.prompts.image;
+package ru.rusguardian.bot.command.prompts.image.text2img;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,13 +22,12 @@ import ru.rusguardian.telegram.bot.util.util.telegram_message.InputFileUtil;
 
 import java.text.MessageFormat;
 
-import static ru.rusguardian.bot.command.service.CommandName.EXECUTE_IMAGE_PROMPT_BLIND_D;
-import static ru.rusguardian.bot.command.service.CommandName.OBTAIN_IMAGE_PROMPT_VIEW_D;
+import static ru.rusguardian.bot.command.service.CommandName.EXECUTE_TEXT_2_IMAGE_PROMPT_BLIND_D;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class ExecuteImagePromptViewDifCommand extends PromptCommand {
+public class ExecuteText2ImagePromptBlindDifCommand extends PromptCommand {
 
     private final ProcessPromptText2Image processPromptText2Image;
     private final ProcessGetTextLimitExpired getTextLimitExpired;
@@ -39,7 +38,7 @@ public class ExecuteImagePromptViewDifCommand extends PromptCommand {
 
     @Override
     public CommandName getType() {
-        return EXECUTE_IMAGE_PROMPT_BLIND_D;
+        return EXECUTE_TEXT_2_IMAGE_PROMPT_BLIND_D;
     }
 
     @Override

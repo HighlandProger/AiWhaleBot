@@ -1,4 +1,4 @@
-package ru.rusguardian.bot.command.prompts.image;
+package ru.rusguardian.bot.command.prompts.image.text2img;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -21,20 +21,20 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 @CommandMapping(viewCommands = {"/img"}, isViewVariable = true)
-public class ObtainImagePromptViewDifCommand extends Command {
+public class ObtainText2ImagePromptViewDifCommand extends Command {
 
     private static final String IMAGE_INSTRUCTION = "IMAGE_INSTRUCTION";
     private static final String CHOOSE_IMAGE_MODEL = "CHOOSE_IMAGE_MODEL";
 
     @Override
     public CommandName getType() {
-        return CommandName.OBTAIN_IMAGE_PROMPT_VIEW_D;
+        return CommandName.OBTAIN_TEXT_2_IMAGE_PROMPT_VIEW_D;
     }
 
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
 
-        String prompt = getViewTextMessage(update).substring(CommandName.OBTAIN_IMAGE_PROMPT_VIEW_D.getViewName().length()).trim();
+        String prompt = getViewTextMessage(update).substring(CommandName.OBTAIN_TEXT_2_IMAGE_PROMPT_VIEW_D.getViewName().length()).trim();
         Chat chatOwner = getChatOwner(update);
         Long initialChatId = getInitialChatId(update);
         if (prompt.isEmpty()) {
@@ -64,7 +64,7 @@ public class ObtainImagePromptViewDifCommand extends Command {
     }
 
     private String getCallback(AIModel model) {
-        return TelegramCallbackUtils.getCallbackWithArgs(CommandName.EXECUTE_IMAGE_PROMPT_BLIND_D.getBlindName(), model.name());
+        return TelegramCallbackUtils.getCallbackWithArgs(CommandName.EXECUTE_TEXT_2_IMAGE_PROMPT_BLIND_D.getBlindName(), model.name());
     }
 }
 
