@@ -19,6 +19,7 @@ import java.text.MessageFormat;
 
 @Component
 @CommandMapping(viewCommands = {
+        "/personality",
         "/role",
         "\uD83C\uDFAD GPT - Роли",
         "\uD83C\uDFAD GPT - Roles",
