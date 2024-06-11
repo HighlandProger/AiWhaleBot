@@ -15,12 +15,12 @@ import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.telegram.bot.util.util.TelegramCallbackUtils;
 import ru.rusguardian.telegram.bot.util.util.TelegramUtils;
 import ru.rusguardian.telegram.bot.util.util.telegram_message.EditMessageUtil;
-import ru.rusguardian.util.GPTRolesInlineKeyboardService;
+import ru.rusguardian.bot.command.main.gpt_roles.service.GPTRolesInlineKeyboardService;
 
 import java.text.MessageFormat;
 
-import static ru.rusguardian.util.GPTRolesInlineKeyboardService.ASSISTANT_TYPE_ACTION;
-import static ru.rusguardian.util.GPTRolesInlineKeyboardService.PAGE_ACTION;
+import static ru.rusguardian.bot.command.main.gpt_roles.service.GPTRolesInlineKeyboardService.ASSISTANT_TYPE_ACTION;
+import static ru.rusguardian.bot.command.main.gpt_roles.service.GPTRolesInlineKeyboardService.PAGE_ACTION;
 
 @Component
 @RequiredArgsConstructor

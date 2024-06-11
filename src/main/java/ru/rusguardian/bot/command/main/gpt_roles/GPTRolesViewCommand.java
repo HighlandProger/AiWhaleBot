@@ -13,7 +13,7 @@ import ru.rusguardian.domain.AssistantRoleData;
 import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.telegram.bot.util.util.TelegramUtils;
 import ru.rusguardian.telegram.bot.util.util.telegram_message.SendMessageUtil;
-import ru.rusguardian.util.GPTRolesInlineKeyboardService;
+import ru.rusguardian.bot.command.main.gpt_roles.service.GPTRolesInlineKeyboardService;
 
 import java.text.MessageFormat;
 

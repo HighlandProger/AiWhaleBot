@@ -1,4 +1,4 @@
-package ru.rusguardian.util;
+package ru.rusguardian.bot.command.main.gpt_roles.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -54,11 +54,12 @@ public class GPTRolesInlineKeyboardService {
 
     private InlineKeyboardMarkup getActionButtons(int page) {
         int nextPage = page == 9 ? 0 : page + 1;
+        int currentPage = page + 1;
         int prevPage = page == 0 ? 9 : page - 1;
         return ReplyMarkupUtil.getInlineKeyboard(new String[][][]{
-                {{"⏪", getPageCallback(0)}, {"◀\uFE0F", getPageCallback(prevPage)},
-                        {++page + "/10", EMPTY.getBlindName()},
-                        {"▶\uFE0F", getPageCallback(nextPage)}, {"⏩", getPageCallback(9)}}
+                {{"⏪", getPageCallback(page != 0 ? 0 : 9)}, {"◀\uFE0F", getPageCallback(prevPage)},
+                        {currentPage + "/10", EMPTY.getBlindName()},
+                        {"▶\uFE0F", getPageCallback(nextPage)}, {"⏩", getPageCallback(page != 9 ? 9 : 0)}}
         });
     }
 

@@ -1,4 +1,4 @@
-package ru.rusguardian.util;
+package ru.rusguardian.bot.command.main.gpt_roles.service;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,9 +7,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class GPTRolesInlineKeyboardServiceTest {
 
+
     @Autowired
     private GPTRolesInlineKeyboardService keyboardService;
-
 
     @Test
     void getPageString() {
