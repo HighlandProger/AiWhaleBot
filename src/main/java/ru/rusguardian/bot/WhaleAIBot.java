@@ -40,7 +40,6 @@ public class WhaleAIBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        log.info(update.toString());
         service.process(update);
     }
 
