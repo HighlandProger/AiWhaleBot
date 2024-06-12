@@ -44,7 +44,7 @@ public class ProcessUpdateService {
     }
     private String getUpdateMessage(Update update){
         String viewOrBlind = TelegramUtils.getViewTextMessage(update).orElse(TelegramUtils.getCallbackQueryData(update));
-        return String.format("Message from %s : %s", viewOrBlind, TelegramUtils.getUserId(update));
+        return String.format("Message from %s : %s", TelegramUtils.getUserId(update), viewOrBlind);
     }
 
     private CommandName getCommandName(Update update) {

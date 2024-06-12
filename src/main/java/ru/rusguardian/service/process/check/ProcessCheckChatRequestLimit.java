@@ -38,7 +38,7 @@ public class ProcessCheckChatRequestLimit {
         AIModel.BalanceType balanceType = model.getBalanceType();
 
         if (balanceType == AIModel.BalanceType.GPT_3) {
-            int extraForSubscriptionCount = isChatHasSubscriptions(chat) ? 5 : 0;
+            int extraForSubscriptionCount = isChatHasChannelSubscriptions(chat) ? 5 : 0;
             return subscriptionMinusUsedCount + extraForSubscriptionCount;
         }
         if (balanceType == AIModel.BalanceType.GPT_4) {
@@ -51,7 +51,7 @@ public class ProcessCheckChatRequestLimit {
     }
 
     //TODO functional checkSubscription
-    public boolean isChatHasSubscriptions(Chat chat) {
+    public boolean isChatHasChannelSubscriptions(Chat chat) {
         return false;
     }
 }

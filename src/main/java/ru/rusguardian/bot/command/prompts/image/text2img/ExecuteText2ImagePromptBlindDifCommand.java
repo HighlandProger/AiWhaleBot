@@ -73,7 +73,7 @@ public class ExecuteText2ImagePromptBlindDifCommand extends PromptCommand {
 
     private String getQuickResponse(Chat chat, AIModel model, boolean isChatLimitExpired) {
         return isChatLimitExpired
-                ? getTextLimitExpired.get(chat, model)
+                ? getTextLimitExpired.get(chat)
                 : getTextByViewDataAndChatLanguage(IMAGE_PREPARING, chat.getAiSettingsEmbedded().getAiLanguage());
     }
 

@@ -2,25 +2,27 @@ package ru.rusguardian.service.process.get;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.rusguardian.constant.user.SubscriptionType;
+import ru.rusguardian.domain.SubscriptionInfo;
 import ru.rusguardian.domain.user.Chat;
-import ru.rusguardian.service.ai.constant.AIModel;
+import ru.rusguardian.service.data.ViewDataService;
 import ru.rusguardian.service.process.check.ProcessCheckChatChannelsSubscription;
-import ru.rusguardian.util.ResourceTextUtil;
 
 @Service
 @RequiredArgsConstructor
 public class ProcessGetTextLimitExpired {
 
-    private static final String LIMIT_EXPIRED_FREE_NO_SUBSCRIPTION = "text/limit_expired_no_subscription/";
-    private static final String LIMIT_EXPIRED = "text/limit_expired/";
+    private static final String VIEW_DATA_FREE = "LIMIT_EXPIRED_FREE";
+    private static final String VIEW_DATA_SUBSCRIPTION = "LIMIT_EXPIRED";
     private final ProcessCheckChatChannelsSubscription checkChatChannelsSubscription;
+    private final ViewDataService viewDataService;
 
-    public String get(Chat chat, AIModel model) {
-        AIModel.BalanceType balanceType = model.getBalanceType();
-        if (balanceType == AIModel.BalanceType.GPT_3 && !checkChatChannelsSubscription.check(chat)) {
-            return ResourceTextUtil.getTextByViewDataAndChatLanguage(LIMIT_EXPIRED_FREE_NO_SUBSCRIPTION, chat);
+    public String get(Chat chat) {
+        SubscriptionInfo subscription = chat.getSubscriptionEmbedded().getSubscriptionInfo();
+        if (subscription.getType() == SubscriptionType.FREE && !checkChatChannelsSubscription.check(chat)) {
+            return viewDataService.getViewByNameAndLanguage(VIEW_DATA_FREE, chat.getAiSettingsEmbedded().getAiLanguage());
         } else {
-            return ResourceTextUtil.getTextByViewDataAndChatLanguage(LIMIT_EXPIRED, chat);
+            return viewDataService.getViewByNameAndLanguage(VIEW_DATA_SUBSCRIPTION, chat.getAiSettingsEmbedded().getAiLanguage());
         }
     }
 }

@@ -6,9 +6,8 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.rusguardian.domain.AIUserRequest;
 import ru.rusguardian.domain.ChatCompletionMessage;
 import ru.rusguardian.domain.user.Chat;
-import ru.rusguardian.service.ai.constant.AIModel;
 import ru.rusguardian.service.ai.constant.Role;
-import ru.rusguardian.service.ai.dto.open_ai.text.OpenAiTextResponseDto;
+import ru.rusguardian.service.ai.dto.common.AiResponseCommonDto;
 import ru.rusguardian.service.data.AIUserRequestService;
 import ru.rusguardian.service.data.ChatCompletionMessageService;
 import ru.rusguardian.service.process.update.ProcessUpdateUserExtraBalance;
@@ -25,13 +24,13 @@ public class ProcessTransactionalAITextRequestUpdate {
     private final ChatCompletionMessageService chatCompletionMessageService;
 
     @Transactional
-    public void update(Chat chat, String userPrompt, OpenAiTextResponseDto responseDto) {
+    public void update(Chat chat, String userPrompt, AiResponseCommonDto responseDto) {
         addAIUserRequestToDatabase(chat, responseDto);
         updateCompletionMessages(chat, userPrompt, responseDto);
-        updateChatBalance.updateUserTextExtraBalance(chat, AIModel.getByModelName(responseDto.getModel()));
+        updateChatBalance.updateUserTextExtraBalance(chat, responseDto.getModel());
     }
 
-    private void updateCompletionMessages(Chat chat, String userPrompt, OpenAiTextResponseDto responseDto) {
+    private void updateCompletionMessages(Chat chat, String userPrompt, AiResponseCommonDto responseDto) {
         ChatCompletionMessage userMessage = new ChatCompletionMessage();
         userMessage.setRole(Role.USER);
         userMessage.setMessage(userPrompt);
@@ -40,20 +39,19 @@ public class ProcessTransactionalAITextRequestUpdate {
         ChatCompletionMessage assistantMessage = new ChatCompletionMessage();
         assistantMessage.setChat(chat);
         assistantMessage.setRole(Role.ASSISTANT);
-        assistantMessage.setMessage(responseDto.getChoices().get(0).getMessage().getContent());
+        assistantMessage.setMessage(responseDto.getAiResponse());
 
         chatCompletionMessageService.saveAll(List.of(userMessage, assistantMessage));
     }
 
-    private void addAIUserRequestToDatabase(Chat chat, OpenAiTextResponseDto responseDto) {
+    private void addAIUserRequestToDatabase(Chat chat, AiResponseCommonDto responseDto) {
         AIUserRequest request = new AIUserRequest();
         request.setRequestTime(LocalDateTime.now());
         request.setChat(chat);
-        request.setPromptTokens(responseDto.getUsage().getPromptTokens());
-        request.setCompletionTokens(responseDto.getUsage().getCompletionTokens());
-        request.setTotalTokens(responseDto.getUsage().getTotalTokens());
-        //VULNERABILITY if model name unknown
-        request.setAiModel(AIModel.getByModelName(responseDto.getModel()));
+        request.setPromptTokens(responseDto.getPromptTokens());
+        request.setCompletionTokens(responseDto.getCompletionTokens());
+        request.setTotalTokens(responseDto.getTotalTokens());
+        request.setAiModel(responseDto.getModel());
 
         aiUserRequestService.save(request);
     }

@@ -35,7 +35,7 @@ public class ProcessGetTextUserAccount {
                 subscriptionInfo.getType() == SubscriptionType.FREE ? "-" : getSubscriptionExpirationDateString(subscription),
                 subscription.getPurchaseType() == null ? "-" : subscription.getPurchaseType(),
                 //----------------------------------------------------------
-                getModelsPerDayUsage(chat.getId(), List.of(AIModel.GPT_3_5_TURBO, AIModel.GPT_3_5_TURBO_16_K)),
+                getModelsPerDayUsage(chat.getId(), List.of(AIModel.GPT_3_5_TURBO)),
                 getModelsPerDayUsage(chat.getId(), List.of(AIModel.GEMINI_1_5_PRO)),
                 getModelsPerDayUsage(chat.getId(), AIModel.getByBalanceType(AIModel.BalanceType.GPT_4)),
                 getAllowedImageCount(chat),

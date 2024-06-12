@@ -7,7 +7,12 @@ import org.springframework.stereotype.Service;
 import ru.rusguardian.domain.AssistantRoleData;
 import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.service.ai.AITextService;
+import ru.rusguardian.service.ai.constant.AIModel;
+import ru.rusguardian.service.ai.constant.Provider;
 import ru.rusguardian.service.ai.constant.Role;
+import ru.rusguardian.service.ai.dto.anthropic.AnthropicTextRequestDto;
+import ru.rusguardian.service.ai.dto.common.AiResponseCommonDto;
+import ru.rusguardian.service.ai.dto.common.AiResponseCommonDtoFactory;
 import ru.rusguardian.service.ai.dto.open_ai.text.OpenAiTextRequestDto;
 import ru.rusguardian.service.ai.dto.open_ai.text.RequestMessageDto;
 import ru.rusguardian.service.data.AssistantRoleDataService;
@@ -28,22 +33,60 @@ public class ProcessPromptText {
     private final ProcessTransactionalAITextRequestUpdate transactionalAITextRequestUpdate;
     private final ChatCompletionMessageService chatCompletionMessageService;
     private final AssistantRoleDataService assistantRoleDataService;
+    private final AiResponseCommonDtoFactory commonDtoFactory;
 
     @Async
     public CompletableFuture<String> process(Chat chat, String prompt) {
+        Provider provider = chat.getAiSettingsEmbedded().getAiActiveModel().getProvider();
 
-        OpenAiTextRequestDto requestDto = getRequestDto(chat, prompt);
-        return aiTextService.getText(requestDto)
-                .thenApply(responseDto -> {
-                    transactionalAITextRequestUpdate.update(chat, prompt, responseDto);
-                    return responseDto.getChoices().get(0).getMessage().getContent();
-                }).exceptionally(e -> {
-                    log.error(e.getMessage());
-                    throw new RuntimeException(e);
-                });
+        if (provider == Provider.OPEN_AI){
+            return aiTextService.getText(getOpenAiRequestDto(chat, prompt))
+                    .thenApply(responseDto -> {
+                        AiResponseCommonDto commonResponseDto = commonDtoFactory.create(responseDto);
+                        transactionalAITextRequestUpdate.update(chat, prompt, commonResponseDto);
+                        return commonResponseDto.getAiResponse();
+                    }).exceptionally(e -> {
+                        log.error(e.getMessage());
+                        throw new RuntimeException(e);
+                    });
+        }
+        if (provider == Provider.ANTHROPIC){
+            return aiTextService.getText(getAnthropicRequestDto(chat, prompt))
+                    .thenApply(responseDto -> {
+                        AiResponseCommonDto commonResponseDto = commonDtoFactory.create(responseDto);
+                        transactionalAITextRequestUpdate.update(chat, prompt, commonResponseDto);
+                        return commonResponseDto.getAiResponse();
+                    }).exceptionally(e -> {
+                        log.error(e.getMessage());
+                        throw new RuntimeException(e);
+                    });
+        }
+
+        throw new UnsupportedOperationException("Unknown text request provider " + provider.name());
     }
 
-    private OpenAiTextRequestDto getRequestDto(Chat chat, String prompt) {
+    private AnthropicTextRequestDto getAnthropicRequestDto(Chat chat, String prompt){
+        AssistantRoleData assistantRoleData = assistantRoleDataService.getByChat(chat);
+        AIModel model = chat.getAiSettingsEmbedded().getAiActiveModel();
+        if (model.getBalanceType() != AIModel.BalanceType.CLAUDE) {throw new UnsupportedOperationException("Not CLAUDE balance type of model " + model);}
+
+        AnthropicTextRequestDto dto = new AnthropicTextRequestDto();
+        dto.setSystem(assistantRoleData.getDescription());
+        dto.setMessages(getAnthropicMessages(chat, prompt));
+        dto.setTemperature(chat.getAiSettingsEmbedded().getTemperature().getValue()/2);
+        dto.setModel(model.getModelName());
+        return dto;
+    }
+
+    private List<AnthropicTextRequestDto.Message> getAnthropicMessages(Chat chat, String prompt){
+        List<AnthropicTextRequestDto.Message> messages =
+                new ArrayList<>(ChatUtil.getPreviousChatCompletionMessages(chat, chatCompletionMessageService))
+                        .stream().map(AnthropicTextRequestDto.Message::new).toList();
+        messages.add(new AnthropicTextRequestDto.Message(Role.USER, prompt));
+        return messages;
+    }
+
+    private OpenAiTextRequestDto getOpenAiRequestDto(Chat chat, String prompt) {
         OpenAiTextRequestDto dto = new OpenAiTextRequestDto();
         dto.setModel(chat.getAiSettingsEmbedded().getAiActiveModel().getModelName());
         dto.setMaxTokens(ChatUtil.getChatMaxTokens(chat));

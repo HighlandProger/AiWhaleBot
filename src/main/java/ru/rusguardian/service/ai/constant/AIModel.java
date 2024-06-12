@@ -17,9 +17,6 @@ import static ru.rusguardian.service.ai.constant.Provider.*;
 public enum AIModel {
 
     GPT_4_OMNI(OPEN_AI, BalanceType.GPT_4, "gpt-4o-2024-05-13"),
-    GPT_4_TURBO(OPEN_AI, BalanceType.GPT_4, "gpt-4-turbo"),
-    GPT_4(OPEN_AI, BalanceType.GPT_4, "gpt-4-0613"),
-    GPT_3_5_TURBO_16_K(OPEN_AI, BalanceType.GPT_3, "gpt-3.5-turbo-16k"),
     GPT_3_5_TURBO(OPEN_AI, BalanceType.GPT_3, "gpt-3.5-turbo-0125"),
     ADA_V2_EMBEDDINGS(OPEN_AI, null, "ada-v2-embedding"),
     DALL_E_2(OPEN_AI, BalanceType.IMAGE, "dall-e-2"),
@@ -39,14 +36,11 @@ public enum AIModel {
 
     private static final List<AIModel> getUserChatModels = List.of(
             AIModel.GPT_4_OMNI,
-            AIModel.GPT_4_TURBO,
-            AIModel.GPT_4,
-            AIModel.GPT_3_5_TURBO_16_K,
             AIModel.GPT_3_5_TURBO,
             AIModel.CLAUDE_3_OPUS,
             AIModel.CLAUDE_3_SONNET,
-            AIModel.CLAUDE_3_HAIKU,
-            AIModel.GEMINI_1_5_PRO
+            AIModel.CLAUDE_3_HAIKU
+            //AIModel.GEMINI_1_5_PRO
     );
 
     private static final Map<String, AIModel> MODEL_NAME_MAP = new HashMap<>();

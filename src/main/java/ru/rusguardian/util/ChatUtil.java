@@ -21,16 +21,16 @@ public class ChatUtil {
 
     public static List<ChatCompletionMessage> getLeadingChatCompletionMessages(Chat chat, ChatCompletionMessageService chatCompletionMessageService, AssistantRoleData role) {
         List<ChatCompletionMessage> messages = new ArrayList<>();
-        messages.addAll(getChatSystemMessage(chat, role));
+        messages.add(getChatSystemMessage(chat, role));
         messages.addAll(getPreviousChatCompletionMessages(chat, chatCompletionMessageService));
         return messages;
     }
 
-    private static List<ChatCompletionMessage> getChatSystemMessage(Chat chat, AssistantRoleData role) {
-        return List.of(new ChatCompletionMessage(chat, Role.SYSTEM, role.getDescription()));
+    public static ChatCompletionMessage getChatSystemMessage(Chat chat, AssistantRoleData role) {
+        return new ChatCompletionMessage(chat, Role.SYSTEM, role.getDescription());
     }
 
-    private static List<ChatCompletionMessage> getPreviousChatCompletionMessages(Chat chat, ChatCompletionMessageService chatCompletionMessageService) {
+    public static List<ChatCompletionMessage> getPreviousChatCompletionMessages(Chat chat, ChatCompletionMessageService chatCompletionMessageService) {
         if (!chat.getAiSettingsEmbedded().isContextEnabled()) {
             return new ArrayList<>();
         }

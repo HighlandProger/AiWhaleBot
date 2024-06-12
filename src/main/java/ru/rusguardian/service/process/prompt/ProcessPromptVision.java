@@ -8,6 +8,8 @@ import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.service.ai.AITextService;
 import ru.rusguardian.service.ai.constant.AIModel;
 import ru.rusguardian.service.ai.constant.Role;
+import ru.rusguardian.service.ai.dto.common.AiResponseCommonDto;
+import ru.rusguardian.service.ai.dto.common.AiResponseCommonDtoFactory;
 import ru.rusguardian.service.ai.dto.open_ai.text.ContentDto;
 import ru.rusguardian.service.ai.dto.open_ai.text.ImageUrlDto;
 import ru.rusguardian.service.ai.dto.open_ai.text.OpenAiTextRequestDto;
@@ -29,6 +31,7 @@ public class ProcessPromptVision {
     private final AITextService aiTextService;
     private final ChatCompletionMessageService chatCompletionMessageService;
     private final AssistantRoleDataService assistantRoleDataService;
+    private final AiResponseCommonDtoFactory commonDtoFactory;
 
     @Async
     public CompletableFuture<String> process(Chat chat, String imageUrl, String prompt) {
@@ -36,7 +39,8 @@ public class ProcessPromptVision {
         OpenAiTextRequestDto requestDto = getRequestDto(chat, imageUrl, prompt);
         return aiTextService.getText(requestDto)
                 .thenApply(responseDto -> {
-                    transactionalAITextRequestUpdate.update(chat, prompt, responseDto);
+                    AiResponseCommonDto commonDto = commonDtoFactory.create(responseDto);
+                    transactionalAITextRequestUpdate.update(chat, prompt, commonDto);
                     return responseDto.getChoices().get(0).getMessage().getContent();
                 });
     }
