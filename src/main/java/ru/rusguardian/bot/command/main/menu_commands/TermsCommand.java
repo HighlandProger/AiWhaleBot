@@ -11,6 +11,8 @@ import ru.rusguardian.bot.command.service.CommandMapping;
 import ru.rusguardian.bot.command.service.CommandName;
 import ru.rusguardian.domain.user.Chat;
 
+import javax.swing.text.html.HTML;
+
 @Component
 @RequiredArgsConstructor
 @CommandMapping(viewCommands = "/terms")
