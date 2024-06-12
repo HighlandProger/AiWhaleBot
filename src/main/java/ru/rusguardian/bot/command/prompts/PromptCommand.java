@@ -19,6 +19,8 @@ import ru.rusguardian.telegram.bot.util.constants.MessageType;
 import ru.rusguardian.telegram.bot.util.util.TelegramUtils;
 import ru.rusguardian.telegram.bot.util.util.telegram_message.SendMessageUtil;
 
+import java.util.concurrent.CompletableFuture;
+
 @RequiredArgsConstructor
 @Component
 @Slf4j
@@ -67,13 +69,15 @@ public class PromptCommand extends Command {
         return edit;
     }
 
-    protected void editForPrompt(EditMessageText editText) {
-        editText.setParseMode(ParseMode.MARKDOWN);
-        try {
-            bot.execute(editText);
-        } catch (TelegramApiException e) {
-            log.error("Error editing message to {}", editText);
-            throw new RuntimeException(e);
-        }
+    protected CompletableFuture<Void> editForPrompt(EditMessageText editText) {
+        return CompletableFuture.runAsync(() -> {
+            editText.setParseMode(ParseMode.MARKDOWN);
+            try {
+                bot.execute(editText);
+            } catch (TelegramApiException e) {
+                log.error("Error editing message to {}", editText);
+                throw new RuntimeException(e);
+            }
+        });
     }
 }

@@ -13,22 +13,21 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-public class ProcessTransactionalAIRequestUpdate {
+public class ProcessTransactionalAIImageRequestUpdate {
 
     private final AIUserRequestService aiUserRequestService;
     private final ProcessUpdateUserExtraBalance updateChatBalance;
 
     @Transactional
     public void update(Chat chat, AIModel model) {
-        addAIUserRequestToDatabase(chat, model);
-        updateChatBalance.updateUserExtraBalance(chat, model);
+        addImageAIUserRequestToDatabase(chat, model);
+        updateChatBalance.updateImageGenerationBalance(chat, model);
     }
 
-    private void addAIUserRequestToDatabase(Chat chat, AIModel model) {
+    private void addImageAIUserRequestToDatabase(Chat chat, AIModel model) {
         AIUserRequest request = new AIUserRequest();
         request.setRequestTime(LocalDateTime.now());
         request.setChat(chat);
-        //VULNERABILITY if model name unknown
         request.setAiModel(model);
 
         aiUserRequestService.save(request);

@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.rusguardian.domain.AIUserRequest;
 import ru.rusguardian.domain.ChatCompletionMessage;
 import ru.rusguardian.domain.user.Chat;
+import ru.rusguardian.service.ai.constant.AIModel;
 import ru.rusguardian.service.ai.constant.Role;
 import ru.rusguardian.service.ai.dto.common.AiResponseCommonDto;
 import ru.rusguardian.service.data.AIUserRequestService;
@@ -27,7 +28,8 @@ public class ProcessTransactionalAITextRequestUpdate {
     public void update(Chat chat, String userPrompt, AiResponseCommonDto responseDto) {
         addAIUserRequestToDatabase(chat, responseDto);
         updateCompletionMessages(chat, userPrompt, responseDto);
-        updateChatBalance.updateUserTextExtraBalance(chat, responseDto.getModel());
+        if (responseDto.getModel() == AIModel.GPT_4_OMNI) {updateChatBalance.updateGPT4ExtraBalance(chat, responseDto.getModel());}
+        if (responseDto.getModel().getBalanceType() == AIModel.BalanceType.CLAUDE) {updateChatBalance.updateClaudeTokensBalance(chat, responseDto);}
     }
 
     private void updateCompletionMessages(Chat chat, String userPrompt, AiResponseCommonDto responseDto) {

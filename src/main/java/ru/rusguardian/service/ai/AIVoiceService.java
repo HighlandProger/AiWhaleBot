@@ -14,7 +14,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import ru.rusguardian.service.ai.dto.open_ai.text.OpenAiErrorResponseDto;
 import ru.rusguardian.service.ai.dto.open_ai.voice.OpenAiCreateSpeechRequestDto;
 import ru.rusguardian.service.ai.dto.open_ai.voice.OpenAiTranscriptionRequestDto;
@@ -28,6 +29,7 @@ import java.io.UncheckedIOException;
 import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
@@ -79,28 +81,19 @@ public class AIVoiceService {
 
     @Async
     public CompletableFuture<File> getTextToSpeech(OpenAiCreateSpeechRequestDto dto) {
-
         String fileFormat = dto.getResponseFormat() == null ? "mp3" : dto.getResponseFormat();
-        return webClient
-                .post()
+
+        return webClient.post()
                 .uri(CREATE_SPEECH_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(dto)
-                .exchangeToFlux(response -> {
-                    if (response.statusCode().is2xxSuccessful()) {
-                        return response.bodyToFlux(DataBuffer.class);
-                    } else {
-                        return response.createException().flatMapMany(Flux::error);
-                    }
-                })
-                .reduce(FileUtils.getTempFile(fileFormat).toPath(), (path, dataBuffer) -> {
-                    try (FileChannel channel = FileChannel.open(path, StandardOpenOption.WRITE, StandardOpenOption.APPEND)) {
-                        channel.write(dataBuffer.asByteBuffer());
-                        DataBufferUtils.release(dataBuffer);
-                    } catch (IOException e) {
-                        throw new UncheckedIOException(e);
-                    }
-                    return path;
+                .retrieve() // Используем retrieve вместо exchangeToFlux для упрощения
+                .bodyToFlux(DataBuffer.class)
+                .collectList()
+                .flatMap(dataBuffers -> {
+                    Path path = FileUtils.getTempFile(fileFormat).toPath();
+                    // Выполняем запись данных в файл асинхронно
+                    return writeDataToFileAsync(path, dataBuffers);
                 })
                 .map(Path::toFile)
                 .toFuture()
@@ -109,6 +102,21 @@ public class AIVoiceService {
                     log.error(errorMessage);
                     throw new OpenAiRequestException(errorMessage, e);
                 });
+    }
+
+
+    private Mono<Path> writeDataToFileAsync(Path path, List<DataBuffer> dataBuffers) {
+        return Mono.fromCallable(() -> {
+            try (FileChannel channel = FileChannel.open(path, StandardOpenOption.WRITE, StandardOpenOption.CREATE)) {
+                for (DataBuffer dataBuffer : dataBuffers) {
+                    channel.write(dataBuffer.asByteBuffer());
+                    DataBufferUtils.release(dataBuffer);
+                }
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+            return path;
+        }).subscribeOn(Schedulers.boundedElastic()); // Используем другой планировщик для асинхронной записи в файл
     }
 
     private String getErrorMessage(Throwable e) {

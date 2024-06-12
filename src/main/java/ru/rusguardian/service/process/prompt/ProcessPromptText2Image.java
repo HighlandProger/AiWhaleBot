@@ -13,7 +13,7 @@ import ru.rusguardian.service.ai.dto.midjourney.image.MidjourneyTextToImageReque
 import ru.rusguardian.service.ai.dto.midjourney.image.MidjourneyTextToImageResponseDto;
 import ru.rusguardian.service.ai.dto.open_ai.image.OpenAiTextToImageRequestDto;
 import ru.rusguardian.service.ai.dto.stable_diffusion.image.StableDiffusionTextToImageRequestDto;
-import ru.rusguardian.service.process.transactional.ProcessTransactionalAIRequestUpdate;
+import ru.rusguardian.service.process.transactional.ProcessTransactionalAIImageRequestUpdate;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -26,7 +26,7 @@ import java.util.concurrent.CompletableFuture;
 public class ProcessPromptText2Image {
 
     private final AIImageService aiImageService;
-    private final ProcessTransactionalAIRequestUpdate transactionalAIRequestUpdate;
+    private final ProcessTransactionalAIImageRequestUpdate transactionalAIRequestUpdate;
     @Value("${stable-diffusion.image-url-pattern}")
     private String stableDiffusionImageUrlPattern1;
     @Value("${stable-diffusion.image-url-pattern-2}")
@@ -60,7 +60,7 @@ public class ProcessPromptText2Image {
         throw new RuntimeException("UNKNOWN IMAGE PROVIDER " + model.getProvider());
     }
 
-    CompletableFuture<String> getStableDiffusionImageUrl(String prompt) {
+    private CompletableFuture<String> getStableDiffusionImageUrl(String prompt) {
         return aiImageService.getStableDiffusionImageUrl(getStableDiffusionRequestDto(prompt))
                 .thenCompose(response -> {
                     log.info(response.toString());
