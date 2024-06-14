@@ -4,7 +4,6 @@ import io.netty.channel.ChannelOption;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -39,11 +38,33 @@ public class AppConfig {
         return scheduler;
     }
 
-    @Bean
-    @Primary
+    @Bean(name = "openAITextWebClient")
     public WebClient openAIWebClient(@Value("${open-api.secret-key}") String apiKey) {
         return WebClient.builder()
                 .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
+                .clientConnector(new ReactorClientHttpConnector(HttpClient.create()
+                        .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000)  // Таймаут на подключение
+                        .responseTimeout(Duration.ofSeconds(15))  // Таймаут на получение ответа
+                ))
+                .build();
+    }
+
+    @Bean(name = "openAIImageWebClient")
+    public WebClient openAIImageWebClient(@Value("${open-api.secret-key}") String apiKey) {
+        return WebClient.builder()
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
+                .clientConnector(new ReactorClientHttpConnector(HttpClient.create()
+                        .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000)  // Таймаут на подключение
+                        .responseTimeout(Duration.ofSeconds(60))  // Таймаут на получение ответа
+                ))
+                .build();
+    }
+
+    @Bean(name = "anthropicWebClient")
+    public WebClient anthropicWebClient(@Value("${anthropic.x-api-key}") String xApiKey, @Value("${anthropic.version}") String anthropicVersion){
+        return WebClient.builder()
+                .defaultHeader("x-api-key", xApiKey)
+                .defaultHeader("anthropic-version", anthropicVersion)
                 .clientConnector(new ReactorClientHttpConnector(HttpClient.create()
                         .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000)  // Таймаут на подключение
                         .responseTimeout(Duration.ofSeconds(10))  // Таймаут на получение ответа
@@ -51,13 +72,13 @@ public class AppConfig {
                 .build();
     }
 
-    @Bean
+    @Bean(name = "midjourneyWebClient")
     public WebClient midjourneyWebClient() {
         return WebClient.builder()
                 .build();
     }
 
-    @Bean
+    @Bean(name = "stablediffusionWebClient")
     public WebClient stablediffusionWebClient() {
         return WebClient.builder()
                 .build();
@@ -68,7 +89,7 @@ public class AppConfig {
         return new RestTemplate();
     }
 
-    @Bean
+    @Bean(name = "yandexTranslateRestClient")
     public RestClient yandexTranslateClient() {
         return RestClient.builder()
                 .build();

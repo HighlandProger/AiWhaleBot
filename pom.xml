@@ -13,9 +13,10 @@
 
     <groupId>ru.rusguardian</groupId>
     <artifactId>whale-ai-bot</artifactId>
-    <version>1.7.10</version>
+    <version>1.8.0</version>
 
     <properties>
+        <telegrambot.util.version>1.0.0</telegrambot.util.version>
         <maven.compiler.source>18</maven.compiler.source>
         <maven.compiler.target>18</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -54,7 +55,7 @@
         <dependency>
             <groupId>ru.rusguardian</groupId>
             <artifactId>telegram-bot-util</artifactId>
-            <version>1.0.0</version>
+            <version>${telegrambot.util.version}</version>
         </dependency>
 
         <dependency>

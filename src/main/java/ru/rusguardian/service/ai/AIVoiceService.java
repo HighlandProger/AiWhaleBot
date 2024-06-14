@@ -2,6 +2,7 @@ package ru.rusguardian.service.ai;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -33,7 +34,6 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
-@RequiredArgsConstructor
 @Service
 @Slf4j
 public class AIVoiceService {
@@ -41,8 +41,11 @@ public class AIVoiceService {
     private static final String TRANSCRIPTIONS_URL = "https://api.openai.com/v1/audio/transcriptions";
     private static final String CREATE_SPEECH_URL = "https://api.openai.com/v1/audio/speech";
 
-    @Qualifier("openAIWebClient")
     private final WebClient webClient;
+
+    public AIVoiceService(@Qualifier("openAITextWebClient") WebClient webClient) {
+        this.webClient = webClient;
+    }
 
     @Async
     public CompletableFuture<String> getSpeechToText(OpenAiTranscriptionRequestDto requestBody) {

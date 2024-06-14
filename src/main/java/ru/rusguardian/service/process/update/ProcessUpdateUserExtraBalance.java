@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.rusguardian.domain.user.Chat;
+import ru.rusguardian.domain.user.UserBalanceEmbedded;
 import ru.rusguardian.service.ai.constant.AIModel;
 import ru.rusguardian.service.ai.dto.common.AiResponseCommonDto;
 import ru.rusguardian.service.data.ChatService;
@@ -43,8 +44,35 @@ public class ProcessUpdateUserExtraBalance {
 
     @Transactional
     public void updateClaudeTokensBalance(Chat chat, AiResponseCommonDto dto){
-        throw new RuntimeException("В РАЗРАБОТКЕ!!!");
-//        int count = chat.getUserBalanceEmbedded().getClaudeTokens();
+        UserBalanceEmbedded balanceEmbedded = chat.getUserBalanceEmbedded();
+        int usedTokens = getUsedTokensByCoefficient(dto);
+        int userBalance = chat.getUserBalanceEmbedded().getClaudeTokens();
+
+        int resultBalance = Math.max(0, userBalance - usedTokens);
+        balanceEmbedded.setClaudeTokens(resultBalance);
+        chat.setUserBalanceEmbedded(balanceEmbedded);
+        chatService.update(chat);
     }
 
+    private int getUsedTokensByCoefficient(AiResponseCommonDto dto){
+        AIModel model = dto.getModel();
+        Integer inputCoefficient;
+        Integer outputCoefficient;
+        switch (model){
+            case CLAUDE_3_HAIKU -> {
+                inputCoefficient = 1;
+                outputCoefficient = 5;
+            }
+            case CLAUDE_3_SONNET -> {
+                inputCoefficient = 24;
+                outputCoefficient = 120;
+            }
+            case CLAUDE_3_OPUS -> {
+                inputCoefficient = 120;
+                outputCoefficient = 640;
+            }
+            default -> throw new UnsupportedOperationException("Model unsupported there: " + model.name());
+        }
+        return (inputCoefficient * dto.getPromptTokens()) + (outputCoefficient * dto.getCompletionTokens());
+    }
 }

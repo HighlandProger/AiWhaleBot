@@ -15,7 +15,6 @@ import ru.rusguardian.bot.command.service.CommandName;
 import ru.rusguardian.constant.ai.AILanguage;
 import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.service.ai.constant.AIModel;
-import ru.rusguardian.service.process.get.ProcessGetTextLimitExpired;
 import ru.rusguardian.service.process.prompt.ProcessPromptText2Image;
 import ru.rusguardian.telegram.bot.util.util.TelegramCallbackUtils;
 import ru.rusguardian.telegram.bot.util.util.telegram_message.InputFileUtil;
@@ -30,7 +29,6 @@ import static ru.rusguardian.bot.command.service.CommandName.EXECUTE_TEXT_2_IMAG
 public class ExecuteText2ImagePromptBlindDifCommand extends PromptCommand {
 
     private final ProcessPromptText2Image processPromptText2Image;
-    private final ProcessGetTextLimitExpired getTextLimitExpired;
 
     private static final String IMAGE_PREPARING = "IMAGE_PREPARING";
     private static final String IMAGE_READY_PATTERN = "IMAGE_READY";
@@ -63,7 +61,7 @@ public class ExecuteText2ImagePromptBlindDifCommand extends PromptCommand {
             });
         }
 
-        String quickResponse = getQuickResponse(chatOwner, model, isChatLimitExpired);
+        String quickResponse = getQuickResponse(chatOwner, isChatLimitExpired);
         edit(EditMessageText.builder()
                 .chatId(initialChatId)
                 .text(quickResponse)
@@ -71,9 +69,9 @@ public class ExecuteText2ImagePromptBlindDifCommand extends PromptCommand {
                 .build());
     }
 
-    private String getQuickResponse(Chat chat, AIModel model, boolean isChatLimitExpired) {
+    private String getQuickResponse(Chat chat, boolean isChatLimitExpired) {
         return isChatLimitExpired
-                ? getTextLimitExpired.get(chat)
+                ? getChatLimitExpiredString(chat)
                 : getTextByViewDataAndChatLanguage(IMAGE_PREPARING, chat.getAiSettingsEmbedded().getAiLanguage());
     }
 

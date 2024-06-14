@@ -25,18 +25,18 @@ public class AIImageService {
     private static final String MIDJOURNEY_GENERATION_URL = "https://app.midjourneyapi.net/api/imagine";
     private static final String STABLE_DIFFUSION_GENERATION_URL = "https://modelslab.com/api/v6/realtime/text2img";
 
+    private final WebClient openAIImageWebClient;
+    private final WebClient midjourneyWebClient;
+    private final WebClient stablediffusionWebClient;
+
     @Autowired
-    public AIImageService(@Qualifier("openAIWebClient") WebClient openAIWebClient,
+    public AIImageService(@Qualifier("openAIImageWebClient") WebClient openAIImageWebClient,
                           @Qualifier("midjourneyWebClient") WebClient midjourneyWebClient,
                           @Qualifier("stablediffusionWebClient") WebClient stablediffusionWebClient) {
-        this.openAIWebClient = openAIWebClient;
+        this.openAIImageWebClient = openAIImageWebClient;
         this.midjourneyWebClient = midjourneyWebClient;
         this.stablediffusionWebClient = stablediffusionWebClient;
     }
-
-    private final WebClient openAIWebClient;
-    private final WebClient midjourneyWebClient;
-    private final WebClient stablediffusionWebClient;
 
     @Value("${midjourney.key}")
     private String midjourneyKey;
@@ -48,7 +48,7 @@ public class AIImageService {
     @Async
     public CompletableFuture<OpenAiTextToImageResponseDto> getOpenAiImageUrl(OpenAiTextToImageRequestDto dto) {
 
-        return openAIWebClient.post()
+        return openAIImageWebClient.post()
                 .uri(OPEN_AI_GENERATION_URL)
                 .bodyValue(dto)
                 .retrieve()

@@ -75,13 +75,14 @@ public class ProcessPromptText {
         dto.setMessages(getAnthropicMessages(chat, prompt));
         dto.setTemperature(chat.getAiSettingsEmbedded().getTemperature().getValue()/2);
         dto.setModel(model.getModelName());
+        dto.setMaxTokens(Math.min(chat.getUserBalanceEmbedded().getClaudeTokens()/2, 4096));
         return dto;
     }
 
     private List<AnthropicTextRequestDto.Message> getAnthropicMessages(Chat chat, String prompt){
         List<AnthropicTextRequestDto.Message> messages =
-                new ArrayList<>(ChatUtil.getPreviousChatCompletionMessages(chat, chatCompletionMessageService))
-                        .stream().map(AnthropicTextRequestDto.Message::new).toList();
+                new ArrayList<>(ChatUtil.getPreviousChatCompletionMessages(chat, chatCompletionMessageService)
+                        .stream().map(AnthropicTextRequestDto.Message::new).toList());
         messages.add(new AnthropicTextRequestDto.Message(Role.USER, prompt));
         return messages;
     }

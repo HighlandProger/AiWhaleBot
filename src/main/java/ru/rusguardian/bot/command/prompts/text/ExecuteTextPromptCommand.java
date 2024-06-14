@@ -9,7 +9,6 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.rusguardian.bot.command.prompts.PromptCommand;
 import ru.rusguardian.bot.command.service.CommandName;
-import ru.rusguardian.constant.user.SubscriptionType;
 import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.service.ai.constant.AIModel;
 import ru.rusguardian.service.process.prompt.ProcessPromptText;
@@ -37,30 +36,24 @@ public class ExecuteTextPromptCommand extends PromptCommand {
         AIModel model = chatOwner.getAiSettingsEmbedded().getAiActiveModel();
         String prompt = getViewTextMessage(update);
 
-        if (!isChatLimitExpired(chatOwner, model)) {
-            processPromptText.process(chatOwner, prompt).thenAccept(response -> {
-                if (!chatOwner.getAiSettingsEmbedded().isVoiceResponseEnabled()) {
-                    editForPrompt(getEditMessageWithResponse(initialChatId, response, replyId));
-                    return;
-                }
-                processPromptVoice.processText2Voice(chatOwner, response).thenAccept(voiceResponse -> {
-                    sendVoice(SendVoice.builder().voice(new InputFile(voiceResponse)).chatId(initialChatId).replyToMessageId(replyId).build());
-                });
-            }).exceptionally(e -> {
-                log.error(e.getMessage());
-                commandContainerService.getCommand(CommandName.ERROR).execute(update);
-                throw new RuntimeException("EXCEPTION DURING FUTURE");
-            });
-        } else {
-            String response;
-            if (chatOwner.getSubscriptionEmbedded().getSubscriptionInfo().getType() == SubscriptionType.FREE) {
-                response = getTextByViewDataAndChatLanguage(LIMIT_EXPIRED_FREE, chatOwner.getAiSettingsEmbedded().getAiLanguage());
-            } else {
-                response = getTextByViewDataAndChatLanguage(LIMIT_EXPIRED, chatOwner.getAiSettingsEmbedded().getAiLanguage());
-            }
-            edit(getEditMessageWithResponse(initialChatId, response, replyId));
+        if (isChatLimitExpired(chatOwner, model)) {
+            edit(getEditMessageWithResponse(initialChatId, getChatLimitExpiredString(chatOwner), replyId));
+            return;
         }
-    }
 
+        processPromptText.process(chatOwner, prompt).thenAccept(response -> {
+            if (!chatOwner.getAiSettingsEmbedded().isVoiceResponseEnabled()) {
+                editForPrompt(getEditMessageWithResponse(initialChatId, response, replyId));
+                return;
+            }
+            processPromptVoice.processText2Voice(chatOwner, response).thenAccept(voiceResponse -> {
+                sendVoice(SendVoice.builder().voice(new InputFile(voiceResponse)).chatId(initialChatId).replyToMessageId(replyId).build());
+            });
+        }).exceptionally(e -> {
+            log.error(e.getMessage());
+            commandContainerService.getCommand(CommandName.ERROR).execute(update);
+            throw new RuntimeException("EXCEPTION DURING FUTURE");
+        });
+    }
 
 }

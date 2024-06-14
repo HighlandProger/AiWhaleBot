@@ -1,6 +1,5 @@
 package ru.rusguardian.service.ai;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
@@ -19,22 +18,25 @@ import ru.rusguardian.service.ai.exception.OpenAiRequestException;
 import java.util.concurrent.CompletableFuture;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class AITextService {
 
     private static final String OPEN_AI_COMPLETIONS_URL = "https://api.openai.com/v1/chat/completions";
     private static final String ANTHROPIC_MESSAGES_URL = "https://api.anthropic.com/v1/messages";
 
-    @Qualifier("openAIWebClient")
-    private final WebClient openAIWebClient;
-    @Qualifier("anthropicWebClient")
+    private final WebClient openAITextWebClient;
     private final WebClient anthropicWebClient;
+
+    public AITextService(@Qualifier("openAITextWebClient") WebClient openAITextWebClient,
+                         @Qualifier("anthropicWebClient") WebClient anthropicWebClient){
+        this.openAITextWebClient = openAITextWebClient;
+        this.anthropicWebClient = anthropicWebClient;
+    }
 
     @Async
     public CompletableFuture<OpenAiTextResponseDto> getText(OpenAiTextRequestDto dto) {
 
-        return openAIWebClient.post()
+        return openAITextWebClient.post()
                 .uri(OPEN_AI_COMPLETIONS_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(dto)
@@ -59,8 +61,9 @@ public class AITextService {
                 .bodyToMono(AnthropicTextResponseDto.class)
                 .toFuture()
                 .exceptionally(e -> {
-                    log.error(e.getMessage());
-                    throw new AnthropicRequestException(e);
+                    String errorMessage = getErrorMessage(e);
+                    log.error(errorMessage);
+                    throw new AnthropicRequestException(errorMessage, e);
                 });
     }
 

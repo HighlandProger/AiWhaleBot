@@ -146,16 +146,8 @@ public abstract class Command implements BotService<CommandName> {
         chatService.updateNextCommand(TelegramUtils.getChatId(update), null);
     }
 
-    protected String getTextFromFileInResources(String fileName) {
-        return FileUtils.getTextFromFile(FileUtils.getFileFromResources2(this, fileName));
-    }
-
     protected String getTextByViewDataAndChatLanguage(String viewDataName, AILanguage language) {
         return viewDataService.getViewByNameAndLanguage(viewDataName, language);
-    }
-
-    protected List<String> getButtonViewsByViewDataAndChatLanguage(String viewDataName, AILanguage language) {
-        return Arrays.stream(viewDataService.getViewByNameAndLanguage(viewDataName, language).split("\n")).toList();
     }
 
     protected ReplyKeyboard getMainKeyboard(AILanguage language) {
@@ -181,13 +173,6 @@ public abstract class Command implements BotService<CommandName> {
 
     protected Long getInitialChatId(Update update) {
         return TelegramUtils.getChatId(update);
-    }
-
-    protected void sendVoice(SendVoice voice) {
-        bot.executeAsync(voice).exceptionally(e -> {
-            log.error(e.getMessage());
-            throw new RuntimeException(e);
-        });
     }
 
     protected void edit(EditMessageText edit) throws TelegramApiException {

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendVoice;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -59,7 +60,7 @@ public class PromptCommand extends Command {
         return bot.execute(reply).getMessageId();
     }
 
-    protected EditMessageText getEditMessageWithResponse(Long chatId, String text, int messageId) {
+    public EditMessageText getEditMessageWithResponse(Long chatId, String text, int messageId) {
         EditMessageText edit = new EditMessageText();
         edit.setChatId(chatId);
         edit.setMessageId(messageId);
@@ -67,6 +68,13 @@ public class PromptCommand extends Command {
         edit.setParseMode(ParseMode.HTML);
 
         return edit;
+    }
+
+    public void sendVoice(SendVoice voice) {
+        bot.executeAsync(voice).exceptionally(e -> {
+            log.error(e.getMessage());
+            throw new RuntimeException(e);
+        });
     }
 
     protected CompletableFuture<Void> editForPrompt(EditMessageText editText) {
@@ -79,5 +87,9 @@ public class PromptCommand extends Command {
                 throw new RuntimeException(e);
             }
         });
+    }
+
+    protected String getChatLimitExpiredString(Chat chat){
+        return getTextLimitExpired.get(chat);
     }
 }
