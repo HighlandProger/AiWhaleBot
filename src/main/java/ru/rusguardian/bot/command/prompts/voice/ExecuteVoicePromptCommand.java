@@ -39,20 +39,23 @@ public class ExecuteVoicePromptCommand extends PromptCommand {
         Long initialChatId = getInitialChatId(update);
 
         AIModel model = chat.getAiSettingsEmbedded().getAiActiveModel();
-        File voiceFile = FileUtils.getFileFromUpdate(update, bot);
+        File voiceFile = FileUtils.getFileFromMessage(update.getMessage(), bot);
 
         if (!isChatLimitExpired(chat, model)) {
-            processPromptVoice.processVoice2Text(chat, voiceFile).thenAccept(transcription -> {
-                processPromptText.process(chat, transcription).thenAccept(response -> {
-                    if (!chat.getAiSettingsEmbedded().isVoiceResponseEnabled()) {
-                        editForPrompt(getEditMessageWithResponse(initialChatId, response, replyId));
-                        return;
-                    }
-                    processPromptVoice.processText2Voice(chat, response).thenAccept(voiceFileResponse -> {
-                        sendVoice(SendVoice.builder().voice(new InputFile(voiceFileResponse)).replyToMessageId(replyId).chatId(chat.getId()).build());
-                    });
-                });
-            }).exceptionally(e -> {
+            processPromptVoice.processVoice2Text(chat, voiceFile)
+                    .thenAccept(transcription -> processPromptText.process(chat, transcription)
+                            .thenAccept(response -> {
+                if (!chat.getAiSettingsEmbedded().isVoiceResponseEnabled()) {
+                    editForPrompt(getEditMessageWithResponse(initialChatId, response, replyId));
+                    return;
+                }
+                processPromptVoice.processText2Voice(chat, response)
+                        .thenAccept(voiceFileResponse -> sendVoice(SendVoice.builder()
+                                .voice(new InputFile(voiceFileResponse))
+                                .replyToMessageId(replyId)
+                                .chatId(chat.getId())
+                                .build()));
+            })).exceptionally(e -> {
                 log.error(e.getMessage());
                 commandContainerService.getCommand(CommandName.ERROR).execute(update);
                 throw new RuntimeException(e);

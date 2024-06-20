@@ -5,7 +5,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.rusguardian.bot.command.service.Command;
 import ru.rusguardian.bot.command.service.CommandName;
-import ru.rusguardian.domain.user.Chat;
+import ru.rusguardian.constant.ai.AILanguage;
 
 @Component
 public class WelcomeCommand extends Command {
@@ -16,12 +16,12 @@ public class WelcomeCommand extends Command {
 
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
-        Chat chat = getChatOwner(update);
-        sendMessage(update, getText(chat), getMainKeyboard(chat.getAiSettingsEmbedded().getAiLanguage()));
+        AILanguage language = getChatLanguage(update);
+        sendMessage(update, getText(language), getMainKeyboard(language));
     }
 
-    public String getText(Chat chat) {
-        return getTextByViewDataAndChatLanguage(getType().name(), chat.getAiSettingsEmbedded().getAiLanguage());
+    public String getText(AILanguage language) {
+        return getTextByViewDataAndChatLanguage(getType().name(), language);
     }
 
 

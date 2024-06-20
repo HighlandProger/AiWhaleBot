@@ -21,7 +21,9 @@ public class ProcessUpdateUserExtraBalance {
 
     @Transactional
     public void updateGPT4ExtraBalance(Chat chat, AIModel model) {
-        if (model != AIModel.GPT_4_OMNI) {throw new UnsupportedOperationException("Supported only GPT4, but used: " + model.name());}
+        if (model != AIModel.GPT_4_OMNI) {
+            throw new UnsupportedOperationException("Supported only GPT4, but used: " + model.name());
+        }
         int allowedInSubscriptionCount = checkChatRequestLimit.getSubscriptionMinusUsedCount(chat, model);
 
         if (allowedInSubscriptionCount <= 0) {
@@ -32,8 +34,10 @@ public class ProcessUpdateUserExtraBalance {
     }
 
     @Transactional
-    public void updateImageGenerationBalance(Chat chat, AIModel model){
-        if (model.getBalanceType()!= AIModel.BalanceType.IMAGE){throw new UnsupportedOperationException("Unsupported balance type for image balance update: " + model.getBalanceType().name());}
+    public void updateImageGenerationBalance(Chat chat, AIModel model) {
+        if (model.getBalanceType() != AIModel.BalanceType.IMAGE) {
+            throw new UnsupportedOperationException("Unsupported balance type for text_to_image balance update: " + model.getBalanceType().name());
+        }
         int allowedInSubscriptionCount = checkChatRequestLimit.getSubscriptionMinusUsedCount(chat, model);
         if (allowedInSubscriptionCount <= 0) {
             int imageExtraRequests = chat.getUserBalanceEmbedded().getExtraImageRequests();
@@ -43,7 +47,7 @@ public class ProcessUpdateUserExtraBalance {
     }
 
     @Transactional
-    public void updateClaudeTokensBalance(Chat chat, AiResponseCommonDto dto){
+    public void updateClaudeTokensBalance(Chat chat, AiResponseCommonDto dto) {
         UserBalanceEmbedded balanceEmbedded = chat.getUserBalanceEmbedded();
         int usedTokens = getUsedTokensByCoefficient(dto);
         int userBalance = chat.getUserBalanceEmbedded().getClaudeTokens();
@@ -54,11 +58,11 @@ public class ProcessUpdateUserExtraBalance {
         chatService.update(chat);
     }
 
-    private int getUsedTokensByCoefficient(AiResponseCommonDto dto){
+    private int getUsedTokensByCoefficient(AiResponseCommonDto dto) {
         AIModel model = dto.getModel();
         Integer inputCoefficient;
         Integer outputCoefficient;
-        switch (model){
+        switch (model) {
             case CLAUDE_3_HAIKU -> {
                 inputCoefficient = 1;
                 outputCoefficient = 5;

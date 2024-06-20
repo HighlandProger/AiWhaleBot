@@ -7,7 +7,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.rusguardian.bot.command.main.subscription.buy_separate.inner.service.ChoosePurchaseCountKeyboardService;
 import ru.rusguardian.bot.command.service.Command;
 import ru.rusguardian.bot.command.service.CommandName;
-import ru.rusguardian.domain.user.Chat;
+import ru.rusguardian.constant.ai.AILanguage;
 import ru.rusguardian.service.ai.constant.AIModel;
 
 @Component
@@ -24,8 +24,8 @@ public class BuyGPT4BlindCommand extends Command {
 
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
-        Chat chat = getChatOwner(update);
-        editMessage(update, getTextByViewDataAndChatLanguage(BUY_SEPARATE_GPT4, getChatOwner(update).getAiSettingsEmbedded().getAiLanguage()),
-                choosePurchaseCountKeyboardService.getKeyboard(AIModel.BalanceType.GPT_4, chat.getAiSettingsEmbedded().getAiLanguage()));
+        AILanguage language = getChatLanguage(update);
+        editMessage(update, getTextByViewDataAndChatLanguage(BUY_SEPARATE_GPT4, language),
+                choosePurchaseCountKeyboardService.getKeyboard(AIModel.BalanceType.GPT_4, language));
     }
 }

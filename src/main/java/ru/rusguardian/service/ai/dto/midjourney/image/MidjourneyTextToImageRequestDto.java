@@ -9,6 +9,10 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class MidjourneyTextToImageRequestDto {
 
+    public MidjourneyTextToImageRequestDto(String prompt) {
+        this.imagine = prompt;
+    }
+
     private String key;
     private String secret;
     private String imagine;

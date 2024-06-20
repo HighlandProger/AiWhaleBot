@@ -1,8 +1,6 @@
 package ru.rusguardian.service.ai;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -14,15 +12,14 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
-import ru.rusguardian.service.ai.dto.open_ai.text.OpenAiErrorResponseDto;
 import ru.rusguardian.service.ai.dto.open_ai.voice.OpenAiCreateSpeechRequestDto;
 import ru.rusguardian.service.ai.dto.open_ai.voice.OpenAiTranscriptionRequestDto;
 import ru.rusguardian.service.ai.dto.open_ai.voice.OpenAiTranscriptionResponseDto;
 import ru.rusguardian.service.ai.exception.OpenAiRequestException;
 import ru.rusguardian.telegram.bot.util.util.FileUtils;
+import ru.rusguardian.util.WebExceptionMessageUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,7 +29,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 
 @Service
 @Slf4j
@@ -101,7 +97,7 @@ public class AIVoiceService {
                 .map(Path::toFile)
                 .toFuture()
                 .exceptionally(e -> {
-                    String errorMessage = getErrorMessage(e);
+                    String errorMessage = WebExceptionMessageUtil.getErrorMessage(e);
                     log.error(errorMessage);
                     throw new OpenAiRequestException(errorMessage, e);
                 });
@@ -122,17 +118,4 @@ public class AIVoiceService {
         }).subscribeOn(Schedulers.boundedElastic()); // Используем другой планировщик для асинхронной записи в файл
     }
 
-    private String getErrorMessage(Throwable e) {
-        if (e instanceof CompletionException ex) {
-            e = ex.getCause();
-        }
-        if (e instanceof WebClientResponseException ex) {
-            try {
-                return ex.getResponseBodyAs(OpenAiErrorResponseDto.class).getError().getMessage();
-            } catch (Exception exc) {
-                log.error(exc.getMessage());
-            }
-        }
-        return e.getMessage();
-    }
 }

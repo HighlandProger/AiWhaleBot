@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import ru.rusguardian.bot.command.service.CommandName;
+import ru.rusguardian.constant.ai.AILanguage;
 import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.repository.ChatRepository;
 import ru.rusguardian.service.data.abstr.CrudService;
@@ -42,8 +43,12 @@ public class ChatService extends CrudService<Chat, Long> {
         return chatRepository.findByInvitedBy(chatId);
     }
 
-    public boolean isUserBanned(Long userId){
+    public boolean isUserBanned(Long userId) {
         Boolean isBanned = chatRepository.isChatBanned(userId);
         return isBanned != null && isBanned;
+    }
+
+    public AILanguage getChatLanguage(Long userId) {
+        return chatRepository.getLanguage(userId);
     }
 }

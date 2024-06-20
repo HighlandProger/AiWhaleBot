@@ -15,11 +15,7 @@ public class WhaleAIBotApp {
         -! add Midjourney integration
         - add Gemini integration
 
-        -! add function for image redaction
-
         - change voice response for user
-
-        - remove context feature
 
         - minor user naming for AIModel, AiRole, SubscriptionType
 

@@ -10,6 +10,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.rusguardian.bot.command.service.Command;
 import ru.rusguardian.bot.command.service.CommandName;
+import ru.rusguardian.constant.ai.AILanguage;
 import ru.rusguardian.constant.purchase.PurchaseProvider;
 import ru.rusguardian.constant.user.SubscriptionType;
 import ru.rusguardian.domain.user.Chat;
@@ -47,8 +48,8 @@ public class PurchaseSubscriptionBlindDifCommand extends Command {
     }
 
     private String getText(Update update) {
-        Chat chat = getChatOwner(update);
-        return MessageFormat.format(getTextByViewDataAndChatLanguage(SUBSCRIPTION_PURCHASING_INFO, chat.getAiSettingsEmbedded().getAiLanguage()), PurchaseProvider.ROBOKASSA.getName());
+        AILanguage language = getChatLanguage(update);
+        return MessageFormat.format(getTextByViewDataAndChatLanguage(SUBSCRIPTION_PURCHASING_INFO, language), PurchaseProvider.ROBOKASSA.getName());
     }
 
     private InlineKeyboardMarkup getKeyboard(Chat chat, SubscriptionType subscriptionType, PurchaseProvider provider) {

@@ -11,8 +11,8 @@ import ru.rusguardian.bot.command.main.subscription.service.SubscriptionsKeyboar
 import ru.rusguardian.bot.command.service.Command;
 import ru.rusguardian.bot.command.service.CommandMapping;
 import ru.rusguardian.bot.command.service.CommandName;
+import ru.rusguardian.constant.ai.AILanguage;
 import ru.rusguardian.domain.SubscriptionInfo;
-import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.telegram.bot.util.util.TelegramCallbackUtils;
 import ru.rusguardian.telegram.bot.util.util.telegram_message.SendMessageUtil;
 
@@ -42,26 +42,26 @@ public class SubscriptionCommand extends Command {
 
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
-        Chat chat = getChatOwner(update);
+        AILanguage language = getChatLanguage(update);
         if (update.hasCallbackQuery()) {
-            edit(update, chat);
+            edit(update, language);
             return;
         }
-        send(update, chat);
+        send(update, language);
     }
 
-    private void send(Update update, Chat chat) throws TelegramApiException {
+    private void send(Update update, AILanguage language) throws TelegramApiException {
         Type type = Type.MONTH;
         List<SubscriptionInfo> subscriptionInfos = new ArrayList<>(subscriptionInfoService.getAll().stream().filter(e -> e.getType().getTimeType() == type).toList());
 
-        SendMessage message = SendMessageUtil.getSimple(update, getTextByViewDataAndChatLanguage(VIEW_DATA, chat.getAiSettingsEmbedded().getAiLanguage()));
-        message.setReplyMarkup(subscriptionsKeyboardService.getKeyboard(type, subscriptionInfos, chat.getAiSettingsEmbedded().getAiLanguage()));
+        SendMessage message = SendMessageUtil.getSimple(update, getTextByViewDataAndChatLanguage(VIEW_DATA, language));
+        message.setReplyMarkup(subscriptionsKeyboardService.getKeyboard(type, subscriptionInfos, language));
         message.setParseMode(ParseMode.HTML);
 
         sendMessage(message);
     }
 
-    private void edit(Update update, Chat chat) throws TelegramApiException {
+    private void edit(Update update, AILanguage language) throws TelegramApiException {
         String typeString = TelegramCallbackUtils.getArgsFromCallback(update).length > 1
                 ? TelegramCallbackUtils.getArgFromCallback(update, 1)
                 : Type.MONTH.name();
@@ -71,6 +71,6 @@ public class SubscriptionCommand extends Command {
 
         InlineKeyboardMarkup markup = subscriptionsKeyboardService.getKeyboard(type, subscriptionInfos, getChatOwner(update).getAiSettingsEmbedded().getAiLanguage());
 
-        editMessage(update, getTextByViewDataAndChatLanguage(VIEW_DATA, chat.getAiSettingsEmbedded().getAiLanguage()), markup);
+        editMessage(update, getTextByViewDataAndChatLanguage(VIEW_DATA, language), markup);
     }
 }

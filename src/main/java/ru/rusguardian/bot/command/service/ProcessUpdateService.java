@@ -42,8 +42,12 @@ public class ProcessUpdateService {
         Command command = commandContainerService.getCommand(commandName);
         command.execute(update);
     }
-    private String getUpdateMessage(Update update){
+
+    private String getUpdateMessage(Update update) {
         String viewOrBlind = TelegramUtils.getViewTextMessage(update).orElse(TelegramUtils.getCallbackQueryData(update));
+        if (viewOrBlind == null) {
+            viewOrBlind = update.hasMessage() && update.getMessage().hasPhoto() ? "PHOTO" : null;
+        }
         return String.format("Message from %s : %s", TelegramUtils.getUserId(update), viewOrBlind);
     }
 
@@ -58,16 +62,22 @@ public class ProcessUpdateService {
                 .orElse(PROMPT);
     }
 
-    private Optional<CommandName> getByMessage(Update update){
-        if(update.hasMessage() && update.getMessage().hasPhoto()) {return Optional.of(OBTAIN_IMAGE_REQUEST);}
+    private Optional<CommandName> getByMessage(Update update) {
+        if (update.hasMessage() && update.getMessage().hasPhoto()) {
+            return Optional.of(OBTAIN_IMAGE_REQUEST);
+        }
 
         Optional<String> viewTextOptional = TelegramUtils.getViewTextMessage(update);
-        if (viewTextOptional.isEmpty()){return Optional.empty();}
-        if (isPublicMessage(update)) {return getForPublic(update);}
+        if (viewTextOptional.isEmpty()) {
+            return Optional.empty();
+        }
+        if (isPublicMessage(update)) {
+            return getForPublic(update);
+        }
         return getByTextMessage(viewTextOptional);
     }
 
-    private Optional<CommandName> getForPublic(Update update){
+    private Optional<CommandName> getForPublic(Update update) {
         Optional<String> viewTextOptional = TelegramUtils.getViewTextMessage(update);
         if (isGroupOwnerNotFound(update)) {
             return Optional.of(GROUP_OWNER_NOT_FOUND);

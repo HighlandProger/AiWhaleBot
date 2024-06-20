@@ -7,7 +7,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.rusguardian.bot.command.service.Command;
 import ru.rusguardian.bot.command.service.CommandName;
-import ru.rusguardian.domain.user.Chat;
+import ru.rusguardian.constant.ai.AILanguage;
 import ru.rusguardian.telegram.bot.util.util.TelegramUtils;
 
 @Component
@@ -24,13 +24,13 @@ public class ObtainVisionPromptViewDifCommand extends Command {
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
         String prompt = getViewTextMessage(update).substring(CommandName.OBTAIN_VISION_PROMPT_VIEW_D.getViewName().length()).trim();
-        Chat chat = getChatOwner(update);
+        AILanguage language = getChatLanguage(update);
         Long initialChatId = getInitialChatId(update);
         if (prompt.isEmpty()) {
             bot.execute(SendMessage.builder()
                     .chatId(initialChatId)
                     .replyToMessageId(TelegramUtils.getMessageId(update))
-                    .text(getTextByViewDataAndChatLanguage(VISION_INSTRUCTION, chat.getAiSettingsEmbedded().getAiLanguage()))
+                    .text(getTextByViewDataAndChatLanguage(VISION_INSTRUCTION, language))
                     .build());
             return;
         }

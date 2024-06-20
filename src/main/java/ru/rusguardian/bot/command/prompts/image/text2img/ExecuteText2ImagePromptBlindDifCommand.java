@@ -11,11 +11,12 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.rusguardian.bot.command.prompts.PromptCommand;
+import ru.rusguardian.bot.command.prompts.image.img.SendPromptImageService;
 import ru.rusguardian.bot.command.service.CommandName;
 import ru.rusguardian.constant.ai.AILanguage;
 import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.service.ai.constant.AIModel;
-import ru.rusguardian.service.process.prompt.ProcessPromptText2Image;
+import ru.rusguardian.service.process.prompt.ProcessImagePrompt;
 import ru.rusguardian.telegram.bot.util.util.TelegramCallbackUtils;
 import ru.rusguardian.telegram.bot.util.util.telegram_message.InputFileUtil;
 
@@ -26,13 +27,13 @@ import static ru.rusguardian.bot.command.service.CommandName.EXECUTE_TEXT_2_IMAG
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class ExecuteText2ImagePromptBlindDifCommand extends PromptCommand {
+public class ExecuteText2ImagePromptBlindDifCommand extends PromptCommand implements SendPromptImageService {
 
-    private final ProcessPromptText2Image processPromptText2Image;
+    private final ProcessImagePrompt processImagePrompt;
 
     private static final String IMAGE_PREPARING = "IMAGE_PREPARING";
     private static final String IMAGE_READY_PATTERN = "IMAGE_READY";
-    private static final String IMG_PREFIX ="/img";
+    private static final String IMG_PREFIX = "/img";
 
     @Override
     public CommandName getType() {
@@ -45,6 +46,7 @@ public class ExecuteText2ImagePromptBlindDifCommand extends PromptCommand {
         Chat chatOwner = getChatOwner(update);
         Long initialChatId = getInitialChatId(update);
         AIModel model = AIModel.valueOf(TelegramCallbackUtils.getArgFromCallback(update, 1));
+        AILanguage language = chatOwner.getAiSettingsEmbedded().getAiLanguage();
 
         Message lastBotMessage = (Message) update.getCallbackQuery().getMessage();
         String reply = lastBotMessage.getReplyToMessage().getText();
@@ -52,10 +54,11 @@ public class ExecuteText2ImagePromptBlindDifCommand extends PromptCommand {
         boolean isChatLimitExpired = isChatLimitExpired(chatOwner, model);
 
         if (!isChatLimitExpired) {
-            processPromptText2Image.processUrl(chatOwner, model, prompt).thenAccept(url ->
-                    sendResponseToUser(url, initialChatId, chatOwner.getAiSettingsEmbedded().getAiLanguage(), model.getModelName(), prompt)
-            ).exceptionally(ex -> {
-                log.error("EXCEPTION DURING EXECUTING ProcessPromptText2Image. Model: {}, prompt: {}, ExMessage: {}", model, prompt, ex.getMessage());
+            processImagePrompt.processText2ImageUrl(chatOwner, model, prompt).thenAccept(url -> {
+                InputFile file = InputFileUtil.getInputFileFromURL(url);
+                sendTextToImagePrompt(getSendPhoto(file, initialChatId, language, model.getModelName(), prompt));
+            }).exceptionally(ex -> {
+                log.error("EXCEPTION DURING EXECUTING ProcessImagePrompt. Model: {}, prompt: {}, ExMessage: {}", model, prompt, ex.getMessage());
                 errorCommand.execute(update);
                 throw new RuntimeException(ex);
             });
@@ -69,19 +72,22 @@ public class ExecuteText2ImagePromptBlindDifCommand extends PromptCommand {
                 .build());
     }
 
-    private String getQuickResponse(Chat chat, boolean isChatLimitExpired) {
-        return isChatLimitExpired
-                ? getChatLimitExpiredString(chat)
-                : getTextByViewDataAndChatLanguage(IMAGE_PREPARING, chat.getAiSettingsEmbedded().getAiLanguage());
-    }
-
-    private void sendResponseToUser(String fileUrl, Long chatId, AILanguage language, String model, String prompt) {
-        InputFile file = InputFileUtil.getInputFileFromURL(fileUrl);
-        sendPhoto(SendPhoto.builder().photo(file).chatId(chatId).caption(getCaption(language, model, prompt)).parseMode(ParseMode.HTML).build());
+    private SendPhoto getSendPhoto(InputFile file, Long chatId, AILanguage language, String model, String prompt) {
+        return SendPhoto.builder()
+                .photo(file)
+                .chatId(chatId)
+                .caption(getCaption(language, model, prompt))
+                .parseMode(ParseMode.HTML).build();
     }
 
     private String getCaption(AILanguage language, String model, String prompt) {
         return MessageFormat.format(getTextByViewDataAndChatLanguage(IMAGE_READY_PATTERN, language), model, prompt);
+    }
+
+    private String getQuickResponse(Chat chat, boolean isChatLimitExpired) {
+        return isChatLimitExpired
+                ? getChatLimitExpiredString(chat)
+                : getTextByViewDataAndChatLanguage(IMAGE_PREPARING, chat.getAiSettingsEmbedded().getAiLanguage());
     }
 
 }

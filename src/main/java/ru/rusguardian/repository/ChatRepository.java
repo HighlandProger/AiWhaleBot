@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import ru.rusguardian.constant.ai.AILanguage;
 import ru.rusguardian.domain.user.Chat;
 
 import java.util.List;
@@ -34,4 +35,7 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
 
     @Query("SELECT isBanned FROM Chat c WHERE c.id = :id")
     Boolean isChatBanned(Long id);
+
+    @Query("SELECT c.aiSettingsEmbedded.aiLanguage FROM Chat c WHERE c.id = :id")
+    AILanguage getLanguage(Long id);
 }

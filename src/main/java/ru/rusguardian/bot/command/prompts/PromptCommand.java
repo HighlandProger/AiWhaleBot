@@ -79,17 +79,26 @@ public class PromptCommand extends Command {
 
     protected CompletableFuture<Void> editForPrompt(EditMessageText editText) {
         return CompletableFuture.runAsync(() -> {
-            editText.setParseMode(ParseMode.MARKDOWN);
+            if (editText.getText().contains("```")) {
+                editText.setParseMode(ParseMode.MARKDOWN);
+            }
             try {
                 bot.execute(editText);
             } catch (TelegramApiException e) {
-                log.error("Error editing message to {}", editText);
-                throw new RuntimeException(e);
+                log.warn(e.getMessage());
+                editText.setParseMode(null);
+                try {
+                    bot.execute(editText);
+                } catch (TelegramApiException ex) {
+                    log.error("Error editing message to {}", editText);
+                    throw new RuntimeException(ex);
+                }
             }
+            log.info("Chat {} successfully received prompt {}", editText.getChatId(), editText.getText().substring(0, 30) + "...");
         });
     }
 
-    protected String getChatLimitExpiredString(Chat chat){
+    protected String getChatLimitExpiredString(Chat chat) {
         return getTextLimitExpired.get(chat);
     }
 }

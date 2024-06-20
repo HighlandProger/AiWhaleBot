@@ -53,7 +53,7 @@ public class ProcessCreateChat {
         chat.setAiSettingsEmbedded(getAiSetting());
         chat.setSubscriptionEmbedded(getSubscription());
         chat.setPartnerEmbeddedInfo(getPartner(update));
-        chat.setUserBalanceEmbedded(getUserBalance());
+        chat.setUserBalanceEmbedded(getUserBalance(chat));
 
         chatService.save(chat);
         createSystemCompletionMessage(chat);
@@ -110,11 +110,19 @@ public class ProcessCreateChat {
         return null;
     }
 
-    private UserBalanceEmbedded getUserBalance() {
+    private UserBalanceEmbedded getUserBalance(Chat chat) {
+        int extraImageRequests = 0;
+        int extraGptRequests = 0;
+
+        if (chat.getPartnerEmbeddedInfo().getInvitedBy() != null) {
+            extraGptRequests = 5;
+            extraImageRequests = 2;
+        }
+
         UserBalanceEmbedded userBalance = new UserBalanceEmbedded();
         userBalance.setClaudeTokens(0);
-        userBalance.setExtraImageRequests(0);
-        userBalance.setExtraGPT4Requests(0);
+        userBalance.setExtraImageRequests(extraImageRequests);
+        userBalance.setExtraGPT4Requests(extraGptRequests);
 
         return userBalance;
     }

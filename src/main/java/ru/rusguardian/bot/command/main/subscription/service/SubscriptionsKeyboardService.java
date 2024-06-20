@@ -9,7 +9,6 @@ import ru.rusguardian.constant.ai.AILanguage;
 import ru.rusguardian.domain.ButtonViewData;
 import ru.rusguardian.domain.SubscriptionInfo;
 import ru.rusguardian.service.data.ButtonViewDataService;
-import ru.rusguardian.telegram.bot.util.constants.Callback;
 import ru.rusguardian.telegram.bot.util.util.TelegramCallbackUtils;
 import ru.rusguardian.telegram.bot.util.util.telegram_message.ReplyMarkupUtil;
 
@@ -45,9 +44,9 @@ public class SubscriptionsKeyboardService {
 
         String currentSmile = "\uD83D\uDFE2";
         String month = monthViewData.getValueByLanguage(language);
-        String monthBlind = Type.MONTH == currentType ? EMPTY.name() : String.join(Callback.ARGS_DELIMITER.getValue(), SUBSCRIPTION.getBlindName(), Type.MONTH.name());
+        String monthBlind = Type.MONTH == currentType ? EMPTY.name() : TelegramCallbackUtils.getCallbackWithArgs(SUBSCRIPTION.getBlindName(), Type.MONTH.name());
         String year = yearViewData.getValueByLanguage(language);
-        String yearBlind = Type.YEAR == currentType ? EMPTY.name() : String.join(Callback.ARGS_DELIMITER.getValue(), SUBSCRIPTION.getBlindName(), Type.YEAR.name());
+        String yearBlind = Type.YEAR == currentType ? EMPTY.name() : TelegramCallbackUtils.getCallbackWithArgs(SUBSCRIPTION.getBlindName(), Type.YEAR.name());
 
         if (currentType == Type.MONTH) {
             month = currentSmile + month;

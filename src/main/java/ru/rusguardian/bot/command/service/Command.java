@@ -9,7 +9,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.methods.send.SendVoice;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -24,12 +23,10 @@ import ru.rusguardian.service.data.*;
 import ru.rusguardian.telegram.bot.service.BotService;
 import ru.rusguardian.telegram.bot.service.task.TaskCommandService;
 import ru.rusguardian.telegram.bot.util.constants.ChatType;
-import ru.rusguardian.telegram.bot.util.util.FileUtils;
 import ru.rusguardian.telegram.bot.util.util.TelegramUtils;
 import ru.rusguardian.telegram.bot.util.util.telegram_message.ReplyMarkupUtil;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -68,7 +65,7 @@ public abstract class Command implements BotService<CommandName> {
     protected TaskService taskService;
 
     @Autowired
-    private ViewDataService viewDataService;
+    protected ViewDataService viewDataService;
 
     @Autowired
     protected AssistantRoleDataService assistantRoleDataService;
@@ -117,7 +114,7 @@ public abstract class Command implements BotService<CommandName> {
         if (chatOwner.isEmpty()) {
             sendChatOwnerNotFoundErrorMessage(TelegramUtils.getChatIdString(update));
         }
-        return chatOwner.get();
+        return chatOwner.orElseThrow();
     }
 
     private void sendChatOwnerNotFoundErrorMessage(String chatId) {
@@ -180,11 +177,14 @@ public abstract class Command implements BotService<CommandName> {
         bot.execute(edit);
     }
 
-    protected void editOrSend(Update update, String text, InlineKeyboardMarkup keyboard) throws TelegramApiException {
+    protected int editOrSend(Update update, String text, InlineKeyboardMarkup keyboard) throws TelegramApiException {
         if (update.hasCallbackQuery()) {
-            editMessage(update, text, keyboard);
-            return;
+            return editMessage(update, text, keyboard);
         }
-        sendMessage(update, text, keyboard);
+        return sendMessage(update, text, keyboard).getMessageId();
+    }
+
+    protected AILanguage getChatLanguage(Update update) {
+        return chatService.getChatLanguage(TelegramUtils.getChatId(update));
     }
 }

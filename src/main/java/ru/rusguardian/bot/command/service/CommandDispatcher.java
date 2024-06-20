@@ -44,7 +44,7 @@ public class CommandDispatcher {
 
     private void initBlind(CommandMapping commandMapping, Command command) {
         String blindText = commandMapping == null || commandMapping.blindCommand().isEmpty() ? command.getType().name() : commandMapping.blindCommand();
-        if (blindText.endsWith("BLIND_D")) {
+        if ((commandMapping != null && commandMapping.isBlindVariable()) || blindText.endsWith("BLIND_D")) {
             blindStartsWithMap.put(blindText, command.getType());
         } else {
             blindEqualsMap.put(blindText, command.getType());
@@ -52,9 +52,9 @@ public class CommandDispatcher {
     }
 
     public Optional<CommandName> getByViewVariable(String view) {
-        for (String value : viewStartsWithMap.keySet()) {
-            if (view.startsWith(value)) {
-                return Optional.of(viewStartsWithMap.get(value));
+        for (Map.Entry<String, CommandName> entry : viewStartsWithMap.entrySet()) {
+            if (view.startsWith(entry.getKey())) {
+                return Optional.of(entry.getValue());
             }
         }
         return Optional.empty();
@@ -68,9 +68,9 @@ public class CommandDispatcher {
     }
 
     public Optional<CommandName> getByBlindVariable(String blind) {
-        for (String value : blindStartsWithMap.keySet()) {
-            if (blind.startsWith(value)) {
-                return Optional.of(blindStartsWithMap.get(value));
+        for (Map.Entry<String, CommandName> entry : blindStartsWithMap.entrySet()) {
+            if (blind.startsWith(entry.getKey())) {
+                return Optional.of(entry.getValue());
             }
         }
         return Optional.empty();

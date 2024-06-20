@@ -6,6 +6,7 @@ import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import ru.rusguardian.bot.command.main.gpt_roles.service.GPTRolesInlineKeyboardService;
 import ru.rusguardian.bot.command.service.Command;
 import ru.rusguardian.bot.command.service.CommandName;
 import ru.rusguardian.constant.ai.AILanguage;
@@ -15,7 +16,6 @@ import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.telegram.bot.util.util.TelegramCallbackUtils;
 import ru.rusguardian.telegram.bot.util.util.TelegramUtils;
 import ru.rusguardian.telegram.bot.util.util.telegram_message.EditMessageUtil;
-import ru.rusguardian.bot.command.main.gpt_roles.service.GPTRolesInlineKeyboardService;
 
 import java.text.MessageFormat;
 
@@ -29,7 +29,6 @@ public class GPTRolesBlindCommand extends Command {
     private final GPTRolesInlineKeyboardService keyboardService;
     private static final String GPT_ROLES_ANSWER_CALLBACK = "GPT_ROLES_ANSWER_CALLBACK";
     private static final String GPT_ROLES_INFO = "GPT_ROLES_INFO";
-
 
     @Override
     public CommandName getType() {

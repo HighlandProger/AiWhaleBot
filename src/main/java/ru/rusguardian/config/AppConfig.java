@@ -8,7 +8,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.CommonsRequestLoggingFilter;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -61,7 +60,7 @@ public class AppConfig {
     }
 
     @Bean(name = "anthropicWebClient")
-    public WebClient anthropicWebClient(@Value("${anthropic.x-api-key}") String xApiKey, @Value("${anthropic.version}") String anthropicVersion){
+    public WebClient anthropicWebClient(@Value("${anthropic.x-api-key}") String xApiKey, @Value("${anthropic.version}") String anthropicVersion) {
         return WebClient.builder()
                 .defaultHeader("x-api-key", xApiKey)
                 .defaultHeader("anthropic-version", anthropicVersion)
@@ -89,9 +88,9 @@ public class AppConfig {
         return new RestTemplate();
     }
 
-    @Bean(name = "yandexTranslateRestClient")
-    public RestClient yandexTranslateClient() {
-        return RestClient.builder()
+    @Bean(name = "yandexTranslateWebClient")
+    public WebClient yandexTranslateClient() {
+        return WebClient.builder()
                 .build();
     }
 }

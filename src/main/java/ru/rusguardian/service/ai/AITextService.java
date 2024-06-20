@@ -6,14 +6,13 @@ import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 import ru.rusguardian.service.ai.dto.anthropic.AnthropicTextRequestDto;
 import ru.rusguardian.service.ai.dto.anthropic.AnthropicTextResponseDto;
-import ru.rusguardian.service.ai.dto.open_ai.text.OpenAiErrorResponseDto;
 import ru.rusguardian.service.ai.dto.open_ai.text.OpenAiTextRequestDto;
 import ru.rusguardian.service.ai.dto.open_ai.text.OpenAiTextResponseDto;
 import ru.rusguardian.service.ai.exception.AnthropicRequestException;
 import ru.rusguardian.service.ai.exception.OpenAiRequestException;
+import ru.rusguardian.util.WebExceptionMessageUtil;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -28,7 +27,7 @@ public class AITextService {
     private final WebClient anthropicWebClient;
 
     public AITextService(@Qualifier("openAITextWebClient") WebClient openAITextWebClient,
-                         @Qualifier("anthropicWebClient") WebClient anthropicWebClient){
+                         @Qualifier("anthropicWebClient") WebClient anthropicWebClient) {
         this.openAITextWebClient = openAITextWebClient;
         this.anthropicWebClient = anthropicWebClient;
     }
@@ -44,14 +43,14 @@ public class AITextService {
                 .bodyToMono(OpenAiTextResponseDto.class)
                 .toFuture()
                 .exceptionally(e -> {
-                    String errorMessage = getErrorMessage(e);
+                    String errorMessage = WebExceptionMessageUtil.getErrorMessage(e);
                     log.error(errorMessage);
                     throw new OpenAiRequestException(errorMessage, e);
                 });
     }
 
     @Async
-    public CompletableFuture<AnthropicTextResponseDto> getText(AnthropicTextRequestDto dto){
+    public CompletableFuture<AnthropicTextResponseDto> getText(AnthropicTextRequestDto dto) {
 
         return anthropicWebClient.post()
                 .uri(ANTHROPIC_MESSAGES_URL)
@@ -61,22 +60,10 @@ public class AITextService {
                 .bodyToMono(AnthropicTextResponseDto.class)
                 .toFuture()
                 .exceptionally(e -> {
-                    String errorMessage = getErrorMessage(e);
+                    String errorMessage = WebExceptionMessageUtil.getErrorMessage(e);
                     log.error(errorMessage);
                     throw new AnthropicRequestException(errorMessage, e);
                 });
     }
-
-    private String getErrorMessage(Throwable e) {
-        if (e instanceof WebClientResponseException ex) {
-            try {
-                return ex.getResponseBodyAs(OpenAiErrorResponseDto.class).getError().getMessage();
-            } catch (Exception exc) {
-                log.error(exc.getMessage());
-            }
-        }
-        return e.getMessage();
-    }
-
 
 }

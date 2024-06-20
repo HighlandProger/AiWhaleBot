@@ -11,7 +11,6 @@ import ru.rusguardian.bot.command.service.CommandName;
 import ru.rusguardian.constant.ai.AILanguage;
 import ru.rusguardian.constant.purchase.PurchaseProvider;
 import ru.rusguardian.constant.purchase.SeparatePurchase;
-import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.telegram.bot.util.util.TelegramCallbackUtils;
 import ru.rusguardian.telegram.bot.util.util.telegram_message.EditMessageUtil;
 import ru.rusguardian.telegram.bot.util.util.telegram_message.ReplyMarkupUtil;
@@ -36,9 +35,9 @@ public class ChooseSeparatePurchaseTypeBlindDifCommand extends Command {
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
 
-        Chat chat = getChatOwner(update);
-        EditMessageText edit = EditMessageUtil.getMessageText(update, getTextByViewDataAndChatLanguage(VIEW_DATA, getChatOwner(update).getAiSettingsEmbedded().getAiLanguage()));
-        edit.setReplyMarkup(getKeyboard(update, chat.getAiSettingsEmbedded().getAiLanguage()));
+        AILanguage language = getChatLanguage(update);
+        EditMessageText edit = EditMessageUtil.getMessageText(update, getTextByViewDataAndChatLanguage(VIEW_DATA, language));
+        edit.setReplyMarkup(getKeyboard(update, language));
 
         bot.executeAsync(edit);
     }
