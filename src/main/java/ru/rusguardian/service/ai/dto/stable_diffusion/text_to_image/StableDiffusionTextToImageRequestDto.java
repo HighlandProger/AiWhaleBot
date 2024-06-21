@@ -27,18 +27,19 @@ public class StableDiffusionTextToImageRequestDto {
      */
     @JsonProperty("negative_prompt")
     private String negativePrompt;
+    //TODO WARN OCCURS galucinations during 1024x1024
     /**
      * Max Height: Width: 1024x1024.
      */
-    private String width = "1024";
+    private String width;
     /**
      * Max Height: Width: 1024x1024.
      */
-    private String height = "1024";
+    private String height;
     /**
      * Number of images to be returned in response. The maximum value is 4.
      */
-    private Integer samples;
+    private Integer samples = 1;
     /**
      * A checker for NSFW images. If such an text_to_image is detected, it will be replaced by a blank text_to_image.
      */
