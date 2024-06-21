@@ -30,20 +30,20 @@ public class StableDiffusionTextToImageRequestDto {
     /**
      * Max Height: Width: 1024x1024.
      */
-    private String width;
+    private String width = "1024";
     /**
      * Max Height: Width: 1024x1024.
      */
-    private String height;
+    private String height = "1024";
     /**
      * Number of images to be returned in response. The maximum value is 4.
      */
-    private int samples;
+    private Integer samples;
     /**
      * A checker for NSFW images. If such an text_to_image is detected, it will be replaced by a blank text_to_image.
      */
     @JsonProperty("safety_checker")
-    private boolean safetyChecker;
+    private Boolean safetyChecker;
     /**
      * Seed is used to reproduce results, same seed will give you same text_to_image in return again. Pass null for a random number.
      */
@@ -52,11 +52,11 @@ public class StableDiffusionTextToImageRequestDto {
      * Seed is used to reproduce results, same seed will give you same text_to_image in return again. Pass null for a random number.
      */
     @JsonProperty("instant_response")
-    private boolean instantResponse;
+    private Boolean instantResponse;
     /**
      * Get response as base64 string, default: false, options: true or false
      */
-    private boolean base64;
+    private Boolean base64;
     /**
      * Set an URL to get a POST API call once the text_to_image generation is complete.
      */
@@ -66,15 +66,5 @@ public class StableDiffusionTextToImageRequestDto {
      */
     @JsonProperty("track_id")
     private String trackId;
-    /**
-     * Enhance prompts for better results; options: true/false
-     */
-    @JsonProperty("enhance_prompt")
-    private boolean enhancePrompt;
-    /**
-     * This allows you to set the style of the text_to_image for better result. Check Stable diffusion api
-     */
-    @JsonProperty("enhance_style")
-    private String enhanceStyle;
 
 }

@@ -101,7 +101,7 @@ public class ProcessImagePrompt {
 
         return switch (provider) {
             case STABLE_DIFFUSION -> yandexTranslateService.getTranslation(prompt, AILanguage.ENGLISH)
-                    .thenCompose(resp -> stableDiffusionImageService.getTextToImageUrl(resp, SDModelId.SDXL));
+                    .thenCompose(resp -> stableDiffusionImageService.getTextToImageUrl(resp, SDModelId.REALISTIC_VISION_V_1_3));
             case OPEN_AI ->
                     openAIImageService.getTextToImageUrl(new OpenAiTextToImageRequestDto(chat.getId(), model, prompt));
             case MIDJOURNEY -> yandexTranslateService.getTranslation(prompt, AILanguage.ENGLISH)

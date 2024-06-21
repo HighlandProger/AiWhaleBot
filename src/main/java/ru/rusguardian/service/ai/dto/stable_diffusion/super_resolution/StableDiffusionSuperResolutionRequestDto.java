@@ -11,9 +11,14 @@ import lombok.NoArgsConstructor;
 public class StableDiffusionSuperResolutionRequestDto {
     private String key;
     private String url;
-    private static final int SCALE = 3;
-    private static final String WEBHOOK = null;
+    private int scale = 3;
+    private String webhook = null;
     @JsonProperty("face_enhance")
-    private static final boolean FACE_ENHANCE = false;
+    private boolean faceEnhance = false;
+
+    public StableDiffusionSuperResolutionRequestDto(String key, String url) {
+        this.key = key;
+        this.url = url;
+    }
 
 }

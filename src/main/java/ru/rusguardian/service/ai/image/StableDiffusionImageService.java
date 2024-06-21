@@ -9,7 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import ru.rusguardian.service.ai.dto.stable_diffusion.StableDiffusionV6Pix2PixResponseDto;
+import ru.rusguardian.service.ai.dto.stable_diffusion.StableDiffusionV6ResponseDto;
 import ru.rusguardian.service.ai.dto.stable_diffusion.fetch.StableDiffusionFetchRequestDto;
 import ru.rusguardian.service.ai.dto.stable_diffusion.fetch.StableDiffusionFetchResponseDto;
 import ru.rusguardian.service.ai.dto.stable_diffusion.pix2pix.StableDiffusionPix2PixRequestDto;
@@ -79,14 +79,14 @@ public class StableDiffusionImageService {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(dto)
                 .retrieve()
-                .bodyToMono(StableDiffusionV6Pix2PixResponseDto.class)
+                .bodyToMono(StableDiffusionV6ResponseDto.class)
                 .toFuture()
                 .thenCompose(response -> {
                     log.info(response.toString());
                     String status = response.getStatus();
                     if (ERROR_STATUS.equals(status)) {
                         log.error("ERROR DURING SD REQUEST");
-                        throw new RuntimeException(response.getMessage());
+                        throw new RuntimeException(response.toString());
                     }
                     if (PROCESSING_STATUS.equals(status)) {
                         return retryFetching(response.getFetchResult(), 10);
