@@ -27,9 +27,13 @@ public class ObtainImageRequestCommand extends PromptCommand {
 
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
-        if (!(update.hasMessage() && update.getMessage().hasPhoto())) throw new RuntimeException();
         setNullCompletedCommand(update);
         AILanguage language = getChatLanguage(update);
+
+        if(update.hasCallbackQuery()){
+            editMessage(update, getTextByViewDataAndChatLanguage(VIEW_DATA, language), keyboardService.getMarkup(language));
+            return;
+        }
 
         SendMessage message = SendMessage.builder()
                 .chatId(TelegramUtils.getChatIdString(update))
