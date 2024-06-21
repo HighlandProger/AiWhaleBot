@@ -41,13 +41,8 @@ public class PromptCommand extends Command {
 
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
-        MessageType type = MessageType.getType(update);
-        if (MessageType.TEXT == type) {
-            commandContainerService.getCommand(CommandName.EXECUTE_TEXT_PROMPT).execute(update);
-        }
-        if (MessageType.VOICE == type) {
-            commandContainerService.getCommand(CommandName.EXECUTE_VOICE_PROMPT).execute(update);
-        }
+        log.warn("THIS CLASS SHOULD NOT BE CALLED");
+        //CLASS FOR INHERITANCE
     }
 
     protected boolean isChatLimitExpired(Chat chat, AIModel model) {

@@ -1,5 +1,6 @@
 package ru.rusguardian.bot.command.prompts.text;
 
+import io.netty.handler.codec.UnsupportedMessageTypeException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -13,6 +14,8 @@ import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.service.ai.constant.AIModel;
 import ru.rusguardian.service.process.prompt.ProcessPromptText;
 import ru.rusguardian.service.process.prompt.ProcessPromptVoice;
+import ru.rusguardian.telegram.bot.util.constants.MessageType;
+import ru.rusguardian.telegram.bot.util.util.FileUtils;
 
 @Component
 @RequiredArgsConstructor
@@ -34,21 +37,30 @@ public class ExecuteTextPromptCommand extends PromptCommand {
         Chat chatOwner = getChatOwner(update);
         Long initialChatId = getInitialChatId(update);
         AIModel model = chatOwner.getAiSettingsEmbedded().getAiActiveModel();
-        String prompt = getViewTextMessage(update);
 
         if (isChatLimitExpired(chatOwner, model)) {
             edit(getEditMessageWithResponse(initialChatId, getChatLimitExpiredString(chatOwner), replyId));
             return;
         }
 
+        String prompt = switch (MessageType.getType(update)){
+            case TEXT -> getViewTextMessage(update);
+            //TODO check async perfomance using AI
+            case VOICE -> processPromptVoice.processVoice2Text(chatOwner, FileUtils.getFileFromMessage(update.getMessage(), bot)).join();
+            default -> throw new UnsupportedMessageTypeException(update.toString());
+        };
+
         processPromptText.process(chatOwner, prompt).thenAccept(response -> {
             if (!chatOwner.getAiSettingsEmbedded().isVoiceResponseEnabled()) {
                 editForPrompt(getEditMessageWithResponse(initialChatId, response, replyId));
                 return;
             }
-            processPromptVoice.processText2Voice(chatOwner, response).thenAccept(voiceResponse -> {
-                sendVoice(SendVoice.builder().voice(new InputFile(voiceResponse)).chatId(initialChatId).replyToMessageId(replyId).build());
-            });
+            processPromptVoice.processText2Voice(chatOwner, response)
+                    .thenAccept(voiceResponse -> sendVoice(SendVoice.builder()
+                            .voice(new InputFile(voiceResponse))
+                            .chatId(initialChatId)
+                            .replyToMessageId(replyId)
+                            .build()));
         }).exceptionally(e -> {
             log.error(e.getMessage());
             commandContainerService.getCommand(CommandName.ERROR).execute(update);

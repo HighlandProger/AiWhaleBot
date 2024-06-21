@@ -4,6 +4,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -39,6 +40,7 @@ public class StableDiffusionImageService {
     private static final String ERROR_STATUS = "error";
 
     @Resource
+    @Lazy
     private StableDiffusionImageService thisService;
 
     private final WebClient stableDiffusionWebClient;

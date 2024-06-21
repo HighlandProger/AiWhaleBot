@@ -59,7 +59,7 @@ public class ProcessUpdateService {
         return getByCallback(update)
                 .or(() -> getByMessage(update))
                 .or(() -> findCommandByNextCommand(update))
-                .orElse(PROMPT);
+                .orElse(EXECUTE_TEXT_PROMPT);
     }
 
     private Optional<CommandName> getByMessage(Update update) {
