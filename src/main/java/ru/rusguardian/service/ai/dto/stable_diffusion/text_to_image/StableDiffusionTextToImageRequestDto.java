@@ -12,11 +12,15 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class StableDiffusionTextToImageRequestDto {
 
-    public StableDiffusionTextToImageRequestDto(String prompt) {
+    public StableDiffusionTextToImageRequestDto(String key, String prompt, SDModelId modelId) {
+        this.key = key;
         this.prompt = prompt;
+        this.modelId = modelId.getValue();
     }
 
     private String key;
+    @JsonProperty("model_id")
+    private String modelId;
     private String prompt;
     /**
      * Items you don't want in the text_to_image.

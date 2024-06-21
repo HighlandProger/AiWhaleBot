@@ -5,16 +5,17 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import ru.rusguardian.bot.command.prompts.image.img.SendPromptImageService;
+import ru.rusguardian.bot.command.prompts.PromptCommand;
 import ru.rusguardian.bot.command.prompts.image.img.inner.service.ImageUrlDtoService;
-import ru.rusguardian.bot.command.service.Command;
 import ru.rusguardian.bot.command.service.CommandName;
+import ru.rusguardian.domain.user.Chat;
+import ru.rusguardian.service.ai.constant.AIModel;
 import ru.rusguardian.telegram.bot.util.util.FileUtils;
 import ru.rusguardian.telegram.bot.util.util.TelegramUtils;
 
 @Component
 @RequiredArgsConstructor
-public class ChangeBackgroundForImageCommand extends Command implements SendPromptImageService {
+public class ChangeBackgroundForImageCommand extends PromptCommand {
 
     private static final String VIEW_DATA = "CHANGE_BACKGROUND_FOR_IMAGE";
 
@@ -25,8 +26,13 @@ public class ChangeBackgroundForImageCommand extends Command implements SendProm
 
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
-        String initImageUrl = FileUtils.getFileUrlFromMessage(((Message) update.getCallbackQuery().getMessage()).getReplyToMessage(), bot).toString();
+        Chat chatOwner = getChatOwner(update);
+        if (isChatLimitExpired(chatOwner, AIModel.STABLE_DIFFUSION)) {
+            edit(getEditMessageWithResponse(TelegramUtils.getChatId(update), getChatLimitExpiredString(chatOwner), TelegramUtils.getMessageId(update)));
+            return;
+        }
 
+        String initImageUrl = FileUtils.getFileUrlFromMessage(((Message) update.getCallbackQuery().getMessage()).getReplyToMessage(), bot).toString();
         setNextCommand(update, CommandName.CHANGE_BACKGROUND_FOR_IMAGE_EXECUTE);
         editMessage(update, getTextByViewDataAndChatLanguage(VIEW_DATA, getChatLanguage(update)), null);
         ImageUrlDtoService.addImageUrl(TelegramUtils.getChatId(update), initImageUrl);

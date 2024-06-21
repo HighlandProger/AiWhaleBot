@@ -11,7 +11,6 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.rusguardian.bot.command.prompts.PromptCommand;
-import ru.rusguardian.bot.command.prompts.image.img.SendPromptImageService;
 import ru.rusguardian.bot.command.service.CommandName;
 import ru.rusguardian.constant.ai.AILanguage;
 import ru.rusguardian.domain.user.Chat;
@@ -21,13 +20,15 @@ import ru.rusguardian.telegram.bot.util.util.TelegramCallbackUtils;
 import ru.rusguardian.telegram.bot.util.util.telegram_message.InputFileUtil;
 
 import java.text.MessageFormat;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 import static ru.rusguardian.bot.command.service.CommandName.EXECUTE_TEXT_2_IMAGE_PROMPT_BLIND_D;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class ExecuteText2ImagePromptBlindDifCommand extends PromptCommand implements SendPromptImageService {
+public class ExecuteText2ImagePromptBlindDifCommand extends PromptCommand {
 
     private final ProcessImagePrompt processImagePrompt;
 
@@ -56,7 +57,8 @@ public class ExecuteText2ImagePromptBlindDifCommand extends PromptCommand implem
         if (!isChatLimitExpired) {
             processImagePrompt.processText2ImageUrl(chatOwner, model, prompt).thenAccept(url -> {
                 InputFile file = InputFileUtil.getInputFileFromURL(url);
-                sendTextToImagePrompt(getSendPhoto(file, initialChatId, language, model.getModelName(), prompt));
+                CompletableFuture.runAsync(() -> sendPhoto(
+                        getSendPhoto(file, initialChatId, language, model.getModelName(), prompt)), CompletableFuture.delayedExecutor(5, TimeUnit.SECONDS));
             }).exceptionally(ex -> {
                 log.error("EXCEPTION DURING EXECUTING ProcessImagePrompt. Model: {}, prompt: {}, ExMessage: {}", model, prompt, ex.getMessage());
                 errorCommand.execute(update);

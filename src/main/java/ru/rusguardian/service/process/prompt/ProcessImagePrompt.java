@@ -8,9 +8,8 @@ import ru.rusguardian.constant.ai.AILanguage;
 import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.service.ai.constant.AIModel;
 import ru.rusguardian.service.ai.constant.Provider;
-import ru.rusguardian.service.ai.dto.midjourney.image.MidjourneyTextToImageRequestDto;
 import ru.rusguardian.service.ai.dto.open_ai.image.OpenAiTextToImageRequestDto;
-import ru.rusguardian.service.ai.dto.stable_diffusion.text_to_image.StableDiffusionTextToImageRequestDto;
+import ru.rusguardian.service.ai.dto.stable_diffusion.text_to_image.SDModelId;
 import ru.rusguardian.service.ai.image.MidjourneyImageService;
 import ru.rusguardian.service.ai.image.OpenAIImageService;
 import ru.rusguardian.service.ai.image.StableDiffusionImageService;
@@ -102,19 +101,11 @@ public class ProcessImagePrompt {
 
         return switch (provider) {
             case STABLE_DIFFUSION -> yandexTranslateService.getTranslation(prompt, AILanguage.ENGLISH)
-                    .thenCompose(resp -> stableDiffusionImageService.getTextToImageUrl(new StableDiffusionTextToImageRequestDto(resp)));
+                    .thenCompose(resp -> stableDiffusionImageService.getTextToImageUrl(resp, SDModelId.SDXL));
             case OPEN_AI ->
                     openAIImageService.getTextToImageUrl(new OpenAiTextToImageRequestDto(chat.getId(), model, prompt));
-            case MIDJOURNEY -> midjourneyImageService.getTextToImageUrl(new MidjourneyTextToImageRequestDto(prompt))
-                    .thenCompose(urlString -> {
-                        if (urlString.isEmpty()) {
-                            return openAIImageService.getTextToImageUrl(new OpenAiTextToImageRequestDto(chat.getId(), AIModel.DALL_E_3, prompt));
-                        }
-                        return CompletableFuture.completedFuture(urlString);
-                    })
-                    .exceptionally(e -> {
-                        throw new RuntimeException(e);
-                    });
+            case MIDJOURNEY -> yandexTranslateService.getTranslation(prompt, AILanguage.ENGLISH)
+                    .thenCompose(resp -> stableDiffusionImageService.getTextToImageUrl(resp, SDModelId.MIDJOURNEY_V_4));
             default -> throw new RuntimeException("UNKNOWN IMAGE PROVIDER " + model.getProvider());
         };
     }

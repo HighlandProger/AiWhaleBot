@@ -15,14 +15,11 @@ import ru.rusguardian.service.ai.dto.stable_diffusion.fetch.StableDiffusionFetch
 import ru.rusguardian.service.ai.dto.stable_diffusion.pix2pix.StableDiffusionPix2PixRequestDto;
 import ru.rusguardian.service.ai.dto.stable_diffusion.remove_background.StableDiffusionRemoveBackgroundRequestDto;
 import ru.rusguardian.service.ai.dto.stable_diffusion.super_resolution.StableDiffusionSuperResolutionRequestDto;
+import ru.rusguardian.service.ai.dto.stable_diffusion.text_to_image.SDModelId;
 import ru.rusguardian.service.ai.dto.stable_diffusion.text_to_image.StableDiffusionTextToImageRequestDto;
-import ru.rusguardian.service.ai.dto.stable_diffusion.text_to_image.StableDiffusionTextToImageResponseDto;
 import ru.rusguardian.service.ai.exception.StableDiffusionRequestException;
 import ru.rusguardian.util.WebExceptionMessageUtil;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.text.MessageFormat;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -32,7 +29,7 @@ import java.util.function.Function;
 @Slf4j
 public class StableDiffusionImageService {
 
-    private static final String TEXT_2_IMG_URL = "https://modelslab.com/api/v6/realtime/text2img";
+    private static final String TEXT_2_IMG_URL = "https://modelslab.com/api/v6/images/text2img";
     private static final String PIX_2_PIX_URL = "https://modelslab.com/api/v6/image_editing/pix2pix";
     private static final String REMOVE_BACKGROUND_URL = "https://modelslab.com/api/v6/image_editing/removebg_mask";
     private static final String SUPER_RESOLUTION_URL = "https://modelslab.com/api/v6/image_editing/super_resolution";
@@ -71,6 +68,11 @@ public class StableDiffusionImageService {
     }
 
     @Async
+    public CompletableFuture<String> getTextToImageUrl(String prompt, SDModelId modelId) {
+        return thisService.getImageUrl(TEXT_2_IMG_URL, new StableDiffusionTextToImageRequestDto(stableDiffusionKey, prompt, modelId));
+    }
+
+    @Async
     public CompletableFuture<String> getImageUrl(String uri, Object dto) {
         return stableDiffusionWebClient.post()
                 .uri(uri)
@@ -81,9 +83,6 @@ public class StableDiffusionImageService {
                 .toFuture()
                 .thenCompose(response -> {
                     log.info(response.toString());
-                    if (response == null) {
-                        throw new IllegalArgumentException("Response is null");
-                    }
                     String status = response.getStatus();
                     if (ERROR_STATUS.equals(status)) {
                         log.error("ERROR DURING SD REQUEST");
@@ -151,50 +150,6 @@ public class StableDiffusionImageService {
                     log.error(errorMessage);
                     throw new StableDiffusionRequestException(errorMessage, e);
                 });
-    }
-
-    @Async
-    public CompletableFuture<String> getTextToImageUrl(StableDiffusionTextToImageRequestDto dto) {
-        dto.setKey(stableDiffusionKey);
-        return stableDiffusionWebClient.post()
-                .uri(TEXT_2_IMG_URL)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(dto)
-                .retrieve()
-                .bodyToMono(StableDiffusionTextToImageResponseDto.class)
-                .toFuture()
-                .thenCompose(response -> {
-                    log.info(response.toString());
-                    if (response.getStatus().equals(PROCESSING_STATUS)) {
-                        return getImageUrlFromStableDiffusionIn1Minute(response.getMeta().getFilePrefix());
-                    }
-                    return CompletableFuture.completedFuture(response.getOutput().get(0));
-                })
-                .exceptionally(e -> {
-                    String errorMessage = WebExceptionMessageUtil.getErrorMessage(e);
-                    log.error(errorMessage);
-                    throw new StableDiffusionRequestException(errorMessage, e);
-                });
-    }
-
-    private CompletableFuture<String> getImageUrlFromStableDiffusionIn1Minute(String filePrefix) {
-        return CompletableFuture.supplyAsync(() -> {
-            try {
-                Thread.sleep(60000); // Ждем 60 секунд
-                try {
-                    //TODO refactor
-                    URL url1 = new URL(MessageFormat.format(stableDiffusionImageUrlPattern1, filePrefix));
-                    log.info(url1.toString());
-                    return url1.toString();
-                } catch (MalformedURLException e) {
-                    log.warn("URL 1 not valid");
-                    return MessageFormat.format(stableDiffusionImageUrlPattern2, filePrefix);
-                }
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt(); // Восстанавливаем статус прерывания
-                throw new RuntimeException("Image retrieval was interrupted");
-            }
-        });
     }
 
 }

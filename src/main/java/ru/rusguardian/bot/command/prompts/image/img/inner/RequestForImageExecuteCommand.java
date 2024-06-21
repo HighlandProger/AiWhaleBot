@@ -4,17 +4,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import ru.rusguardian.bot.command.prompts.image.img.SendPromptImageService;
+import ru.rusguardian.bot.command.prompts.PromptCommand;
 import ru.rusguardian.bot.command.prompts.image.img.inner.service.ImageUrlDtoService;
-import ru.rusguardian.bot.command.service.Command;
 import ru.rusguardian.bot.command.service.CommandName;
 import ru.rusguardian.domain.user.Chat;
+import ru.rusguardian.service.ai.constant.AIModel;
 import ru.rusguardian.service.process.prompt.ProcessImagePrompt;
 import ru.rusguardian.telegram.bot.util.util.TelegramUtils;
 
 @Component
 @RequiredArgsConstructor
-public class RequestForImageExecuteCommand extends Command implements SendPromptImageService {
+public class RequestForImageExecuteCommand extends PromptCommand {
 
     private final ProcessImagePrompt processImagePrompt;
 
@@ -25,15 +25,17 @@ public class RequestForImageExecuteCommand extends Command implements SendPrompt
 
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
-        int replyId = sendReplyToImageRequest(update, getChatLanguage(update), viewDataService, bot).getMessageId();
+        Chat chatOwner = getChatOwner(update);
+        if (isChatLimitExpired(chatOwner, AIModel.STABLE_DIFFUSION)) {
+            edit(getEditMessageWithResponse(TelegramUtils.getChatId(update), getChatLimitExpiredString(chatOwner), TelegramUtils.getMessageId(update)));
+            return;
+        }
 
+        int replyId = sendReplyToImageRequest(update, getChatLanguage(update)).getMessageId();
         String prompt = TelegramUtils.getTextMessage(update);
         String initImageUrl = ImageUrlDtoService.getImageUrlAndRemove(TelegramUtils.getChatId(update));
-
-        Chat chat = getChatOwner(update);
-
-        processImagePrompt.processImageChangeUrl(chat, initImageUrl, prompt)
-                .thenAccept(url -> sendPromptImage(url, String.valueOf(chat.getId()), replyId, bot))
+        processImagePrompt.processImageChangeUrl(chatOwner, initImageUrl, prompt)
+                .thenAccept(url -> sendPromptImage(url, String.valueOf(chatOwner.getId()), replyId))
                 .exceptionally(e -> {
                     errorCommand.execute(update);
                     throw new RuntimeException(e);

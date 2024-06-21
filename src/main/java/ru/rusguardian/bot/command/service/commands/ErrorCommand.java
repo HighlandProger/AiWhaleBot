@@ -20,6 +20,7 @@ public class ErrorCommand extends Command {
 
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
+        setNullCompletedCommand(update);
         sendMessage(update, MESSAGE);
     }
 
