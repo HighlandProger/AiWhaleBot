@@ -41,7 +41,7 @@ public class StableDiffusionRealtimeTextToImageRequestDto {
      * A checker for NSFW images. If such an text_to_image is detected, it will be replaced by a blank text_to_image.
      */
     @JsonProperty("safety_checker")
-    private String safetyChecker = "yes";
+    private Boolean safetyChecker = true;
     /**
      * Get response as base64 string, default: false, options: true or false
      */
