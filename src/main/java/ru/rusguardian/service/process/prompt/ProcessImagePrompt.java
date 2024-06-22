@@ -16,6 +16,7 @@ import ru.rusguardian.service.ai.image.StableDiffusionImageService;
 import ru.rusguardian.service.process.transactional.ProcessTransactionalAIImageRequestUpdate;
 import ru.rusguardian.service.translate.YandexTranslateService;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @Service
@@ -84,8 +85,8 @@ public class ProcessImagePrompt {
     }
 
     @Async
-    public CompletableFuture<String> processText2ImageUrl(Chat chat, AIModel model, String prompt) {
-        return getTextToImageUrl(chat, model, prompt)
+    public CompletableFuture<List<String>> processText2ImageUrls(Chat chat, AIModel model, String prompt) {
+        return getTextToImageUrls(chat, model, prompt)
                 .thenApply(url -> {
                     transactionalAIImageRequestUpdate.update(chat, model);
                     return url;
@@ -96,16 +97,16 @@ public class ProcessImagePrompt {
                 });
     }
 
-    private CompletableFuture<String> getTextToImageUrl(Chat chat, AIModel model, String prompt) {
+    private CompletableFuture<List<String>> getTextToImageUrls(Chat chat, AIModel model, String prompt) {
         Provider provider = model.getProvider();
 
         return switch (provider) {
             case STABLE_DIFFUSION -> yandexTranslateService.getTranslation(prompt, AILanguage.ENGLISH)
-                    .thenCompose(resp -> stableDiffusionImageService.getTextToImageUrl(resp, SDModelId.REALISTIC_VISION_V_1_3));
+                    .thenCompose(stableDiffusionImageService::getRealtimeTextToImageUrls);
             case OPEN_AI ->
-                    openAIImageService.getTextToImageUrl(new OpenAiTextToImageRequestDto(chat.getId(), model, prompt));
+                    openAIImageService.getTextToImageUrl(new OpenAiTextToImageRequestDto(chat.getId(), model, prompt)).thenApply(List::of);
             case MIDJOURNEY -> yandexTranslateService.getTranslation(prompt, AILanguage.ENGLISH)
-                    .thenCompose(resp -> stableDiffusionImageService.getTextToImageUrl(resp, SDModelId.MIDJOURNEY_V_4));
+                    .thenCompose(resp -> stableDiffusionImageService.getModelTextToImageUrl(resp, SDModelId.MIDJOURNEY_V_4));
             default -> throw new RuntimeException("UNKNOWN IMAGE PROVIDER " + model.getProvider());
         };
     }
