@@ -13,11 +13,12 @@ import ru.rusguardian.service.ai.dto.stable_diffusion.StableDiffusionV6ResponseD
 import ru.rusguardian.service.ai.dto.stable_diffusion.fetch.StableDiffusionFetchRequestDto;
 import ru.rusguardian.service.ai.dto.stable_diffusion.fetch.StableDiffusionFetchResponseDto;
 import ru.rusguardian.service.ai.dto.stable_diffusion.pix2pix.StableDiffusionPix2PixRequestDto;
+import ru.rusguardian.service.ai.dto.stable_diffusion.realtime.img2img.StableDiffusionRealtimeImg2ImgRequestDto;
 import ru.rusguardian.service.ai.dto.stable_diffusion.remove_background.StableDiffusionRemoveBackgroundRequestDto;
 import ru.rusguardian.service.ai.dto.stable_diffusion.super_resolution.StableDiffusionSuperResolutionRequestDto;
 import ru.rusguardian.service.ai.dto.stable_diffusion.text_to_image.SDModelId;
 import ru.rusguardian.service.ai.dto.stable_diffusion.text_to_image.StableDiffusionModelTextToImageRequestDto;
-import ru.rusguardian.service.ai.dto.stable_diffusion.text_to_image.realtime.StableDiffusionRealtimeTextToImageRequestDto;
+import ru.rusguardian.service.ai.dto.stable_diffusion.realtime.text2img.StableDiffusionRealtimeTextToImageRequestDto;
 import ru.rusguardian.service.ai.exception.StableDiffusionRequestException;
 import ru.rusguardian.util.WebExceptionMessageUtil;
 
@@ -33,6 +34,7 @@ public class StableDiffusionImageService {
     private static final String REALTIME_TEXT_2_IMG_URL = "https://modelslab.com/api/v6/realtime/text2img";
     private static final String MODEL_TEXT_2_IMG_URL = "https://modelslab.com/api/v6/images/text2img";
     private static final String PIX_2_PIX_URL = "https://modelslab.com/api/v6/image_editing/pix2pix";
+    private static final String REALTIME_IMG_2_IMG_URL = "https://modelslab.com/api/v6/realtime/img2img";
     private static final String REMOVE_BACKGROUND_URL = "https://modelslab.com/api/v6/image_editing/removebg_mask";
     private static final String SUPER_RESOLUTION_URL = "https://modelslab.com/api/v6/image_editing/super_resolution";
     private static final String PROCESSING_STATUS = "processing";
@@ -57,6 +59,12 @@ public class StableDiffusionImageService {
     @Async
     public CompletableFuture<String> getPix2PixImageUrl(String initImageUrl, String prompt) {
         return thisService.getImageUrl(PIX_2_PIX_URL, new StableDiffusionPix2PixRequestDto(stableDiffusionKey, initImageUrl, prompt)).thenApply(resp -> resp.get(0));
+    }
+
+    @Deprecated
+    @Async
+    public CompletableFuture<String> getImg2ImgImageUrl(String initImageUrl, String prompt) {
+        return thisService.getImageUrl(REALTIME_IMG_2_IMG_URL, new StableDiffusionRealtimeImg2ImgRequestDto(stableDiffusionKey, initImageUrl, prompt)).thenApply(resp -> resp.get(0));
     }
 
     @Async

@@ -22,6 +22,8 @@ import ru.rusguardian.telegram.bot.util.util.telegram_message.InputFileUtil;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 import static ru.rusguardian.bot.command.service.CommandName.EXECUTE_TEXT_2_IMAGE_PROMPT_BLIND_D;
 
@@ -59,15 +61,17 @@ public class ExecuteText2ImagePromptBlindDifCommand extends PromptCommand {
             return;
         }
 
-        processImagePrompt.processText2ImageUrls(chatOwner, model, prompt).thenAccept(urls -> bot.executeAsync(getSendPhoto(initialChatId, language, model.getModelName(), prompt, urls))
+        processImagePrompt.processText2ImageUrls(chatOwner, model, prompt)
+                .thenCompose(urls -> CompletableFuture.supplyAsync(
+                        () -> getSendPhoto(initialChatId, language, model.getModelName(), prompt, urls),
+                        CompletableFuture.delayedExecutor(5, TimeUnit.SECONDS)
+                ))
+                .thenCompose(bot::executeAsync)
                 .exceptionally(e -> {
-                    log.error(e.getMessage());
+                    log.error("Exception with ProcessImagePrompt. Model: {}, prompt: {}, error: {}", model, prompt, e.getMessage());
+                    errorCommand.execute(update);
                     throw new RuntimeException(e);
-                })).exceptionally(ex -> {
-            log.error("EXCEPTION DURING EXECUTING ProcessImagePrompt. Model: {}, prompt: {}, ExMessage: {}", model, prompt, ex.getMessage());
-            errorCommand.execute(update);
-            throw new RuntimeException(ex);
-        });
+                });
 
         String quickResponse = getQuickResponse(chatOwner, isChatLimitExpired);
         edit(EditMessageText.builder()

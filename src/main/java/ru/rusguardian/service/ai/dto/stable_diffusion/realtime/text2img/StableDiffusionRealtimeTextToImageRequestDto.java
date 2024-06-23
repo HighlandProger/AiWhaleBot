@@ -1,4 +1,4 @@
-package ru.rusguardian.service.ai.dto.stable_diffusion.text_to_image.realtime;
+package ru.rusguardian.service.ai.dto.stable_diffusion.realtime.text2img;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
