@@ -33,7 +33,8 @@ public class StableDiffusionImageService {
 
     private static final String REALTIME_TEXT_2_IMG_URL = "https://modelslab.com/api/v6/realtime/text2img";
     private static final String MODEL_TEXT_2_IMG_URL = "https://modelslab.com/api/v6/images/text2img";
-    private static final String PIX_2_PIX_URL = "https://modelslab.com/api/v6/image_editing/pix2pix";
+    private static final String PIX_2_PIX_V_6_URL = "https://modelslab.com/api/v6/image_editing/pix2pix";
+    private static final String PIX_2_PIX_V_5_URL = "https://modelslab.com/api/v5/pix2pix";
     private static final String REALTIME_IMG_2_IMG_URL = "https://modelslab.com/api/v6/realtime/img2img";
     private static final String REMOVE_BACKGROUND_URL = "https://modelslab.com/api/v6/image_editing/removebg_mask";
     private static final String SUPER_RESOLUTION_URL = "https://modelslab.com/api/v6/image_editing/super_resolution";
@@ -58,7 +59,7 @@ public class StableDiffusionImageService {
 
     @Async
     public CompletableFuture<String> getPix2PixImageUrl(String initImageUrl, String prompt) {
-        return thisService.getImageUrl(PIX_2_PIX_URL, new StableDiffusionPix2PixRequestDto(stableDiffusionKey, initImageUrl, prompt)).thenApply(resp -> resp.get(0));
+        return thisService.getImageUrl(PIX_2_PIX_V_6_URL, new StableDiffusionPix2PixRequestDto(stableDiffusionKey, initImageUrl, prompt)).thenApply(resp -> resp.get(0));
     }
 
     @Deprecated

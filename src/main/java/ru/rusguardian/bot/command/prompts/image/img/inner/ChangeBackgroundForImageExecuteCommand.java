@@ -28,6 +28,7 @@ public class ChangeBackgroundForImageExecuteCommand extends PromptCommand {
         String prompt = TelegramUtils.getTextMessage(update);
         String initImageUrl = ImageUrlDtoService.getImageUrlAndRemove(TelegramUtils.getChatId(update));
         Chat chat = getChatOwner(update);
+        setNullCompletedCommand(update);
         processImagePrompt.processChangeBackgroundImageUrl(chat, initImageUrl, prompt)
                 .thenAccept(url -> sendPromptImage(url, String.valueOf(chat.getId()), replyId))
                 .exceptionally(e -> {

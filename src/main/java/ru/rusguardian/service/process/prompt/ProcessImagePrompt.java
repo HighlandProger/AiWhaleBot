@@ -2,6 +2,7 @@ package ru.rusguardian.service.process.prompt;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import ru.rusguardian.constant.ai.AILanguage;
@@ -15,7 +16,11 @@ import ru.rusguardian.service.ai.image.OpenAIImageService;
 import ru.rusguardian.service.ai.image.StableDiffusionImageService;
 import ru.rusguardian.service.process.transactional.ProcessTransactionalAIImageRequestUpdate;
 import ru.rusguardian.service.translate.YandexTranslateService;
+import ru.rusguardian.telegram.bot.util.util.FileUtils;
 
+import java.io.File;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -27,6 +32,11 @@ public class ProcessImagePrompt {
     private static final String ANIME_PROMPT = "Make it anime";
     private static final String REMOVE_TEXT_PROMPT = "Remove all texts";
     private static final String CHANGE_BACKGROUND_PROMPT = "Change background to ";
+    private static final String IMAGES_DOWNLOAD_PATH = "/target/classes/static/images/";
+    private static final String IMAGES_DOWNLOAD_DIR_URI = "/images/";
+
+    @Value("${server.port}")
+    private String localPort;
 
     private final MidjourneyImageService midjourneyImageService;
     private final OpenAIImageService openAIImageService;
@@ -35,21 +45,22 @@ public class ProcessImagePrompt {
     private final YandexTranslateService yandexTranslateService;
 
     @Async
-    public CompletableFuture<String> processAnimeImageUrl(Chat chat, String initImageUrl) {
-        return processImageChangeUrl(chat, initImageUrl, ANIME_PROMPT);
+    public CompletableFuture<String> processAnimeImageUrl(Chat chat, String telegramImageUrl) {
+        return processImageChangeUrl(chat, telegramImageUrl, ANIME_PROMPT);
     }
 
     @Async
-    public CompletableFuture<String> processRemoveTextFromImageUrl(Chat chat, String initImageUrl) {
-        return processImageChangeUrl(chat, initImageUrl, REMOVE_TEXT_PROMPT);
+    public CompletableFuture<String> processRemoveTextFromImageUrl(Chat chat, String telegramImageUrl) {
+        return processImageChangeUrl(chat, telegramImageUrl, REMOVE_TEXT_PROMPT);
     }
 
     @Async
-    public CompletableFuture<String> processChangeBackgroundImageUrl(Chat chat, String initImageUrl, String backgroundPrompt) {
-        return processImageChangeUrl(chat, initImageUrl, CHANGE_BACKGROUND_PROMPT + backgroundPrompt);
+    public CompletableFuture<String> processChangeBackgroundImageUrl(Chat chat, String telegramImageUrl, String backgroundPrompt) {
+        return processImageChangeUrl(chat, telegramImageUrl, CHANGE_BACKGROUND_PROMPT + backgroundPrompt);
     }
 
-    public CompletableFuture<String> processImageChangeUrl(Chat chat, String initImageUrl, String prompt) {
+    public CompletableFuture<String> processImageChangeUrl(Chat chat, String telegramImageUrl, String prompt) {
+        String initImageUrl = getInitImageUrl(telegramImageUrl);
         return yandexTranslateService.getTranslation(prompt, AILanguage.ENGLISH)
                 .thenCompose(resp -> stableDiffusionImageService.getPix2PixImageUrl(initImageUrl, resp)
                         .thenApply(url -> {
@@ -62,8 +73,9 @@ public class ProcessImagePrompt {
     }
 
     @Async
-    public CompletableFuture<String> processRemoveBackground(Chat chat, String imageUrl) {
-        return stableDiffusionImageService.getRemoveBackgroundImageUrl(imageUrl).thenApply(url -> {
+    public CompletableFuture<String> processRemoveBackground(Chat chat, String telegramImageUrl) {
+        String initImageUrl = getInitImageUrl(telegramImageUrl);
+        return stableDiffusionImageService.getRemoveBackgroundImageUrl(initImageUrl).thenApply(url -> {
                     transactionalAIImageRequestUpdate.update(chat, AIModel.STABLE_DIFFUSION);
                     return url;
                 })
@@ -74,8 +86,9 @@ public class ProcessImagePrompt {
     }
 
     @Async
-    public CompletableFuture<String> processSuperResolution(Chat chat, String imageUrl) {
-        return stableDiffusionImageService.getSuperResolutionUrl(imageUrl).thenApply(url -> {
+    public CompletableFuture<String> processSuperResolution(Chat chat, String telegramImageUrl) {
+        String initImageUrl = getInitImageUrl(telegramImageUrl);
+        return stableDiffusionImageService.getSuperResolutionUrl(initImageUrl).thenApply(url -> {
             transactionalAIImageRequestUpdate.update(chat, AIModel.STABLE_DIFFUSION);
             return url;
         }).exceptionally(e -> {
@@ -111,5 +124,18 @@ public class ProcessImagePrompt {
         };
     }
 
+    private String getInitImageUrl(String telegramImageUrl){
+        File file = FileUtils.getFileFromURLInPath(telegramImageUrl, IMAGES_DOWNLOAD_PATH);
+        return getSystemIp() + ":" + localPort + IMAGES_DOWNLOAD_DIR_URI + file.getName();
+    }
 
+    private String getSystemIp(){
+        try {
+            InetAddress ip = InetAddress.getLocalHost();
+            return ip.getHostAddress();
+        } catch (UnknownHostException e) {
+            log.error("Ошибка получения IP-адреса: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
 }

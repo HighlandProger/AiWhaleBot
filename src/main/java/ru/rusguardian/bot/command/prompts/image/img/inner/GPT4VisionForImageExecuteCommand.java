@@ -30,6 +30,7 @@ public class GPT4VisionForImageExecuteCommand extends PromptCommand {
         String prompt = TelegramUtils.getTextMessage(update);
         String initImageUrl = ImageUrlDtoService.getImageUrlAndRemove(TelegramUtils.getChatId(update));
         Chat chat = getChatOwner(update);
+        setNullCompletedCommand(update);
         processPromptVision.process(chat, initImageUrl, prompt)
                 .thenAccept(response -> editForPrompt(EditMessageText.builder().chatId(chat.getId()).text(response).messageId(replyId).build()))
                 .exceptionally(e -> {

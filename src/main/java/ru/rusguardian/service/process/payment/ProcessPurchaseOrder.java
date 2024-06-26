@@ -38,6 +38,7 @@ public class ProcessPurchaseOrder {
     public void process(Long orderId) {
         Order order = orderService.findById(orderId);
         order.setPurchased(true);
+        order.setPurchasedAt(LocalDateTime.now());
         Chat user = order.getChat();
         Chat partner = user.getPartnerEmbeddedInfo().getInvitedBy();
 

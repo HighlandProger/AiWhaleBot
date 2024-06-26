@@ -34,6 +34,7 @@ public class RequestForImageExecuteCommand extends PromptCommand {
         int replyId = sendReplyToImageRequest(update, getChatLanguage(update)).getMessageId();
         String prompt = TelegramUtils.getTextMessage(update);
         String initImageUrl = ImageUrlDtoService.getImageUrlAndRemove(TelegramUtils.getChatId(update));
+        setNullCompletedCommand(update);
         processImagePrompt.processImageChangeUrl(chatOwner, initImageUrl, prompt)
                 .thenAccept(url -> sendPromptImage(url, String.valueOf(chatOwner.getId()), replyId))
                 .exceptionally(e -> {
