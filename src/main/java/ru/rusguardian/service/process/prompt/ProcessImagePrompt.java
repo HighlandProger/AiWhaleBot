@@ -32,11 +32,13 @@ public class ProcessImagePrompt {
     private static final String ANIME_PROMPT = "Make it anime";
     private static final String REMOVE_TEXT_PROMPT = "Remove all texts";
     private static final String CHANGE_BACKGROUND_PROMPT = "Change background to ";
-    private static final String IMAGES_DOWNLOAD_PATH = "/target/classes/static/images/";
+    private static final String IMAGES_DOWNLOAD_PATH = "/app/images/";
     private static final String IMAGES_DOWNLOAD_DIR_URI = "/images/";
 
     @Value("${server.port}")
     private String localPort;
+    @Value("${server.host}")
+    private String localHost;
 
     private final MidjourneyImageService midjourneyImageService;
     private final OpenAIImageService openAIImageService;
@@ -126,16 +128,7 @@ public class ProcessImagePrompt {
 
     private String getInitImageUrl(String telegramImageUrl){
         File file = FileUtils.getFileFromURLInPath(telegramImageUrl, IMAGES_DOWNLOAD_PATH);
-        return getSystemIp() + ":" + localPort + IMAGES_DOWNLOAD_DIR_URI + file.getName();
+        return "http://" + localHost + ":" + localPort + IMAGES_DOWNLOAD_DIR_URI + file.getName();
     }
 
-    private String getSystemIp(){
-        try {
-            InetAddress ip = InetAddress.getLocalHost();
-            return ip.getHostAddress();
-        } catch (UnknownHostException e) {
-            log.error("Ошибка получения IP-адреса: " + e.getMessage());
-            throw new RuntimeException(e);
-        }
-    }
 }

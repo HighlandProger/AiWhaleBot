@@ -111,7 +111,7 @@ public class StableDiffusionImageService {
                     if (outputList == null || outputList.isEmpty()) {
                         throw new IllegalArgumentException("Output is null or empty");
                     }
-                    return CompletableFuture.completedFuture(outputList);
+                    return CompletableFuture.supplyAsync(() -> CompletableFuture.completedFuture(outputList), CompletableFuture.delayedExecutor(5, TimeUnit.SECONDS)).thenCompose(Function.identity());
                 })
                 .exceptionally(e -> {
                     String errorMessage = WebExceptionMessageUtil.getErrorMessage(e);

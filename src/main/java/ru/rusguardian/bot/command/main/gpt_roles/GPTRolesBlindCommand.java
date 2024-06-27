@@ -2,7 +2,6 @@ package ru.rusguardian.bot.command.main.gpt_roles;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -10,11 +9,9 @@ import ru.rusguardian.bot.command.main.gpt_roles.service.GPTRolesInlineKeyboardS
 import ru.rusguardian.bot.command.service.Command;
 import ru.rusguardian.bot.command.service.CommandName;
 import ru.rusguardian.constant.ai.AILanguage;
-import ru.rusguardian.constant.user.SubscriptionType;
 import ru.rusguardian.domain.AssistantRoleData;
 import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.telegram.bot.util.util.TelegramCallbackUtils;
-import ru.rusguardian.telegram.bot.util.util.TelegramUtils;
 import ru.rusguardian.telegram.bot.util.util.telegram_message.EditMessageUtil;
 
 import java.text.MessageFormat;
@@ -53,14 +50,6 @@ public class GPTRolesBlindCommand extends Command {
                 if (isRoleNotChanged(chat, role)) {
                     return;
                 }
-                if (isFreeSubscription(chat)) {
-                    AnswerCallbackQuery answer = new AnswerCallbackQuery();
-                    answer.setCallbackQueryId(TelegramUtils.getCallbackQueryId(update));
-                    answer.setShowAlert(true);
-                    answer.setText(getTextByViewDataAndChatLanguage(GPT_ROLES_ANSWER_CALLBACK, language));
-                    bot.execute(answer);
-                    return;
-                }
 
                 chat.getAiSettingsEmbedded().setAssistantRoleName(role.getName());
                 chatService.update(chat);
@@ -77,10 +66,6 @@ public class GPTRolesBlindCommand extends Command {
 
     private boolean isRoleNotChanged(Chat chat, AssistantRoleData role) {
         return chat.getAiSettingsEmbedded().getAssistantRoleName().equals(role.getName());
-    }
-
-    private boolean isFreeSubscription(Chat chat) {
-        return chat.getSubscriptionEmbedded().getSubscriptionInfo().getType() == SubscriptionType.FREE;
     }
 
     private String getDescriptionText(AssistantRoleData role, AILanguage language) {
