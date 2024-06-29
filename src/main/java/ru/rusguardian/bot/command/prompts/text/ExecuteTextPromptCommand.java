@@ -43,12 +43,13 @@ public class ExecuteTextPromptCommand extends PromptCommand {
             return;
         }
 
-        String prompt = switch (MessageType.getType(update)){
-            case TEXT -> getViewTextMessage(update);
-            //TODO check async perfomance using AI
-            case VOICE -> processPromptVoice.processVoice2Text(chatOwner, FileUtils.getFileFromMessage(update.getMessage(), bot)).join();
+        String prompt;
+        switch (MessageType.getType(update)) {
+            case TEXT -> prompt = getViewTextMessage(update);
+            case VOICE ->
+                    prompt = processPromptVoice.processVoice2Text(chatOwner, FileUtils.getFileFromMessage(update.getMessage(), bot)).join();
             default -> throw new UnsupportedMessageTypeException(update.toString());
-        };
+        }
 
         processPromptText.process(chatOwner, prompt).thenAccept(response -> {
             if (!chatOwner.getAiSettingsEmbedded().isVoiceResponseEnabled()) {
@@ -58,6 +59,7 @@ public class ExecuteTextPromptCommand extends PromptCommand {
             processPromptVoice.processText2Voice(chatOwner, response)
                     .thenAccept(voiceResponse -> sendVoice(SendVoice.builder()
                             .voice(new InputFile(voiceResponse))
+                            .caption(response.substring(0, Math.min(response.length(), 1024)))
                             .chatId(initialChatId)
                             .replyToMessageId(replyId)
                             .build()));

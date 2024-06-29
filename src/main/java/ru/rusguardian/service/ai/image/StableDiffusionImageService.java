@@ -14,11 +14,11 @@ import ru.rusguardian.service.ai.dto.stable_diffusion.fetch.StableDiffusionFetch
 import ru.rusguardian.service.ai.dto.stable_diffusion.fetch.StableDiffusionFetchResponseDto;
 import ru.rusguardian.service.ai.dto.stable_diffusion.pix2pix.StableDiffusionPix2PixRequestDto;
 import ru.rusguardian.service.ai.dto.stable_diffusion.realtime.img2img.StableDiffusionRealtimeImg2ImgRequestDto;
+import ru.rusguardian.service.ai.dto.stable_diffusion.realtime.text2img.StableDiffusionRealtimeTextToImageRequestDto;
 import ru.rusguardian.service.ai.dto.stable_diffusion.remove_background.StableDiffusionRemoveBackgroundRequestDto;
 import ru.rusguardian.service.ai.dto.stable_diffusion.super_resolution.StableDiffusionSuperResolutionRequestDto;
 import ru.rusguardian.service.ai.dto.stable_diffusion.text_to_image.SDModelId;
 import ru.rusguardian.service.ai.dto.stable_diffusion.text_to_image.StableDiffusionModelTextToImageRequestDto;
-import ru.rusguardian.service.ai.dto.stable_diffusion.realtime.text2img.StableDiffusionRealtimeTextToImageRequestDto;
 import ru.rusguardian.service.ai.exception.StableDiffusionRequestException;
 import ru.rusguardian.util.WebExceptionMessageUtil;
 
@@ -111,7 +111,7 @@ public class StableDiffusionImageService {
                     if (outputList == null || outputList.isEmpty()) {
                         throw new IllegalArgumentException("Output is null or empty");
                     }
-                    return CompletableFuture.supplyAsync(() -> CompletableFuture.completedFuture(outputList), CompletableFuture.delayedExecutor(5, TimeUnit.SECONDS)).thenCompose(Function.identity());
+                    return CompletableFuture.supplyAsync(() -> CompletableFuture.completedFuture(outputList), CompletableFuture.delayedExecutor(15, TimeUnit.SECONDS)).thenCompose(Function.identity());
                 })
                 .exceptionally(e -> {
                     String errorMessage = WebExceptionMessageUtil.getErrorMessage(e);

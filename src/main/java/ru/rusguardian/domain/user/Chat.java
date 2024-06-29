@@ -36,7 +36,9 @@ public class Chat {
     @Column(name = "campaign")
     private String campaign;
     @Column(name = "is_banned")
-    private boolean isBanned;
+    private Boolean isBanned;
+    @Column(name = "is_kicked")
+    private Boolean isKicked;
 
     @Embedded
     private SubscriptionEmbedded subscriptionEmbedded;

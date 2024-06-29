@@ -28,6 +28,10 @@ public class ChatService extends CrudService<Chat, Long> {
         chatRepository.updateUserNextCommand(chatId, name);
     }
 
+    public void setChatKicked(Long chatId) {
+        chatRepository.setKicked(chatId);
+    }
+
 
     @Override
     protected Long getIdFromEntity(Chat entity) {

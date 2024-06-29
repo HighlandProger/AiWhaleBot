@@ -38,4 +38,7 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
 
     @Query("SELECT c.aiSettingsEmbedded.aiLanguage FROM Chat c WHERE c.id = :id")
     AILanguage getLanguage(Long id);
+
+    @Query(value = "UPDATE ncs_bot.chats SET is_kicked = true WHERE id = :id", nativeQuery = true)
+    void setKicked(Long id);
 }

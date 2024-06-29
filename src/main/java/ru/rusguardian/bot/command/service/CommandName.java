@@ -14,6 +14,7 @@ public enum CommandName {
     EMPTY(),
     ERROR(),
     USER_BANNED(),
+    USER_KICKED(),
     GROUP_OWNER_NOT_FOUND(),
     TEXT_COMMAND_DISTRIBUTOR(),
 

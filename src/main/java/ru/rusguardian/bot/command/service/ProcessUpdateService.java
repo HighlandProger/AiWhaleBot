@@ -52,6 +52,9 @@ public class ProcessUpdateService {
     }
 
     private CommandName getCommandName(Update update) {
+        if (TelegramUtils.isUserKickedInfo(update)) {
+            return USER_KICKED;
+        }
         if (chatService.isUserBanned(TelegramUtils.getUserId(update))) {
             return USER_BANNED;
         }
