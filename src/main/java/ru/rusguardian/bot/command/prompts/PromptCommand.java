@@ -81,6 +81,13 @@ public class PromptCommand extends Command {
         });
     }
 
+    public void sendMessagePrompt(SendMessage message){
+        try {
+            bot.execute(message);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
+    }
     protected CompletableFuture<Void> editForPrompt(EditMessageText editText) {
         return CompletableFuture.runAsync(() -> {
             if (editText.getText().contains("```")) {
