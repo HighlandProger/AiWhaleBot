@@ -18,4 +18,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     void setOrderAsPurchased(Long orderId);
 
     List<Order> findOrdersByIsPurchasedAndChatIdIn(boolean isPurchased, List<Long> ids);
+
+    List<Order> findAllByIsPurchased(boolean isPurchased);
 }

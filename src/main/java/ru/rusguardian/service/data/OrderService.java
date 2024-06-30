@@ -33,4 +33,8 @@ public class OrderService extends CrudService<Order, Long> {
     public List<Order> findAllPurchasedReferralsOrders(List<Long> referralsIds) {
         return orderRepository.findOrdersByIsPurchasedAndChatIdIn(true, referralsIds);
     }
+
+    public List<Order> findAllPurchasedOrders(){
+        return orderRepository.findAllByIsPurchased(true);
+    }
 }

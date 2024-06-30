@@ -123,13 +123,14 @@ public enum CommandName {
 
     GIVE_ME_MESSAGE_FOR_MAILING(),
     CHECK_MAILING_MESSAGE(),
-    CONFIRM_MAILING(),
+    SEND_MAILING(),
 
-    GET_INVOICE_LINK("Получить ссылку для оплаты", "/getInvoiceLink"),
-    ASK_PRICE_FOR_INVOICE(null),
-    ASK_INFO_FOR_INVOICE(null),
-    CONFIRM_ORDER(null),
-    GET_ORDER_WITH_LINK(null),
+    CHOOSE_REPORT(),
+//    CHOOSE_REPORT(),
+    GET_USERS_REPORT(),
+    GET_ORDERS_REPORT(),
+
+
 
     BACK("⬅\uFE0F Назад");
 
@@ -143,11 +144,6 @@ public enum CommandName {
         for (CommandName c : CommandName.values()) {
             if (c.getBlindName() != null) BLIND_NAME_MAP.put(c.blindName, c);
         }
-    }
-
-    CommandName(String viewName, String blindName) {
-        this.viewName = viewName;
-        this.blindName = blindName;
     }
 
     CommandName(String commandName) {

@@ -33,7 +33,9 @@ public class AdminCommand extends Command {
 
     private ReplyKeyboard getKeyboard() {
         return ReplyMarkupUtil.getInlineKeyboard(new String[][][]{
-                {{CommandName.ASK_INPUT_FILE.getBlindName(), CommandName.ASK_INPUT_FILE.getBlindName()}},
+                {{"Узнать ID файла", CommandName.ASK_INPUT_FILE.getBlindName()}},
+                {{"Отправить рассылку", CommandName.GIVE_ME_MESSAGE_FOR_MAILING.getBlindName()}},
+                {{"Отчеты", CommandName.CHOOSE_REPORT.getBlindName()}},
         });
     }
 

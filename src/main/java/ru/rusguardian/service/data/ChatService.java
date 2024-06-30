@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.rusguardian.bot.command.service.CommandName;
 import ru.rusguardian.constant.ai.AILanguage;
 import ru.rusguardian.domain.user.Chat;
@@ -28,8 +29,13 @@ public class ChatService extends CrudService<Chat, Long> {
         chatRepository.updateUserNextCommand(chatId, name);
     }
 
+    @Transactional
     public void setChatKicked(Long chatId) {
-        chatRepository.setKicked(chatId);
+        try {
+            chatRepository.setKicked(chatId);
+        } catch (Exception e){
+            log.error("Exception during set kicked to chat with id {}. Not modified", chatId);
+        }
     }
 
 
@@ -54,5 +60,9 @@ public class ChatService extends CrudService<Chat, Long> {
 
     public AILanguage getChatLanguage(Long userId) {
         return chatRepository.getLanguage(userId);
+    }
+
+    public List<Long> getAllNotKickedChatIds() {
+        return chatRepository.findAllNotKickedIds();
     }
 }

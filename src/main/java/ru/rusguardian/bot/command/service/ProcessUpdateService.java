@@ -58,11 +58,15 @@ public class ProcessUpdateService {
         if (chatService.isUserBanned(TelegramUtils.getUserId(update))) {
             return USER_BANNED;
         }
-
         return getByCallback(update)
                 .or(() -> getByMessage(update))
                 .or(() -> findCommandByNextCommand(update))
-                .orElse(EXECUTE_TEXT_PROMPT);
+                .orElseGet(() -> {
+                    if (update.hasMessage()) {
+                        return EXECUTE_TEXT_PROMPT;
+                    }
+                    return EMPTY;
+                });
     }
 
     private Optional<CommandName> getByMessage(Update update) {

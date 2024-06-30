@@ -49,6 +49,7 @@ public class ProcessCreateChat {
         chat.setStartInfo(TelegramUtils.getStartInfo(update));
         chat.setTrafficLink(TelegramStartInfoUtils.getTrafficLink(update).orElse(null));
         chat.setCampaign(TelegramStartInfoUtils.getCampaign(update).orElse(null));
+        chat.setIsKicked(false);
 
         chat.setAiSettingsEmbedded(getAiSetting());
         chat.setSubscriptionEmbedded(getSubscription());
