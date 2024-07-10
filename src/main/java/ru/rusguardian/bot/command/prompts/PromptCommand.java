@@ -8,6 +8,7 @@ import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+import org.telegram.telegrambots.meta.api.methods.send.SendVideo;
 import org.telegram.telegrambots.meta.api.methods.send.SendVoice;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
@@ -55,7 +56,7 @@ public class PromptCommand extends Command {
     }
 
     protected boolean isChatLimitExpired(Chat chat, AIModel model) {
-        return checkChatRequestLimit.getTotalAllowedCount(chat, model) <= 0;
+        return checkChatRequestLimit.getTotalAllowedCount(chat, model, bot) <= 0;
     }
 
     protected int sendQuickReply(Update update) throws TelegramApiException {
@@ -148,6 +149,23 @@ public class PromptCommand extends Command {
                 } catch (TelegramApiException exc) {
                     System.out.println("ERROR DURING SEND BY DOCUMENT");
                     sendPhoto(new SendPhoto(photo.getChatId(), new InputFile(file)));
+                }
+            }
+        }
+    }
+
+    protected void sendPromptVideo(SendVideo video) {
+        try {
+            bot.execute(video);
+        } catch (TelegramApiException e) {
+            if (e instanceof TelegramApiRequestException ex && ex.getErrorCode() == 400) {
+                System.out.println("ERROR DURING SEND BY URL");
+                File file = FileUtils.getFileFromURL(video.getFile().getAttachName());
+                try {
+                    bot.execute(new SendDocument(video.getChatId(), new InputFile(file)));
+                } catch (TelegramApiException exc) {
+                    System.out.println("ERROR DURING SEND BY DOCUMENT");
+                    sendVideo(new SendVideo(video.getChatId(), new InputFile(file)));
                 }
             }
         }

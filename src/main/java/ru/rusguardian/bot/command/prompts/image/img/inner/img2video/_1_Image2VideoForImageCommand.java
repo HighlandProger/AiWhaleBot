@@ -1,27 +1,33 @@
-package ru.rusguardian.bot.command.prompts.image.img.inner;
+package ru.rusguardian.bot.command.prompts.image.img.inner.img2video;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.rusguardian.bot.command.prompts.PromptCommand;
 import ru.rusguardian.bot.command.service.CommandName;
 import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.service.ai.constant.AIModel;
+import ru.rusguardian.service.ai.dto.stable_diffusion.img2video.VideoModel;
 import ru.rusguardian.service.data.UserDataDtoService;
 import ru.rusguardian.telegram.bot.util.util.FileUtils;
 import ru.rusguardian.telegram.bot.util.util.TelegramUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
-public class ChangeBackgroundForImageCommand extends PromptCommand {
+public class _1_Image2VideoForImageCommand extends PromptCommand {
 
-    private static final String VIEW_DATA = "CHANGE_BACKGROUND_FOR_IMAGE";
+    private static final String VIEW_DATA = "IMG_2_VIDEO_CHOOSE_VIDEO_MODEL";
 
     @Override
     public CommandName getType() {
-        return CommandName.CHANGE_BACKGROUND_FOR_IMAGE;
+        return CommandName._1_IMAGE_2_VIDEO_FOR_IMAGE;
     }
 
     @Override
@@ -33,8 +39,17 @@ public class ChangeBackgroundForImageCommand extends PromptCommand {
         }
 
         String initImageUrl = FileUtils.getFileUrlFromMessage(((Message) update.getCallbackQuery().getMessage()).getReplyToMessage(), bot).toString();
-        setNextCommand(update, CommandName.CHANGE_BACKGROUND_FOR_IMAGE_EXECUTE);
-        editMessage(update, getTextByViewDataAndChatLanguage(VIEW_DATA, getChatLanguage(update)), null);
         UserDataDtoService.addImageUrl(TelegramUtils.getChatId(update), initImageUrl);
+        setNextCommand(update, CommandName._2_IMAGE_2_VIDEO_FOR_IMAGE);
+        editMessage(update, getTextByViewDataAndChatLanguage(VIEW_DATA, getChatLanguage(update)), getKeyboard());
+    }
+
+    private InlineKeyboardMarkup getKeyboard(){
+        List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
+        for (VideoModel model : VideoModel.values()){
+            buttons.add(List.of(InlineKeyboardButton.builder().text(model.getValue()).callbackData(model.name()).build()));
+        }
+        buttons.add(List.of(InlineKeyboardButton.builder().text(CommandName.BACK.getViewName()).callbackData(CommandName.OBTAIN_IMAGE_REQUEST.getBlindName()).build()));
+        return new InlineKeyboardMarkup(buttons);
     }
 }

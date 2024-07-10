@@ -6,10 +6,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import ru.rusguardian.constant.ai.AILanguage;
+import ru.rusguardian.domain.UserDataDto;
 import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.service.ai.constant.AIModel;
 import ru.rusguardian.service.ai.constant.Provider;
 import ru.rusguardian.service.ai.dto.open_ai.image.OpenAiTextToImageRequestDto;
+import ru.rusguardian.service.ai.dto.stable_diffusion.img2video.StableDiffusionImg2VideoRequestDto;
 import ru.rusguardian.service.ai.dto.stable_diffusion.text_to_image.SDModelId;
 import ru.rusguardian.service.ai.image.MidjourneyImageService;
 import ru.rusguardian.service.ai.image.OpenAIImageService;
@@ -19,8 +21,6 @@ import ru.rusguardian.service.translate.YandexTranslateService;
 import ru.rusguardian.telegram.bot.util.util.FileUtils;
 
 import java.io.File;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -104,6 +104,24 @@ public class ProcessImagePrompt {
         return getTextToImageUrls(chat, model, prompt)
                 .thenApply(url -> {
                     transactionalAIImageRequestUpdate.update(chat, model);
+                    return url;
+                })
+                .exceptionally(e -> {
+                    log.error(e.getMessage());
+                    throw new RuntimeException(e);
+                });
+    }
+
+    @Async
+    public CompletableFuture<String> processImg2VideoUrl(Chat chat, UserDataDto dto){
+        StableDiffusionImg2VideoRequestDto requestDto = new StableDiffusionImg2VideoRequestDto();
+        requestDto.setPrompt(yandexTranslateService.getTranslation(dto.getPrompt(), AILanguage.ENGLISH).join());
+        requestDto.setInitImage(getInitImageUrl(dto.getImageUrl()));
+        requestDto.setModelId(dto.getVideoModel().getValue());
+        log.info(requestDto.toString());
+        return stableDiffusionImageService.getVideoFromImageUrl(requestDto)
+                .thenApply(url -> {
+                    transactionalAIImageRequestUpdate.update(chat, AIModel.STABLE_DIFFUSION);
                     return url;
                 })
                 .exceptionally(e -> {

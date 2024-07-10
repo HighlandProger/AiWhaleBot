@@ -31,8 +31,8 @@ public class ImageRequestInlineKeyboardService {
                 {{viewButtons.get(2), REQUEST_FOR_IMAGE.getBlindName()}, {viewButtons.get(3), GET_KNOWN_FOR_IMAGE.getBlindName()}},
                 {{viewButtons.get(4), REMOVE_BACKGROUND_FOR_IMAGE.getBlindName()}, {viewButtons.get(5), CHANGE_BACKGROUND_FOR_IMAGE.getBlindName()}},
                 {{viewButtons.get(6), REMOVE_TEXT_FOR_IMAGE.getBlindName()}, {viewButtons.get(7), SUPER_QUALITY_FOR_IMAGE.getBlindName()}},
-                {{viewButtons.get(8), GPT_4_VISION_FOR_IMAGE.getBlindName()}},
-                {{viewButtons.get(9), HELP_FOR_IMAGE.getBlindName()}}
+                {{viewButtons.get(8), GPT_4_VISION_FOR_IMAGE.getBlindName()}}, {{viewButtons.get(9), _1_IMAGE_2_VIDEO_FOR_IMAGE.getBlindName()}},
+                {{viewButtons.get(10), HELP_FOR_IMAGE.getBlindName()}}
         };
     }
 

@@ -1,17 +1,23 @@
 package ru.rusguardian.service.process.check;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.domain.user.UserBalanceEmbedded;
 import ru.rusguardian.service.ai.constant.AIModel;
 import ru.rusguardian.service.data.AIUserRequestService;
+import ru.rusguardian.telegram.bot.util.constants.ChatMemberStatus;
+import ru.rusguardian.telegram.bot.util.util.TelegramUtils;
 
 @Service
 @RequiredArgsConstructor
 public class ProcessCheckChatRequestLimit {
 
     private final AIUserRequestService aiUserRequestService;
+    @Value("{telegram.channel.id}")
+    private String telegramOwnerId;
 
     public int getSubscriptionMinusUsedCount(Chat chat, AIModel model) {
         AIModel.BalanceType balanceType = model.getBalanceType();
@@ -32,13 +38,13 @@ public class ProcessCheckChatRequestLimit {
         throw new RuntimeException("UNKNOWN BALANCE TYPE: " + balanceType);
     }
 
-    public int getTotalAllowedCount(Chat chat, AIModel model) {
+    public int getTotalAllowedCount(Chat chat, AIModel model, TelegramLongPollingBot bot) {
         UserBalanceEmbedded userBalance = chat.getUserBalanceEmbedded();
         int subscriptionMinusUsedCount = getSubscriptionMinusUsedCount(chat, model);
         AIModel.BalanceType balanceType = model.getBalanceType();
 
         if (balanceType == AIModel.BalanceType.GPT_3) {
-            int extraForSubscriptionCount = isChatHasChannelSubscriptions(chat) ? 5 : 0;
+            int extraForSubscriptionCount = isChatHasChannelSubscriptions(chat.getId(), bot) ? 5 : 0;
             return subscriptionMinusUsedCount + extraForSubscriptionCount;
         }
         if (balanceType == AIModel.BalanceType.GPT_4) {
@@ -54,8 +60,7 @@ public class ProcessCheckChatRequestLimit {
         return subscriptionMinusUsedCount;
     }
 
-    //TODO functional checkSubscription
-    public boolean isChatHasChannelSubscriptions(Chat chat) {
-        return false;
+    public boolean isChatHasChannelSubscriptions(Long userId, TelegramLongPollingBot bot) {
+        return TelegramUtils.getChatMemberStatus(telegramOwnerId, userId, bot) == ChatMemberStatus.MEMBER;
     }
 }

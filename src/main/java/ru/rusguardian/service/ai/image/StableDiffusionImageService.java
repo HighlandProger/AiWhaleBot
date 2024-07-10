@@ -12,6 +12,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import ru.rusguardian.service.ai.dto.stable_diffusion.StableDiffusionV6ResponseDto;
 import ru.rusguardian.service.ai.dto.stable_diffusion.fetch.StableDiffusionFetchRequestDto;
 import ru.rusguardian.service.ai.dto.stable_diffusion.fetch.StableDiffusionFetchResponseDto;
+import ru.rusguardian.service.ai.dto.stable_diffusion.img2video.StableDiffusionImg2VideoRequestDto;
 import ru.rusguardian.service.ai.dto.stable_diffusion.pix2pix.StableDiffusionPix2PixRequestDto;
 import ru.rusguardian.service.ai.dto.stable_diffusion.realtime.img2img.StableDiffusionRealtimeImg2ImgRequestDto;
 import ru.rusguardian.service.ai.dto.stable_diffusion.realtime.text2img.StableDiffusionRealtimeTextToImageRequestDto;
@@ -38,6 +39,7 @@ public class StableDiffusionImageService {
     private static final String REALTIME_IMG_2_IMG_URL = "https://modelslab.com/api/v6/realtime/img2img";
     private static final String REMOVE_BACKGROUND_URL = "https://modelslab.com/api/v6/image_editing/removebg_mask";
     private static final String SUPER_RESOLUTION_URL = "https://modelslab.com/api/v6/image_editing/super_resolution";
+    private static final String IMG_2_VIDEO_URL = "https://modelslab.com/api/v6/video/img2video";
     private static final String PROCESSING_STATUS = "processing";
     private static final String ERROR_STATUS = "error";
 
@@ -89,11 +91,17 @@ public class StableDiffusionImageService {
     }
 
     @Async
-    public CompletableFuture<List<String>> getImageUrl(String uri, Object dto) {
+    public CompletableFuture<String> getVideoFromImageUrl(StableDiffusionImg2VideoRequestDto dto){
+        dto.setKey(stableDiffusionKey);
+        return thisService.getImageUrl(IMG_2_VIDEO_URL, dto).thenApply(resp -> resp.get(0));
+    }
+
+    @Async
+    public CompletableFuture<List<String>> getImageUrl(String uri, Object requestDto) {
         return stableDiffusionWebClient.post()
                 .uri(uri)
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(dto)
+                .bodyValue(requestDto)
                 .retrieve()
                 .bodyToMono(StableDiffusionV6ResponseDto.class)
                 .toFuture()

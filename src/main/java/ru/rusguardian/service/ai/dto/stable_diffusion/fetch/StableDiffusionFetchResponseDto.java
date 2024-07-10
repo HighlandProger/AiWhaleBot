@@ -19,7 +19,5 @@ public class StableDiffusionFetchResponseDto {
     private String message;
     @JsonDeserialize(using = StringToEmptyListDeserializer.class)
     private List<String> output;
-    @JsonProperty("proxy_links")
-    private String proxyLinks;
 
 }

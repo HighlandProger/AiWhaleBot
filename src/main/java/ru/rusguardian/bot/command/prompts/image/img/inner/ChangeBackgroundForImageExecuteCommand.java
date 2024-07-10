@@ -5,9 +5,9 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.rusguardian.bot.command.prompts.PromptCommand;
-import ru.rusguardian.bot.command.prompts.image.img.inner.service.ImageUrlDtoService;
 import ru.rusguardian.bot.command.service.CommandName;
 import ru.rusguardian.domain.user.Chat;
+import ru.rusguardian.service.data.UserDataDtoService;
 import ru.rusguardian.service.process.prompt.ProcessImagePrompt;
 import ru.rusguardian.telegram.bot.util.util.TelegramUtils;
 
@@ -26,7 +26,7 @@ public class ChangeBackgroundForImageExecuteCommand extends PromptCommand {
     protected void mainExecute(Update update) throws TelegramApiException {
         int replyId = sendReplyToImageRequest(update, getChatLanguage(update)).getMessageId();
         String prompt = TelegramUtils.getTextMessage(update);
-        String initImageUrl = ImageUrlDtoService.getImageUrlAndRemove(TelegramUtils.getChatId(update));
+        String initImageUrl = UserDataDtoService.getDtoByIdAndRemove(TelegramUtils.getChatId(update)).getImageUrl();
         Chat chat = getChatOwner(update);
         setNullCompletedCommand(update);
         processImagePrompt.processChangeBackgroundImageUrl(chat, initImageUrl, prompt)

@@ -108,6 +108,9 @@ public enum CommandName {
     GPT_4_VISION_FOR_IMAGE(),
     GPT_4_VISION_FOR_IMAGE_EXECUTE(),
     HELP_FOR_IMAGE(),
+    _1_IMAGE_2_VIDEO_FOR_IMAGE(),
+    _2_IMAGE_2_VIDEO_FOR_IMAGE(),
+    _3_IMAGE_2_VIDEO_FOR_IMAGE(),
 
 
     //ADMIN

@@ -1,3 +1,6 @@
+server:
+  port: 8080
+  host: localhost
 logging:
   level:
     root: info
@@ -36,6 +39,8 @@ bot:
   token: type_your_value
 
 telegram:
+  channel:
+    id: type_your_value
   owner:
     chat:
       id: type_your_value
