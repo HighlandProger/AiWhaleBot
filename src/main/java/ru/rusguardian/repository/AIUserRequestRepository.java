@@ -13,7 +13,7 @@ import java.util.List;
 @Repository
 public interface AIUserRequestRepository extends JpaRepository<AIUserRequest, Long> {
 
-    @Query("SELECT COUNT(req) FROM AIUserRequest req " +
+    @Query("SELECT COUNT(req.id) FROM AIUserRequest req " +
             "WHERE req.chat.id = :chatId " +
             "AND req.aiModel in :models " +
             "AND req.requestTime BETWEEN :startOfDay AND :endOfDay")
@@ -21,6 +21,13 @@ public interface AIUserRequestRepository extends JpaRepository<AIUserRequest, Lo
                                                  @Param("models") List<AIModel> models,
                                                  @Param("startOfDay") LocalDateTime startOfDay,
                                                  @Param("endOfDay") LocalDateTime endOfDay);
+
+    @Query("SELECT COUNT(req.id) FROM AIUserRequest req " +
+            "WHERE req.aiModel in :models " +
+            "AND req.requestTime BETWEEN :startOfDay AND :endOfDay")
+    Integer getRequestsCountByModelsAndTime(@Param("models") List<AIModel> models,
+                                        @Param("startOfDay") LocalDateTime startTime,
+                                        @Param("endOfDay") LocalDateTime endTime);
 
     @Query("SELECT SUM(req.totalTokens) FROM AIUserRequest req " +
             "WHERE req.chat.id = :chatId " +

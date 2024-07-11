@@ -132,6 +132,7 @@ public enum CommandName {
 //    CHOOSE_REPORT(),
     GET_USERS_REPORT(),
     GET_ORDERS_REPORT(),
+    GET_REQUESTS_REPORT(),
 
 
 

@@ -31,7 +31,7 @@ public class ChooseReportCommand extends Command {
 
     private String[][][] getButtons(){
         return new String[][][]{
-                {{"Пользователи", CommandName.GET_USERS_REPORT.getBlindName()}, {"Заказы", CommandName.GET_ORDERS_REPORT.getBlindName()}},
+                {{"Пользователи", CommandName.GET_USERS_REPORT.getBlindName()}, {"Заказы", CommandName.GET_ORDERS_REPORT.getBlindName()}, {"Запросы", CommandName.GET_REQUESTS_REPORT.getBlindName()}},
                 {{CommandName.BACK.getViewName(), CommandName.ADMIN.getBlindName()}}
         };
     }
