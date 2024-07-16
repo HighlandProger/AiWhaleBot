@@ -45,7 +45,7 @@ public class AppConfig {
                 .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
                 .clientConnector(new ReactorClientHttpConnector(HttpClient.create()
                         .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000)  // Таймаут на подключение
-                        .responseTimeout(Duration.ofSeconds(25))  // Таймаут на получение ответа
+                        .responseTimeout(Duration.ofSeconds(35))  // Таймаут на получение ответа
                 ))
                 .build();
     }
