@@ -139,7 +139,7 @@ public class ProcessImagePrompt {
             case OPEN_AI ->
                     openAIImageService.getTextToImageUrl(new OpenAiTextToImageRequestDto(chat.getId(), model, prompt)).thenApply(List::of);
             case MIDJOURNEY -> yandexTranslateService.getTranslation(prompt, AILanguage.ENGLISH)
-                    .thenCompose(resp -> stableDiffusionImageService.getModelTextToImageUrl(resp, SDModelId.MIDJOURNEY_V_4));
+                    .thenCompose(resp -> stableDiffusionImageService.getModelTextToImageUrl(resp, SDModelId.CYBERREALISTIC_111));
             default -> throw new RuntimeException("UNKNOWN IMAGE PROVIDER " + model.getProvider());
         };
     }

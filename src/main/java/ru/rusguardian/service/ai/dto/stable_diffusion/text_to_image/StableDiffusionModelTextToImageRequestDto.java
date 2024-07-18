@@ -27,13 +27,13 @@ public class StableDiffusionModelTextToImageRequestDto {
     private String height = "512";
     private String samples = "4";
     @JsonProperty("num_inference_steps")
-    private String numInferenceSteps = "31";
+    private String numInferenceSteps = "21";
     @JsonProperty("safety_checker")
     private String safetyChecker = "no";
     @JsonProperty("enhance_prompt")
     private String enhancePrompt = "yes";
     @JsonProperty("guidance_scale")
-    private double guidanceScale = 7.5;
+    private double guidanceScale = 3;
     @JsonProperty("multi_lingual")
     private String multiLingual = "no";
     private String panorama = "no";
