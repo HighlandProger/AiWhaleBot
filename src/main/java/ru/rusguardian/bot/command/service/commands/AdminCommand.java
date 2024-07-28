@@ -26,6 +26,7 @@ public class AdminCommand extends Command {
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
         Chat chat = chatService.findById(TelegramUtils.getChatId(update));
+        setNullCompletedCommand(update);
 
         if (!chat.isAdmin()) sendMessage(update, NOT_ADMIN_MESSAGE);
         else sendMessage(update, MESSAGE, getKeyboard());

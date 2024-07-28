@@ -29,6 +29,7 @@ public class StartCommand extends Command {
     protected void mainExecute(Update update) throws TelegramApiException {
 
         Chat chat = chatService.findByIdOptional(TelegramUtils.getChatId(update)).orElseGet(() -> createNewUser(update));
+        setNullCompletedCommand(update);
         executeCommand(update, CommandName.WELCOME);
     }
 
