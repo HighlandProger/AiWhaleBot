@@ -12,7 +12,7 @@ import ru.rusguardian.domain.Order;
 import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.service.data.ChatService;
 import ru.rusguardian.service.data.OrderService;
-import ru.rusguardian.service.data.SubscriptionInfoService;
+import ru.rusguardian.service.data.SubscriptionService;
 import ru.rusguardian.service.process.create.ProcessCreateChat;
 import ru.rusguardian.service.process.get.ProcessGetPartnerInfoDto;
 
@@ -31,7 +31,7 @@ class ProcessPurchaseOrderTest {
     @Autowired
     private ProcessGetPartnerInfoDto getPartnerInfoDto;
     @Autowired
-    private SubscriptionInfoService subscriptionInfoService;
+    private SubscriptionService subscriptionService;
     @Autowired
     private ProcessPurchaseOrder processPurchaseOrder;
     @Autowired
@@ -51,7 +51,7 @@ class ProcessPurchaseOrderTest {
         order.setChat(chat);
         order.setPrice(100.0f);
         order.setSeparatePurchase(null);
-        order.setSubscriptionType(SubscriptionType.ALPHA_MONTH);
+        order.setSubscriptionType(SubscriptionType.ALPHA);
 
         order = orderService.save(order);
     }

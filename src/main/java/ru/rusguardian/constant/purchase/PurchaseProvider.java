@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum PurchaseProvider {
 
+    EMPTY("-"),
     ROBOKASSA("Robokassa"),
     PAYSELECTION("Payselection"),
     CRYPTOCLOUD("Crypto");

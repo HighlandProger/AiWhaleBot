@@ -30,6 +30,11 @@ public class RequestForImageCommand extends PromptCommand {
             return;
         }
 
+        if(true){
+            sendCurrentlyUnavailable(update);
+            return;
+        }
+
         String initImageUrl = FileUtils.getFileUrlFromMessage(((Message) update.getCallbackQuery().getMessage()).getReplyToMessage(), bot).toString();
         setNextCommand(update, CommandName.REQUEST_FOR_IMAGE_EXECUTE);
         editMessage(update, getTextByViewDataAndChatLanguage(VIEW_DATA, getChatLanguage(update)), null);

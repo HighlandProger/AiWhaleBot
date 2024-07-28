@@ -4,23 +4,23 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import ru.rusguardian.constant.user.SubscriptionType;
-import ru.rusguardian.domain.SubscriptionInfo;
-import ru.rusguardian.repository.SubscriptionInfoRepository;
+import ru.rusguardian.domain.Subscription;
+import ru.rusguardian.repository.SubscriptionRepository;
 import ru.rusguardian.service.data.abstr.CrudService;
 
 @Service
 @RequiredArgsConstructor
-public class SubscriptionInfoService extends CrudService<SubscriptionInfo, SubscriptionType> {
+public class SubscriptionService extends CrudService<Subscription, SubscriptionType> {
 
-    private final SubscriptionInfoRepository repository;
+    private final SubscriptionRepository repository;
 
     @Override
-    protected JpaRepository<SubscriptionInfo, SubscriptionType> getRepository() {
+    protected JpaRepository<Subscription, SubscriptionType> getRepository() {
         return repository;
     }
 
     @Override
-    protected SubscriptionType getIdFromEntity(SubscriptionInfo entity) {
+    protected SubscriptionType getIdFromEntity(Subscription entity) {
         return entity.getType();
     }
 

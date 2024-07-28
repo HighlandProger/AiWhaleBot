@@ -56,7 +56,7 @@ public abstract class Command implements BotService<CommandName> {
     protected ChatService chatService;
 
     @Autowired
-    protected SubscriptionInfoService subscriptionInfoService;
+    protected SubscriptionService subscriptionService;
 
     @Autowired
     protected LogEventService logEventService;
@@ -72,6 +72,8 @@ public abstract class Command implements BotService<CommandName> {
 
     @Autowired
     protected ButtonViewDataService buttonViewDataService;
+    @Autowired
+    protected UserSubscriptionService userSubscriptionService;
 
     @Override
     public boolean hasEvent(Update update, CommandName event) {

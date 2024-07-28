@@ -51,6 +51,11 @@ public class ExecuteText2ImagePromptBlindDifCommand extends PromptCommand {
         AIModel model = AIModel.valueOf(TelegramCallbackUtils.getArgFromCallback(update, 1));
         AILanguage language = chatOwner.getAiSettingsEmbedded().getAiLanguage();
 
+        if (model != AIModel.DALL_E_3){
+            sendCurrentlyUnavailable(update);
+            return;
+        }
+
         Message lastBotMessage = (Message) update.getCallbackQuery().getMessage();
         String reply = lastBotMessage.getReplyToMessage().getText();
         String prompt = reply.substring(IMG_PREFIX.length()).trim();

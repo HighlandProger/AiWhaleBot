@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import ru.rusguardian.domain.AssistantRoleData;
+import ru.rusguardian.domain.Subscription;
 import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.service.ai.AITextService;
 import ru.rusguardian.service.ai.constant.AIModel;
@@ -17,6 +18,7 @@ import ru.rusguardian.service.ai.dto.open_ai.text.OpenAiTextRequestDto;
 import ru.rusguardian.service.ai.dto.open_ai.text.RequestMessageDto;
 import ru.rusguardian.service.data.AssistantRoleDataService;
 import ru.rusguardian.service.data.ChatCompletionMessageService;
+import ru.rusguardian.service.data.UserSubscriptionService;
 import ru.rusguardian.service.process.transactional.ProcessTransactionalAITextRequestUpdate;
 import ru.rusguardian.util.ChatUtil;
 
@@ -34,6 +36,7 @@ public class ProcessPromptText {
     private final ChatCompletionMessageService chatCompletionMessageService;
     private final AssistantRoleDataService assistantRoleDataService;
     private final AiResponseCommonDtoFactory commonDtoFactory;
+    private final UserSubscriptionService userSubscriptionService;
 
     @Async
     public CompletableFuture<String> process(Chat chat, String prompt) {
@@ -81,7 +84,7 @@ public class ProcessPromptText {
 
     private List<AnthropicTextRequestDto.Message> getAnthropicMessages(Chat chat, String prompt){
         List<AnthropicTextRequestDto.Message> messages =
-                new ArrayList<>(ChatUtil.getPreviousChatCompletionMessages(chat, chatCompletionMessageService)
+                new ArrayList<>(ChatUtil.getPreviousChatCompletionMessages(chat, chatCompletionMessageService, userSubscriptionService.getCurrentSubscription(chat.getId()))
                         .stream().map(AnthropicTextRequestDto.Message::new).toList());
         messages.add(new AnthropicTextRequestDto.Message(Role.USER, prompt));
         return messages;
@@ -90,7 +93,7 @@ public class ProcessPromptText {
     private OpenAiTextRequestDto getOpenAiRequestDto(Chat chat, String prompt) {
         OpenAiTextRequestDto dto = new OpenAiTextRequestDto();
         dto.setModel(chat.getAiSettingsEmbedded().getAiActiveModel().getModelName());
-        dto.setMaxTokens(ChatUtil.getChatMaxTokens(chat));
+        dto.setMaxTokens(ChatUtil.getChatMaxTokens(userSubscriptionService.getCurrentSubscription(chat.getId())));
         dto.setTemperature(chat.getAiSettingsEmbedded().getTemperature().getValue());
         dto.setMessages(getChatMessages(chat, prompt));
         dto.setUser((String.valueOf(chat.getId())));
@@ -100,8 +103,8 @@ public class ProcessPromptText {
 
     private List<RequestMessageDto> getChatMessages(Chat chat, String prompt) {
         AssistantRoleData role = assistantRoleDataService.getByChat(chat);
-        List<RequestMessageDto> chatMessages = new ArrayList<>();
-        chatMessages.addAll(ChatUtil.getLeadingChatCompletionMessages(chat, chatCompletionMessageService, role).stream().map(RequestMessageDto::new).toList());
+        Subscription subscription = userSubscriptionService.getCurrentSubscription(chat.getId());
+        List<RequestMessageDto> chatMessages = new ArrayList<>(ChatUtil.getLeadingChatCompletionMessages(chat, chatCompletionMessageService, role, subscription).stream().map(RequestMessageDto::new).toList());
         chatMessages.add((new RequestMessageDto(prompt, Role.USER.getValue())));
 
         return chatMessages;

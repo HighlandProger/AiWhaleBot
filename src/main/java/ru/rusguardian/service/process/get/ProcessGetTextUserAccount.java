@@ -2,50 +2,55 @@ package ru.rusguardian.service.process.get;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.rusguardian.constant.user.SubscriptionType;
-import ru.rusguardian.domain.SubscriptionInfo;
+import ru.rusguardian.domain.Subscription;
+import ru.rusguardian.domain.UserSubscription;
 import ru.rusguardian.domain.user.AISettingsEmbedded;
 import ru.rusguardian.domain.user.Chat;
-import ru.rusguardian.domain.user.SubscriptionEmbedded;
 import ru.rusguardian.domain.user.UserBalanceEmbedded;
 import ru.rusguardian.service.ai.constant.AIModel;
 import ru.rusguardian.service.data.AIUserRequestService;
+import ru.rusguardian.service.data.AssistantRoleDataService;
+import ru.rusguardian.service.data.UserSubscriptionService;
 
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class ProcessGetTextUserAccount {
 
     private final AIUserRequestService userRequestService;
+    private final UserSubscriptionService userSubscriptionService;
+    private final AssistantRoleDataService assistantRoleDataService;
 
     public String get(Chat chat, String textPattern) {
-        SubscriptionEmbedded subscription = chat.getSubscriptionEmbedded();
-        SubscriptionInfo subscriptionInfo = subscription.getSubscriptionInfo();
+        Optional<UserSubscription> userSubscriptionOptional = userSubscriptionService.getCurrentUserSubscriptionOptional(chat.getId());
+        Subscription subscription = userSubscriptionService.getCurrentSubscription(chat.getId());
         UserBalanceEmbedded userBalance = chat.getUserBalanceEmbedded();
         AISettingsEmbedded aiSettings = chat.getAiSettingsEmbedded();
+        String roleViewName = assistantRoleDataService.getByNameAndLanguage(aiSettings.getAssistantRoleName(), aiSettings.getAiLanguage()).getViewName();
 
         return MessageFormat.format(textPattern,
                 String.valueOf(chat.getId()),
-                subscriptionInfo.getType(),
-                subscriptionInfo.getType() == SubscriptionType.FREE ? "-" : getSubscriptionExpirationDateString(subscription),
-                subscription.getPurchaseType() == null ? "-" : subscription.getPurchaseType(),
+                subscription.getName(),
+                userSubscriptionOptional.map(userSubscription -> getSubscriptionExpirationDateString(userSubscription.getExpirationTime())).orElse("-"),
+                userSubscriptionOptional.isEmpty() ? "-" : userSubscriptionOptional.get().getPurchaseProvider(),
                 //----------------------------------------------------------
+                getModelsPerDayUsage(chat.getId(), List.of(AIModel.GPT_4_MINI)),
                 getModelsPerDayUsage(chat.getId(), List.of(AIModel.GPT_3_5_TURBO)),
-                getModelsPerDayUsage(chat.getId(), List.of(AIModel.GEMINI_1_5_PRO)),
                 getModelsPerDayUsage(chat.getId(), AIModel.getByBalanceType(AIModel.BalanceType.GPT_4)),
-                getAllowedImageCount(chat),
+                getAllowedImageCount(chat.getId(), subscription),
                 userBalance.getClaudeTokens(),
                 //----------------------------------------------------------
                 userBalance.getExtraGPT4Requests(),
                 userBalance.getExtraImageRequests(),
                 //----------------------------------------------------------
                 aiSettings.getAiActiveModel(),
-                aiSettings.getAssistantRoleName(),
+                roleViewName,
                 aiSettings.getTemperature(),
                 aiSettings.isContextEnabled() ? "✅" : "❌",
                 aiSettings.isVoiceResponseEnabled() ? "✅" : "❌",
@@ -53,20 +58,20 @@ public class ProcessGetTextUserAccount {
                 getHoursAndMinsOfDayRemaining());
     }
 
-    private String getSubscriptionExpirationDateString(SubscriptionEmbedded subscription) {
+    private String getSubscriptionExpirationDateString(LocalDateTime expirationTime) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy 'г.'", new Locale("ru"));
-        return subscription.getExpirationTime().format(formatter);
+        return expirationTime.format(formatter);
     }
 
     private int getModelsPerDayUsage(Long chatId, List<AIModel> models) {
         return userRequestService.getDayRequestsCountByChatIdAndModels(chatId, models);
     }
 
-    private String getAllowedImageCount(Chat chat) {
-        int dayLimit = chat.getSubscriptionEmbedded().getSubscriptionInfo().getImageDayLimit();
+    private String getAllowedImageCount(Long chatId, Subscription subscription) {
+        int dayLimit = subscription.getImageDayLimit();
         if (dayLimit == -1) return "+";
-        return String.valueOf(chat.getSubscriptionEmbedded().getSubscriptionInfo().getImageDayLimit()
-                - getModelsPerDayUsage(chat.getId(), AIModel.getByBalanceType(AIModel.BalanceType.IMAGE)));
+        return String.valueOf(subscription.getImageDayLimit()
+                - getModelsPerDayUsage(chatId, AIModel.getByBalanceType(AIModel.BalanceType.IMAGE)));
     }
 
     private String getHoursAndMinsOfDayRemaining() {

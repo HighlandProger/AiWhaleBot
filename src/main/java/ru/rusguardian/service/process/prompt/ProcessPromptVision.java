@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import ru.rusguardian.domain.AssistantRoleData;
+import ru.rusguardian.domain.Subscription;
 import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.service.ai.AITextService;
 import ru.rusguardian.service.ai.constant.AIModel;
@@ -16,6 +17,7 @@ import ru.rusguardian.service.ai.dto.open_ai.text.OpenAiTextRequestDto;
 import ru.rusguardian.service.ai.dto.open_ai.text.RequestMessageDto;
 import ru.rusguardian.service.data.AssistantRoleDataService;
 import ru.rusguardian.service.data.ChatCompletionMessageService;
+import ru.rusguardian.service.data.UserSubscriptionService;
 import ru.rusguardian.service.process.transactional.ProcessTransactionalAITextRequestUpdate;
 import ru.rusguardian.util.ChatUtil;
 
@@ -32,6 +34,7 @@ public class ProcessPromptVision {
     private final ChatCompletionMessageService chatCompletionMessageService;
     private final AssistantRoleDataService assistantRoleDataService;
     private final AiResponseCommonDtoFactory commonDtoFactory;
+    private final UserSubscriptionService userSubscriptionService;
 
     @Async
     public CompletableFuture<String> process(Chat chat, String imageUrl, String prompt) {
@@ -48,7 +51,7 @@ public class ProcessPromptVision {
     private OpenAiTextRequestDto getRequestDto(Chat chat, String imageUrl, String prompt) {
         OpenAiTextRequestDto dto = new OpenAiTextRequestDto();
         dto.setModel(AIModel.GPT_4_OMNI.getModelName());
-        dto.setMaxTokens(ChatUtil.getChatMaxTokens(chat));
+        dto.setMaxTokens(ChatUtil.getChatMaxTokens(userSubscriptionService.getCurrentSubscription(chat.getId())));
         dto.setTemperature(chat.getAiSettingsEmbedded().getTemperature().getValue());
         dto.setMessages(getChatMessages(chat, imageUrl, prompt));
         dto.setUser((String.valueOf(chat.getId())));
@@ -58,8 +61,8 @@ public class ProcessPromptVision {
 
     private List<RequestMessageDto> getChatMessages(Chat chat, String imageUrl, String prompt) {
         AssistantRoleData role = assistantRoleDataService.getByChat(chat);
-        List<RequestMessageDto> chatMessages = new ArrayList<>();
-        chatMessages.addAll(ChatUtil.getLeadingChatCompletionMessages(chat, chatCompletionMessageService, role).stream().map(RequestMessageDto::new).toList());
+        Subscription subscription = userSubscriptionService.getCurrentSubscription(chat.getId());
+        List<RequestMessageDto> chatMessages = new ArrayList<>(ChatUtil.getLeadingChatCompletionMessages(chat, chatCompletionMessageService, role, subscription).stream().map(RequestMessageDto::new).toList());
         chatMessages.add((getImageRequestMessageDto(imageUrl, prompt)));
 
         return chatMessages;

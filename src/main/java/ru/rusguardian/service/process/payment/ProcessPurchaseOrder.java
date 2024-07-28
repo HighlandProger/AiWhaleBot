@@ -6,23 +6,23 @@ import org.springframework.transaction.annotation.Transactional;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import ru.rusguardian.bot.command.main.subscription.Type;
 import ru.rusguardian.constant.purchase.SeparatePurchase;
-import ru.rusguardian.constant.user.SubscriptionType;
 import ru.rusguardian.domain.Order;
+import ru.rusguardian.domain.UserSubscription;
 import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.domain.user.PartnerEmbedded;
-import ru.rusguardian.domain.user.SubscriptionEmbedded;
 import ru.rusguardian.domain.user.UserBalanceEmbedded;
 import ru.rusguardian.service.ai.constant.AIModel;
 import ru.rusguardian.service.data.ChatService;
 import ru.rusguardian.service.data.OrderService;
-import ru.rusguardian.service.data.SubscriptionInfoService;
+import ru.rusguardian.service.data.SubscriptionService;
+import ru.rusguardian.service.data.UserSubscriptionService;
 import ru.rusguardian.service.process.get.ProcessGetPartnerInfoDto;
 import ru.rusguardian.service.process.get.dto.PartnerInfoDto;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +31,8 @@ public class ProcessPurchaseOrder {
     private final OrderService orderService;
     private final ChatService chatService;
     private final ProcessGetPartnerInfoDto getPartnerInfoDto;
-    private final SubscriptionInfoService subscriptionInfoService;
+    private final SubscriptionService subscriptionService;
+    private final UserSubscriptionService userSubscriptionService;
     private final TelegramLongPollingBot bot;
 
     @Transactional
@@ -101,40 +102,37 @@ public class ProcessPurchaseOrder {
     }
 
     private void updateUserSubscription(Order order) {
-        SubscriptionEmbedded subscriptionEmbedded = order.getChat().getSubscriptionEmbedded();
-        if (isUserAlreadyHasSubscription(subscriptionEmbedded)) {
+        if (isUserAlreadyHasSubscription(order.getChat().getId())) {
             returnUnusedDaysOnBalance(order.getChat());
         }
 
-        SubscriptionType subscriptionType = order.getSubscriptionType();
-        subscriptionEmbedded.setSubscriptionInfo(subscriptionInfoService.findById(subscriptionType));
-        subscriptionEmbedded.setPurchaseTime(LocalDateTime.now());
-        subscriptionEmbedded.setPurchaseType(order.getPurchaseProvider());
-        subscriptionEmbedded.setExpirationTime(getExpirationTime(subscriptionType));
+        LocalDateTime now = LocalDateTime.now();
+        UserSubscription userSubscription = new UserSubscription();
+        userSubscription.setChat(order.getChat());
+        userSubscription.setSubscription(subscriptionService.findById(order.getSubscriptionType()));
+        userSubscription.setStartTime(now);
+        userSubscription.setExpirationTime(now.plusMonths(order.getSubscriptionMonths()));
+        userSubscription.setOrder(order);
+        userSubscription.setPurchaseProvider(order.getPurchaseProvider());
+
+        userSubscriptionService.save(userSubscription);
     }
 
-    private LocalDateTime getExpirationTime(SubscriptionType subscriptionType) {
-        if (subscriptionType.getTimeType() == Type.MONTH) {
-            return LocalDateTime.now().plusMonths(1);
-        }
-        if (subscriptionType.getTimeType() == Type.YEAR) {
-            return LocalDateTime.now().plusYears(1);
-        }
-        throw new RuntimeException("UNKNOWN TIME TYPE " + subscriptionType.getTimeType());
-    }
-
-    private boolean isUserAlreadyHasSubscription(SubscriptionEmbedded subscriptionEmbedded) {
-        return subscriptionEmbedded.getExpirationTime() != null
-                && subscriptionEmbedded.getExpirationTime().isAfter(LocalDateTime.now());
+    private boolean isUserAlreadyHasSubscription(Long chatId) {
+        Optional<UserSubscription> currentUserSubscriptionOptional = userSubscriptionService.getCurrentUserSubscriptionOptional(chatId);
+        return currentUserSubscriptionOptional.isPresent();
     }
 
     //TODO test
     private void returnUnusedDaysOnBalance(Chat chat) {
+        UserSubscription userSubscription = userSubscriptionService.getCurrentUserSubscription(chat.getId());
+        Order order = userSubscription.getOrder();
+        if(order == null) {return;}
+
         PartnerEmbedded partnerEmbedded = chat.getPartnerEmbeddedInfo();
-        SubscriptionEmbedded subscriptionEmbedded = chat.getSubscriptionEmbedded();
-        long unusedDays = ChronoUnit.DAYS.between(LocalDateTime.now(), subscriptionEmbedded.getExpirationTime());
-        long fullSubscriptionDays = ChronoUnit.DAYS.between(subscriptionEmbedded.getPurchaseTime(), subscriptionEmbedded.getExpirationTime());
-        float unusedValue = ((float) unusedDays / fullSubscriptionDays) * subscriptionEmbedded.getSubscriptionInfo().getPrice();
+        long unusedDays = ChronoUnit.DAYS.between(LocalDateTime.now(), userSubscription.getExpirationTime());
+        long fullSubscriptionDays = ChronoUnit.DAYS.between(userSubscription.getStartTime(), userSubscription.getExpirationTime());
+        double unusedValue = ((double) unusedDays / fullSubscriptionDays) * order.getPrice();
 
         partnerEmbedded.setBalance(partnerEmbedded.getBalance() + unusedValue);
     }

@@ -3,8 +3,6 @@ package ru.rusguardian.domain.user;
 import jakarta.persistence.*;
 import lombok.Data;
 import ru.rusguardian.bot.command.service.CommandName;
-import ru.rusguardian.domain.SubscriptionInfo;
-import ru.rusguardian.service.ai.constant.AIModel;
 
 import java.time.LocalDateTime;
 
@@ -41,31 +39,9 @@ public class Chat {
     private Boolean isKicked;
 
     @Embedded
-    private SubscriptionEmbedded subscriptionEmbedded;
-    @Embedded
     private AISettingsEmbedded aiSettingsEmbedded;
     @Embedded
     private UserBalanceEmbedded userBalanceEmbedded;
     @Embedded
     private PartnerEmbedded partnerEmbeddedInfo;
-
-    public int getAllowedBySubscriptionRequestCount(AIModel.BalanceType balanceType) {
-        SubscriptionInfo subscriptionInfo = this.getSubscriptionEmbedded().getSubscriptionInfo();
-        if (balanceType == AIModel.BalanceType.GPT_3) {
-            return subscriptionInfo.getGpt3DayLimit();
-        }
-        if (balanceType == AIModel.BalanceType.GPT_4) {
-            return subscriptionInfo.getGpt4DayLimit();
-        }
-        if (balanceType == AIModel.BalanceType.IMAGE) {
-            return subscriptionInfo.getImageDayLimit();
-        }
-        if (balanceType == AIModel.BalanceType.CLAUDE) {
-            return subscriptionInfo.getClaudeTokensMonthLimit();
-        }
-        if (balanceType == AIModel.BalanceType.MUSIC) {
-            return subscriptionInfo.getSongMonthLimit();
-        }
-        throw new RuntimeException("UNKNOWN BALANCE TYPE: " + balanceType);
-    }
 }

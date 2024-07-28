@@ -32,6 +32,11 @@ public class RemoveBackgroundForImageCommand extends PromptCommand {
             return;
         }
 
+        if(true){
+            sendCurrentlyUnavailable(update);
+            return;
+        }
+
         int replyId = editReplyToImageRequest(update, getChatLanguage(update));
         String initImageUrl = FileUtils.getFileUrlFromMessage(((Message) update.getCallbackQuery().getMessage()).getReplyToMessage(), bot).toString();
         processImagePrompt.processRemoveBackground(chatOwner, initImageUrl)

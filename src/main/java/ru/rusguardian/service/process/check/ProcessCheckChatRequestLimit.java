@@ -8,6 +8,7 @@ import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.domain.user.UserBalanceEmbedded;
 import ru.rusguardian.service.ai.constant.AIModel;
 import ru.rusguardian.service.data.AIUserRequestService;
+import ru.rusguardian.service.data.UserSubscriptionService;
 import ru.rusguardian.telegram.bot.util.constants.ChatMemberStatus;
 import ru.rusguardian.telegram.bot.util.util.TelegramUtils;
 
@@ -16,12 +17,13 @@ import ru.rusguardian.telegram.bot.util.util.TelegramUtils;
 public class ProcessCheckChatRequestLimit {
 
     private final AIUserRequestService aiUserRequestService;
+    private final UserSubscriptionService userSubscriptionService;
     @Value("{telegram.channel.id}")
     private String telegramOwnerId;
 
     public int getSubscriptionMinusUsedCount(Chat chat, AIModel model) {
         AIModel.BalanceType balanceType = model.getBalanceType();
-        int allowedBySubscriptionRequestCount = chat.getAllowedBySubscriptionRequestCount(balanceType);
+        int allowedBySubscriptionRequestCount = userSubscriptionService.getCurrentSubscription(chat.getId()).getAllowedBySubscriptionRequestCount(balanceType);
         //For not limited
         if (allowedBySubscriptionRequestCount == -1) {
             return 1000000000;

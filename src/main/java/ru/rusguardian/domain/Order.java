@@ -48,6 +48,8 @@ public class Order {
     private boolean isPurchased;
     @Column(name = "partner_income")
     private Double partnerIncome;
+    @Column(name = "subscription_months")
+    private Integer subscriptionMonths;
 
     public Order(Chat chat, PurchaseProvider purchaseProvider, SeparatePurchase separatePurchase) {
         this.info = separatePurchase.name();
@@ -59,12 +61,12 @@ public class Order {
         this.isPurchased = false;
     }
 
-    public Order(Chat chat, PurchaseProvider provider, SubscriptionInfo subscriptionInfo) {
-        this.info = subscriptionInfo.getName();
-        this.price = subscriptionInfo.getPrice();
+    public Order(Chat chat, PurchaseProvider provider, Subscription subscription, int months) {
+        this.info = subscription.getName();
+        this.price = subscription.getOneMonthPrice() * months;
         this.chat = chat;
         this.purchaseProvider = provider;
-        this.subscriptionType = subscriptionInfo.getType();
+        this.subscriptionType = subscription.getType();
         this.createdAt = LocalDateTime.now();
         this.isPurchased = false;
     }

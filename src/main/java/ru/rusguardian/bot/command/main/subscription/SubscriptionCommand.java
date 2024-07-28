@@ -12,7 +12,7 @@ import ru.rusguardian.bot.command.service.Command;
 import ru.rusguardian.bot.command.service.CommandMapping;
 import ru.rusguardian.bot.command.service.CommandName;
 import ru.rusguardian.constant.ai.AILanguage;
-import ru.rusguardian.domain.SubscriptionInfo;
+import ru.rusguardian.domain.Subscription;
 import ru.rusguardian.telegram.bot.util.util.TelegramCallbackUtils;
 import ru.rusguardian.telegram.bot.util.util.telegram_message.SendMessageUtil;
 
@@ -52,10 +52,10 @@ public class SubscriptionCommand extends Command {
 
     private void send(Update update, AILanguage language) throws TelegramApiException {
         Type type = Type.MONTH;
-        List<SubscriptionInfo> subscriptionInfos = new ArrayList<>(subscriptionInfoService.getAll().stream().filter(e -> e.getType().getTimeType() == type).toList());
+        List<Subscription> subscriptions = subscriptionService.getAll();
 
         SendMessage message = SendMessageUtil.getSimple(update, getTextByViewDataAndChatLanguage(VIEW_DATA, language));
-        message.setReplyMarkup(subscriptionsKeyboardService.getKeyboard(type, subscriptionInfos, language));
+        message.setReplyMarkup(subscriptionsKeyboardService.getKeyboard(type, subscriptions, language));
         message.setParseMode(ParseMode.HTML);
 
         sendMessage(message);
@@ -67,9 +67,9 @@ public class SubscriptionCommand extends Command {
                 : Type.MONTH.name();
 
         Type type = Type.valueOf(typeString);
-        List<SubscriptionInfo> subscriptionInfos = new ArrayList<>(subscriptionInfoService.getAll().stream().filter(e -> e.getType().getTimeType() == type).toList());
+        List<Subscription> subscriptions = subscriptionService.getAll();
 
-        InlineKeyboardMarkup markup = subscriptionsKeyboardService.getKeyboard(type, subscriptionInfos, getChatOwner(update).getAiSettingsEmbedded().getAiLanguage());
+        InlineKeyboardMarkup markup = subscriptionsKeyboardService.getKeyboard(type, subscriptions, getChatOwner(update).getAiSettingsEmbedded().getAiLanguage());
 
         editMessage(update, getTextByViewDataAndChatLanguage(VIEW_DATA, language), markup);
     }

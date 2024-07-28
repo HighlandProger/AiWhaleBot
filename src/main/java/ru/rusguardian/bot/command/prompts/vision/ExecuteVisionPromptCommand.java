@@ -48,7 +48,7 @@ public class ExecuteVisionPromptCommand extends PromptCommand {
             });
         } else {
             String response;
-            if (chat.getSubscriptionEmbedded().getSubscriptionInfo().getType() == SubscriptionType.FREE) {
+            if (userSubscriptionService.getCurrentSubscription(chat.getId()).getType() == SubscriptionType.FREE) {
                 response = getTextByViewDataAndChatLanguage(LIMIT_EXPIRED_FREE, chat.getAiSettingsEmbedded().getAiLanguage());
             } else {
                 response = getTextByViewDataAndChatLanguage(LIMIT_EXPIRED, chat.getAiSettingsEmbedded().getAiLanguage());

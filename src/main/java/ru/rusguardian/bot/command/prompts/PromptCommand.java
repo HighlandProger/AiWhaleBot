@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -169,5 +170,13 @@ public class PromptCommand extends Command {
                 }
             }
         }
+    }
+
+    protected void sendCurrentlyUnavailable(Update update) throws TelegramApiException{
+        AnswerCallbackQuery answer = new AnswerCallbackQuery();
+        answer.setShowAlert(true);
+        answer.setText("Функционал временно не доступен");
+        answer.setCallbackQueryId(TelegramUtils.getCallbackQueryId(update));
+        bot.execute(answer);
     }
 }

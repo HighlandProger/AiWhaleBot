@@ -17,9 +17,9 @@ import static ru.rusguardian.service.ai.constant.Provider.*;
 public enum AIModel {
 
     GPT_4_OMNI(OPEN_AI, BalanceType.GPT_4, "gpt-4o-2024-05-13"),
+    GPT_4_MINI(OPEN_AI, BalanceType.GPT_3, "gpt-4o-mini-2024-07-18"),
     GPT_3_5_TURBO(OPEN_AI, BalanceType.GPT_3, "gpt-3.5-turbo-0125"),
     ADA_V2_EMBEDDINGS(OPEN_AI, null, "ada-v2-embedding"),
-    DALL_E_2(OPEN_AI, BalanceType.IMAGE, "dall-e-2"),
     DALL_E_3(OPEN_AI, BalanceType.IMAGE, "dall-e-3"),
     STABLE_DIFFUSION(Provider.STABLE_DIFFUSION, BalanceType.IMAGE, "Stable Diffusion"),
     MIDJOURNEY(Provider.MIDJOURNEY, BalanceType.IMAGE, "Midjourney"),
@@ -27,8 +27,7 @@ public enum AIModel {
     TTS(OPEN_AI, null, "tts-1"),
     CLAUDE_3_OPUS(ANTHROPIC, BalanceType.CLAUDE, "claude-3-opus-20240229"),
     CLAUDE_3_SONNET(ANTHROPIC, BalanceType.CLAUDE, "claude-3-sonnet-20240229"),
-    CLAUDE_3_HAIKU(ANTHROPIC, BalanceType.CLAUDE, "claude-3-haiku-20240307"),
-    GEMINI_1_5_PRO(GOOGLE, BalanceType.GPT_3, "???");
+    CLAUDE_3_HAIKU(ANTHROPIC, BalanceType.CLAUDE, "claude-3-haiku-20240307");
 
     private final Provider provider;
     private final BalanceType balanceType;
@@ -36,11 +35,11 @@ public enum AIModel {
 
     private static final List<AIModel> getUserChatModels = List.of(
             AIModel.GPT_4_OMNI,
+            AIModel.GPT_4_MINI,
             AIModel.GPT_3_5_TURBO,
             AIModel.CLAUDE_3_OPUS,
             AIModel.CLAUDE_3_SONNET,
             AIModel.CLAUDE_3_HAIKU
-            //AIModel.GEMINI_1_5_PRO
     );
 
     private static final Map<String, AIModel> MODEL_NAME_MAP = new HashMap<>();

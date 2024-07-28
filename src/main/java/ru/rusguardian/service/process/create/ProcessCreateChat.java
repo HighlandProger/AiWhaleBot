@@ -9,14 +9,15 @@ import ru.rusguardian.constant.ai.AITemperature;
 import ru.rusguardian.constant.user.SubscriptionType;
 import ru.rusguardian.domain.AssistantRoleData;
 import ru.rusguardian.domain.ChatCompletionMessage;
-import ru.rusguardian.domain.SubscriptionInfo;
+import ru.rusguardian.domain.UserSubscription;
 import ru.rusguardian.domain.user.*;
 import ru.rusguardian.service.ai.constant.AIModel;
 import ru.rusguardian.service.ai.constant.Role;
 import ru.rusguardian.service.data.AssistantRoleDataService;
 import ru.rusguardian.service.data.ChatCompletionMessageService;
 import ru.rusguardian.service.data.ChatService;
-import ru.rusguardian.service.data.SubscriptionInfoService;
+import ru.rusguardian.service.data.SubscriptionService;
+import ru.rusguardian.service.data.UserSubscriptionService;
 import ru.rusguardian.telegram.bot.util.util.TelegramStartInfoUtils;
 import ru.rusguardian.telegram.bot.util.util.TelegramUtils;
 
@@ -31,7 +32,8 @@ import static ru.rusguardian.constant.ai.AILanguage.RUSSIAN;
 public class ProcessCreateChat {
 
     private static final String INVITED_BY = "invitedBy";
-    private final SubscriptionInfoService subscriptionInfoService;
+    private final UserSubscriptionService userSubscriptionService;
+    private final SubscriptionService subscriptionService;
     private final ChatService chatService;
     private final ChatCompletionMessageService chatCompletionMessageService;
     private final AssistantRoleDataService assistantRoleDataService;
@@ -52,12 +54,12 @@ public class ProcessCreateChat {
         chat.setIsKicked(false);
 
         chat.setAiSettingsEmbedded(getAiSetting());
-        chat.setSubscriptionEmbedded(getSubscription());
         chat.setPartnerEmbeddedInfo(getPartner(update));
         chat.setUserBalanceEmbedded(getUserBalance(chat));
 
-        chatService.save(chat);
+        chat = chatService.save(chat);
         createSystemCompletionMessage(chat);
+        addTestMiniSubscription(chat);
 
         return chat;
     }
@@ -65,7 +67,7 @@ public class ProcessCreateChat {
     private AISettingsEmbedded getAiSetting() {
         AISettingsEmbedded aiSettingsEmbedded = new AISettingsEmbedded();
         aiSettingsEmbedded.setAssistantRoleName("USUAL");
-        aiSettingsEmbedded.setAiActiveModel(AIModel.GPT_3_5_TURBO);
+        aiSettingsEmbedded.setAiActiveModel(AIModel.GPT_4_MINI);
         aiSettingsEmbedded.setTemperature(AITemperature.MIDDLE);
         aiSettingsEmbedded.setAiLanguage(RUSSIAN);
         aiSettingsEmbedded.setContextEnabled(true);
@@ -73,12 +75,15 @@ public class ProcessCreateChat {
         return aiSettingsEmbedded;
     }
 
-    private SubscriptionEmbedded getSubscription() {
-        SubscriptionInfo info = subscriptionInfoService.findById(SubscriptionType.FREE);
 
-        SubscriptionEmbedded subscription = new SubscriptionEmbedded();
-        subscription.setSubscriptionInfo(info);
-        return subscription;
+    private void addTestMiniSubscription(Chat chat){
+        UserSubscription userSubscription = new UserSubscription();
+        userSubscription.setChat(chat);
+        userSubscription.setSubscription(subscriptionService.findById(SubscriptionType.PREMIUM));
+        userSubscription.setStartTime(LocalDateTime.now());
+        userSubscription.setExpirationTime(LocalDateTime.now().plusWeeks(1));
+        userSubscription.setOrder(null);
+        userSubscriptionService.save(userSubscription);
     }
 
     private PartnerEmbedded getPartner(Update update) {

@@ -24,7 +24,6 @@ import static ru.rusguardian.bot.command.service.CommandName.*;
 @RequiredArgsConstructor
 public class ChooseSubscriptionPurchaseTypeBlindDifCommand extends Command {
 
-    //TODO minor refactor name
     private static final String SUBSCRIPTION_PURCHASING_INFO = "SUBSCRIPTION_PURCHASING_INFO";
     private static final String BUTTON_VIEW_DATA = "CHOOSE_PURCHASE_TYPE";
 
@@ -44,15 +43,16 @@ public class ChooseSubscriptionPurchaseTypeBlindDifCommand extends Command {
     private InlineKeyboardMarkup getKeyboard(Update update, AILanguage language) {
         SubscriptionType subscriptionType = SubscriptionType.valueOf(TelegramCallbackUtils.getArgFromCallback(update, 1));
         List<String> viewButtons = buttonViewDataService.getByNameAndLanguage(BUTTON_VIEW_DATA, language);
+        int months = Integer.parseInt(TelegramCallbackUtils.getArgFromCallback(update, 2));
 
         return ReplyMarkupUtil.getInlineKeyboard(new String[][][]{
-                {{viewButtons.get(0), getCallback(PURCH_SUBS_BLIND_D, subscriptionType, PurchaseProvider.ROBOKASSA)}},
-                {{viewButtons.get(1), getCallback(PURCH_SUBS_CRYPTO_BLIND_D, subscriptionType, PurchaseProvider.CRYPTOCLOUD)}},
+                {{viewButtons.get(0), getCallback(PURCH_SUBS_BLIND_D, subscriptionType, months, PurchaseProvider.ROBOKASSA)}},
+                {{viewButtons.get(1), getCallback(PURCH_SUBS_BLIND_D, subscriptionType, months, PurchaseProvider.CRYPTOCLOUD)}},
                 {{viewButtons.get(2), SUBSCRIPTION.getBlindName()}},
         });
     }
 
-    private String getCallback(CommandName commandName, SubscriptionType subscriptionType, PurchaseProvider provider) {
-        return TelegramCallbackUtils.getCallbackWithArgs(commandName.name(), subscriptionType.name(), provider.name());
+    private String getCallback(CommandName commandName, SubscriptionType subscriptionType, int months, PurchaseProvider provider) {
+        return TelegramCallbackUtils.getCallbackWithArgs(commandName.name(), subscriptionType.name(), String.valueOf(months), provider.name());
     }
 }

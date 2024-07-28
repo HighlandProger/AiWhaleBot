@@ -38,7 +38,7 @@ public class ChooseTemperatureBlindDifCommand extends Command {
         Chat chat = getChatOwner(update);
         String temperatureString = TelegramCallbackUtils.getArgFromCallback(update, 1);
 
-        if (chat.getSubscriptionEmbedded().getSubscriptionInfo().getType() == SubscriptionType.FREE) {
+        if (userSubscriptionService.getCurrentSubscription(chat.getId()).getType() == SubscriptionType.FREE) {
             AnswerCallbackQuery callbackQuery = new AnswerCallbackQuery();
             callbackQuery.setText(getTextByViewDataAndChatLanguage(OPERATION_RESTRICTED_FOR_FREE, chat.getAiSettingsEmbedded().getAiLanguage()));
             callbackQuery.setCallbackQueryId(TelegramUtils.getCallbackQueryId(update));

@@ -7,11 +7,11 @@ import lombok.RequiredArgsConstructor;
 @Getter
 public enum AITemperature {
 
-    HIGHEST(1.8),
-    HIGH(1.4),
+    HIGHEST(1.6),
+    HIGH(1.3),
     MIDDLE(1.0),
-    LOW(0.6),
-    LOWEST(0.2);
+    LOW(0.7),
+    LOWEST(0.4);
 
     private final double value;
 

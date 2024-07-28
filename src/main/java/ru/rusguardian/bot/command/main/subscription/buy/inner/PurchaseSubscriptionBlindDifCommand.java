@@ -38,10 +38,11 @@ public class PurchaseSubscriptionBlindDifCommand extends Command {
     @Override
     protected void mainExecute(Update update) throws TelegramApiException {
         SubscriptionType subscriptionType = SubscriptionType.valueOf(TelegramCallbackUtils.getArgFromCallback(update, 1));
-        PurchaseProvider provider = PurchaseProvider.valueOf(TelegramCallbackUtils.getArgFromCallback(update, 2));
+        int months = Integer.parseInt(TelegramCallbackUtils.getArgFromCallback(update, 2));
+        PurchaseProvider provider = PurchaseProvider.valueOf(TelegramCallbackUtils.getArgFromCallback(update, 3));
 
         EditMessageText edit = EditMessageUtil.getMessageText(update, getText(update));
-        edit.setReplyMarkup(getKeyboard(getChatOwner(update), subscriptionType, provider));
+        edit.setReplyMarkup(getKeyboard(getChatOwner(update), subscriptionType, provider, months));
         edit.setParseMode(ParseMode.HTML);
 
         edit(edit);
@@ -52,11 +53,11 @@ public class PurchaseSubscriptionBlindDifCommand extends Command {
         return MessageFormat.format(getTextByViewDataAndChatLanguage(SUBSCRIPTION_PURCHASING_INFO, language), PurchaseProvider.ROBOKASSA.getName());
     }
 
-    private InlineKeyboardMarkup getKeyboard(Chat chat, SubscriptionType subscriptionType, PurchaseProvider provider) {
+    private InlineKeyboardMarkup getKeyboard(Chat chat, SubscriptionType subscriptionType, PurchaseProvider provider, int months) {
 
         String url = switch (provider) {
-            case ROBOKASSA -> createSeparateInvoice.getRobokassaInvoiceUrl(chat, subscriptionType).toString();
-            case CRYPTOCLOUD -> createSeparateInvoice.getCryptocloudInvoiceUrl(chat, subscriptionType).toString();
+            case ROBOKASSA -> createSeparateInvoice.getRobokassaInvoiceUrl(chat, subscriptionType, months).toString();
+            case CRYPTOCLOUD -> createSeparateInvoice.getCryptocloudInvoiceUrl(chat, subscriptionType, months).toString();
             default -> throw new UnsupportedOperationException(provider.getName());
         };
 

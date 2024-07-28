@@ -6,8 +6,9 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import ru.rusguardian.bot.command.main.subscription.Type;
 import ru.rusguardian.constant.ai.AILanguage;
+import ru.rusguardian.constant.user.SubscriptionType;
 import ru.rusguardian.domain.ButtonViewData;
-import ru.rusguardian.domain.SubscriptionInfo;
+import ru.rusguardian.domain.Subscription;
 import ru.rusguardian.service.data.ButtonViewDataService;
 import ru.rusguardian.telegram.bot.util.util.TelegramCallbackUtils;
 import ru.rusguardian.telegram.bot.util.util.telegram_message.ReplyMarkupUtil;
@@ -29,12 +30,12 @@ public class SubscriptionsKeyboardService {
     private static final String BODY_YEAR_BUTTONS = "SUBSCRIPTION_BODY_YEAR";
     private static final String SEPARATE_BUTTONS = "SUBSCRIPTION_SEPARATE";
 
-    public InlineKeyboardMarkup getKeyboard(Type currentType, List<SubscriptionInfo> subscriptionInfos, AILanguage language) {
+    public InlineKeyboardMarkup getKeyboard(Type currentType, List<Subscription> subscriptions, AILanguage language) {
         InlineKeyboardMarkup head = getChangeTypeButtons(currentType, language);
-        InlineKeyboardMarkup subscriptions = getSubscriptionButtons(currentType, subscriptionInfos, language);
+        InlineKeyboardMarkup subscriptionButtons = getSubscriptionButtons(currentType, subscriptions, language);
         InlineKeyboardMarkup separately = getSeparatelyBuyButtons(language);
 
-        return ReplyMarkupUtil.getMergedKeyboard(head, subscriptions, separately);
+        return ReplyMarkupUtil.getMergedKeyboard(head, subscriptionButtons, separately);
     }
 
     private InlineKeyboardMarkup getChangeTypeButtons(Type currentType, AILanguage language) {
@@ -59,20 +60,20 @@ public class SubscriptionsKeyboardService {
         });
     }
 
-    private InlineKeyboardMarkup getSubscriptionButtons(Type currentType, List<SubscriptionInfo> subscriptionInfos, AILanguage language) {
+    private InlineKeyboardMarkup getSubscriptionButtons(Type currentType, List<Subscription> subscriptions, AILanguage language) {
 
         String viewDataName = currentType == Type.MONTH ? BODY_MONTH_BUTTONS : BODY_YEAR_BUTTONS;
 
         String textPattern = buttonViewDataService.getByNameLanguageAndButtonNumber(viewDataName, language, 1);
 
-        Collections.reverse(subscriptionInfos);
-        return new InlineKeyboardMarkup(subscriptionInfos.stream()
+        Collections.reverse(subscriptions);
+        return new InlineKeyboardMarkup(subscriptions.stream()
                 .distinct()
-                .filter(el -> el.getType().getTimeType() == currentType)
+                .filter(el -> el.getType() != SubscriptionType.FREE)
                 .map(el -> {
                     InlineKeyboardButton button = new InlineKeyboardButton();
-                    button.setText(getSubscriptionInfoString(textPattern, el));
-                    button.setCallbackData(getBuySubscriptionCommand(el));
+                    button.setText(getSubscriptionInfoString(textPattern, el, currentType));
+                    button.setCallbackData(getBuySubscriptionCommand(el, currentType));
                     return List.of(button);
                 }).toList());
     }
@@ -86,12 +87,14 @@ public class SubscriptionsKeyboardService {
         });
     }
 
-    private static String getBuySubscriptionCommand(SubscriptionInfo info) {
-        return TelegramCallbackUtils.getCallbackWithArgs(CHS_SUBS_PURCH_TYPE_BLIND_D.getBlindName(), info.getType().name());
+    private static String getBuySubscriptionCommand(Subscription subscription, Type timeType) {
+        int months = timeType == Type.MONTH ? 1 : 12;
+        return TelegramCallbackUtils.getCallbackWithArgs(CHS_SUBS_PURCH_TYPE_BLIND_D.getBlindName(), subscription.getType().name(), String.valueOf(months));
     }
 
-    private static String getSubscriptionInfoString(String textPattern, SubscriptionInfo info) {
-        return MessageFormat.format(textPattern, info.getSmile(), info.getName(), info.getPrice());
+    private static String getSubscriptionInfoString(String textPattern, Subscription subscription, Type timeType) {
+        double price = timeType == Type.MONTH ? subscription.getOneMonthPrice() : subscription.getOneMonthPrice() * 12;
+        return MessageFormat.format(textPattern, subscription.getSmile(), subscription.getName(), price);
     }
 
 }

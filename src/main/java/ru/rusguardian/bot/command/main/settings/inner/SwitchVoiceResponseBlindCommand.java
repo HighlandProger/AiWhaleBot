@@ -40,7 +40,7 @@ public class SwitchVoiceResponseBlindCommand extends Command {
     }
 
     private boolean isFreeSubscription(Chat chat) {
-        return chat.getSubscriptionEmbedded().getSubscriptionInfo().getType() == SubscriptionType.FREE;
+        return userSubscriptionService.getCurrentSubscription(chat.getId()).getType() == SubscriptionType.FREE;
     }
 
     private void sendOperationRestrictedToChat(Chat chat, Update update) throws TelegramApiException {

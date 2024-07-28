@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.rusguardian.constant.user.SubscriptionType;
 import ru.rusguardian.domain.AIUserRequest;
+import ru.rusguardian.domain.UserSubscription;
 import ru.rusguardian.domain.user.Chat;
 import ru.rusguardian.repository.AIUserRequestRepository;
 import ru.rusguardian.service.ai.constant.AIModel;
@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,10 +23,7 @@ import java.util.List;
 public class AIUserRequestService {
 
     private final AIUserRequestRepository repository;
-
-    public int getDayRequestsCountByChatIdAndModel(Long chatId, AIModel model) {
-        return getDayRequestsCountByChatIdAndModels(chatId, List.of(model));
-    }
+    private final UserSubscriptionService userSubscriptionService;
 
     public int getDayRequestsCountByChatIdAndModels(Long chatId, List<AIModel> models) {
         log.debug("Request to {} for subscription used count for chatId {} with {}", this, chatId, models);
@@ -36,12 +34,14 @@ public class AIUserRequestService {
 
     //MAY RETURN (CLAUDE TOKENS) OR (SONGS MONTH COUNT)
     public int getInSubscriptionUsedCount(Chat chat, AIModel.BalanceType balanceType) {
-        log.debug("Request to {} for subscription used count for {} with {}", this, chat.getSubscriptionEmbedded(), balanceType);
-        if (chat.getSubscriptionEmbedded().getSubscriptionInfo().getType() == SubscriptionType.FREE) {
-            return 0;
-        }
-        LocalDateTime subscriptionStartTime = chat.getSubscriptionEmbedded().getPurchaseTime();
-        LocalDateTime subscriptionEndTime = chat.getSubscriptionEmbedded().getExpirationTime();
+        log.debug("Request to {} for subscription used count for chat {} with {}", this, chat.getId(), balanceType);
+        Optional<UserSubscription> userSubscriptionOptional = userSubscriptionService.getCurrentUserSubscriptionOptional(chat.getId());
+        if (userSubscriptionOptional.isEmpty()){return 0;}
+
+        UserSubscription userSubscription = userSubscriptionOptional.get();
+
+        LocalDateTime subscriptionStartTime = userSubscription.getStartTime();
+        LocalDateTime subscriptionEndTime = userSubscription.getExpirationTime();
         List<AIModel> claudeModels = AIModel.getByBalanceType(balanceType);
 
         Integer result = repository.getUsedTokensInSubscriptionTime(chat.getId(), claudeModels, subscriptionStartTime, subscriptionEndTime);
@@ -52,10 +52,4 @@ public class AIUserRequestService {
         log.debug("Saving {}", request);
         return repository.save(request);
     }
-
-    public List<AIUserRequest> saveAll(List<AIUserRequest> requests) {
-        log.debug("Saving {}", requests);
-        return repository.saveAll(requests);
-    }
-
 }
