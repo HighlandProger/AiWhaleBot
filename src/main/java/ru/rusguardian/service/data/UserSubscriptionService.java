@@ -47,4 +47,9 @@ public class UserSubscriptionService extends CrudService<UserSubscription, Long>
         return getCurrentUserSubscriptionOptional(userId).orElseThrow();
     }
 
+    public void removeUserSubscriptions(Long userId){
+        log.info("Removing subscriptions for user {}", userId);
+        repository.removeUserSubscriptions(userId);
+    }
+
 }

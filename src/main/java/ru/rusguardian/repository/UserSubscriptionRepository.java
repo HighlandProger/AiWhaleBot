@@ -17,9 +17,8 @@ public interface UserSubscriptionRepository extends JpaRepository<UserSubscripti
     @Query("SELECT us FROM UserSubscription us WHERE us.chat.id = :id AND us.expirationTime > :currentTime")
     Optional<UserSubscription> getCurrentUserSubscription(@Param("id") Long id, @Param("currentTime") LocalDateTime currentTime);
 
-
     @Modifying
     @Transactional
-    @Query(value = "INSERT INTO ncs_bot.user_subscriptions (chat_id, type, expiration_time) VALUES (:chatId, :type, :expirationTime, :purchaseProvider)", nativeQuery = true)
-    UserSubscription saveUserSubscription(@Param("chatId") Long chatId, @Param("type") String subscriptionType, @Param("expirationTime") LocalDateTime expirationTime, @Param("purchaseProvider") String purchaseProvider);
-}
+    @Query(value = "DELETE us FROM UserSubscription us WHERE us.chat.id = :id")
+    void removeUserSubscriptions(@Param("id") Long id);
+  }

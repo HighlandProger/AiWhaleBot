@@ -104,6 +104,7 @@ public class ProcessPurchaseOrder {
     private void updateUserSubscription(Order order) {
         if (isUserAlreadyHasSubscription(order.getChat().getId())) {
             returnUnusedDaysOnBalance(order.getChat());
+            userSubscriptionService.removeUserSubscriptions(order.getChat().getId());
         }
 
         LocalDateTime now = LocalDateTime.now();
