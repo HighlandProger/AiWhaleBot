@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendVoice;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -21,6 +22,8 @@ import ru.rusguardian.telegram.bot.util.constants.MessageType;
 import ru.rusguardian.telegram.bot.util.util.FileUtils;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -58,28 +61,29 @@ public class ExecuteTextPromptCommand extends PromptCommand {
     }
 
     private String extractPrompt(Update update, Chat chatOwner, Long initialChatId, int replyId) throws UnsupportedMessageTypeException {
-        switch (MessageType.getType(update)) {
-            case TEXT:
-                return getViewTextMessage(update);
-            case VOICE:
-                return processPromptVoice.processVoice2Text(chatOwner, FileUtils.getFileFromMessage(update.getMessage(), bot))
-                        .thenApply(transcription -> {
-                            sendMessagePrompt(SendMessage.builder()
-                                    .chatId(initialChatId)
-                                    .text(getTranscriptionViewData(chatOwner.getAiSettingsEmbedded().getAiLanguage(), transcription))
-                                    .replyToMessageId(replyId - 1)
-                                    .parseMode(ParseMode.HTML)
-                                    .build());
-                            return transcription;
-                        }).join();
-            default:
-                throw new UnsupportedMessageTypeException(update.toString());
-        }
+        return switch (MessageType.getType(update)) {
+            case TEXT -> getViewTextMessage(update);
+            case VOICE ->
+                    processPromptVoice.processVoice2Text(chatOwner, FileUtils.getFileFromMessage(update.getMessage(), bot))
+                            .thenApply(transcription -> {
+                                sendMessagePrompt(SendMessage.builder()
+                                        .chatId(initialChatId)
+                                        .text(getTranscriptionViewData(chatOwner.getAiSettingsEmbedded().getAiLanguage(), transcription))
+                                        .replyToMessageId(replyId - 1)
+                                        .parseMode(ParseMode.HTML)
+                                        .build());
+                                return transcription;
+                            }).join();
+            default -> throw new UnsupportedMessageTypeException(update.toString());
+        };
     }
 
     private void processPromptText(Update update, Chat chatOwner, String prompt, Long initialChatId, int replyId) {
         processPromptText.process(chatOwner, prompt).thenAccept(response -> {
             if (!chatOwner.getAiSettingsEmbedded().isVoiceResponseEnabled()) {
+                if(response.length() > 4090){
+                    sendLongMessage(response, initialChatId, replyId);
+                }
                 editForPrompt(getEditMessageWithResponse(initialChatId, response, replyId));
             } else {
                 processVoiceResponse(chatOwner, response, initialChatId, replyId);
@@ -118,4 +122,32 @@ public class ExecuteTextPromptCommand extends PromptCommand {
     private String trimCaption(String text) {
         return text.substring(0, Math.min(text.length(), 1024));
     }
+
+    private void sendLongMessage(String response, Long initialChatId, int replyId){
+        try {
+            bot.execute(DeleteMessage.builder().chatId(initialChatId).messageId(replyId).build());
+            sendSeparately(initialChatId, response);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    protected void sendSeparately(Long chatId, String text) throws TelegramApiException {
+        List<String> parts = new ArrayList<>();
+        if (text == null || text.isEmpty()) {
+            return;
+        }
+
+        int length = text.length();
+        for (int start = 0; start < length; start += MAX_MESSAGE_PART_SIZE) {
+            // Вычисляем конец строки для текущей части
+            int end = Math.min(start + MAX_MESSAGE_PART_SIZE, length);
+            parts.add(text.substring(start, end)); // Добавляем часть в список
+        }
+
+        for (String part : parts){
+            bot.execute(SendMessage.builder().chatId(chatId).text(part).build());
+        }
+    }
+
 }

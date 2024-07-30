@@ -13,7 +13,7 @@
 
     <groupId>ru.rusguardian</groupId>
     <artifactId>whale-ai-bot</artifactId>
-    <version>1.14.2</version>
+    <version>1.14.3</version>
 
     <properties>
         <telegrambot.util.version>1.2.2</telegrambot.util.version>

@@ -19,6 +19,6 @@ public interface UserSubscriptionRepository extends JpaRepository<UserSubscripti
 
     @Modifying
     @Transactional
-    @Query(value = "DELETE us FROM UserSubscription us WHERE us.chat.id = :id")
+    @Query(value = "DELETE FROM UserSubscription us WHERE us.chat.id = :id")
     void removeUserSubscriptions(@Param("id") Long id);
   }

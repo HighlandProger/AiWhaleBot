@@ -40,6 +40,7 @@ public class PromptCommand extends Command {
     protected static final String LIMIT_EXPIRED_FREE = "LIMIT_EXPIRED_FREE";
     protected static final String LIMIT_EXPIRED = "LIMIT_EXPIRED";
     protected static final String IMAGE_PREPARING_VIEW_DATA = "IMAGE_PREPARING";
+    protected static final int MAX_MESSAGE_PART_SIZE = 4090;
     @Autowired
     private ProcessCheckChatRequestLimit checkChatRequestLimit;
     @Autowired
