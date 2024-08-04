@@ -16,7 +16,6 @@ public enum CommandName {
     USER_BANNED(),
     USER_KICKED(),
     GROUP_OWNER_NOT_FOUND(),
-    TEXT_COMMAND_DISTRIBUTOR(),
 
     //START_VIEW_D
     WELCOME(),
@@ -40,7 +39,7 @@ public enum CommandName {
 
 
     //SUBSCRIPTION
-    BUY_SEPARATE_BLIND("⭐\uFE0F Купить запросы отдельно"),
+    BUY_SEPARATE_BLIND("⭐️Купить запросы отдельно"),
     BUY_GPT_4_BLIND("\uD83E\uDD16 Купить GPT-4"),
     BUY_IMAGE_BLIND("\uD83C\uDF06 Купить Midjourney/SD/DALLE 3"),
     BUY_CLAUDE_BLIND("\uD83E\uDDE0 Купить токены Claude"),
@@ -89,7 +88,6 @@ public enum CommandName {
     EXECUTE_TEXT_PROMPT(),
     OBTAIN_TEXT_2_IMAGE_PROMPT_VIEW_D("/img"),
     EXECUTE_TEXT_2_IMAGE_PROMPT_BLIND_D(),
-    EXECUTE_VOICE_PROMPT(),
     OBTAIN_VISION_PROMPT_VIEW_D("/vision"),
     EXECUTE_VISION_PROMPT(),
     OBTAIN_IMAGE_REQUEST(),
@@ -136,7 +134,7 @@ public enum CommandName {
 
 
 
-    BACK("⬅\uFE0F Назад");
+    BACK("⬅️ Назад");
 
 
     private final String viewName;
@@ -158,10 +156,6 @@ public enum CommandName {
     CommandName() {
         this.viewName = null;
         this.blindName = this.name();
-    }
-
-    public static CommandName getByBlind(String blindName) {
-        return BLIND_NAME_MAP.get(blindName);
     }
 
 }

@@ -69,6 +69,7 @@ public class Order {
         this.subscriptionType = subscription.getType();
         this.createdAt = LocalDateTime.now();
         this.isPurchased = false;
+        this.subscriptionMonths = months;
     }
 
 

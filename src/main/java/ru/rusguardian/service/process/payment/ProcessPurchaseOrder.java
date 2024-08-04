@@ -56,7 +56,6 @@ public class ProcessPurchaseOrder {
         order.setPartnerIncome(partnerIncome);
 
         updatePartnerBalance(partner, partnerIncome);
-        chatService.update(user);
         orderService.update(order);
 
         sendNotificationAboutPurchase(order);
