@@ -57,7 +57,7 @@ midjourney:
 stable-diffusion:
   key: ${STABLE_DIFFUSION_KEY}
   image-url-pattern: ${STABLE_DIFFUSION_IMAGE_URL_PATTERN_1}
-  image-url-pattern-2: ${STABLE_DIFFUSION_IMAGE_URL_PATTERN_1}
+  image-url-pattern-2: ${STABLE_DIFFUSION_IMAGE_URL_PATTERN_2}
 
 yandex:
   passport-oauth-token: ${YANDEX_PASSPORT_OAUTH_TOKEN}
