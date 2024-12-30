@@ -1,20 +1,18 @@
 server:
-  port: 8080
+  port: ${SERVER_PORT:8080}
   host: localhost
 logging:
   level:
-    root: info
+    root: ${LOGGING_LEVEL:debug}
 
 spring:
   main:
-    allow-circular-references: true
-  profiles:
-    active: test
+    allow-circular-references: ${SPRING_ALLOW_CIRCULAR_REFERENCES:true}
 
   datasource:
-    url: type_your_value
-    username: type_your_value
-    password: type_your_value
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
     hikari:
@@ -35,30 +33,40 @@ spring:
       show-sql: true
 
 bot:
-  username: type_your_value
-  token: type_your_value
+  username: ${TELEGRAM_BOT_USERNAME}
+  token: ${TELEGRAM_BOT_TOKEN}
 
 telegram:
   channel:
-    id: type_your_value
+    id: ${TELEGRAM_CHANNEL_ID:NOT_USED_VALUE}
   owner:
     chat:
-      id: type_your_value
+      id: ${TELEGRAM_OWNER_CHAT_ID}
 
 open-api:
-  secret-key: type_your_value
+  secret-key: ${OPEN_API_SECRET_KEY}
+
+anthropic:
+  x-api-key: ${ANTHROPIC_X_API_KEY}
+  version: ${ANTHROPIC_VERSION}
 
 midjourney:
-  key: type_your_value
-  secret: type_your_value
+  key: ${MIDJOURNEY_KEY}
+  secret: ${MIDJOURNEY_SECRET}
 
 stable-diffusion:
-  key: type_your_value
+  key: ${STABLE_DIFFUSION_KEY}
+  image-url-pattern: ${STABLE_DIFFUSION_IMAGE_URL_PATTERN_1}
+  image-url-pattern-2: ${STABLE_DIFFUSION_IMAGE_URL_PATTERN_1}
+
+yandex:
+  passport-oauth-token: ${YANDEX_PASSPORT_OAUTH_TOKEN}
+  folder-id: ${YANDEX_FOLDER_ID}
 
 payment:
   robokassa:
-    merchant-login: type_your_value
-    merchant-password: type_your_value
+    merchant-login: ${ROBOKASSA_MERCHANT_LOGIN}
+    merchant-password: ${ROBOKASSA_MERCHANT_PASSWORD}
   cryptocloud:
-    shop-id: type_your_value
-    token: type_your_value
+    shop-id: ${CRYPTOCLOUD_SHOP_ID}
+    token: ${CRYPTOCLOUD_TOKEN}
