@@ -21,7 +21,6 @@
         <maven.compiler.source>18</maven.compiler.source>
         <maven.compiler.target>18</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring-ai.version>1.0.0-SNAPSHOT</spring-ai.version>
         <telegrambots.spring.boot.version>6.9.7.1</telegrambots.spring.boot.version>
     </properties>
 
