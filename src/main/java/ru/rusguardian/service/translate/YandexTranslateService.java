@@ -34,6 +34,7 @@ public class YandexTranslateService {
     @Value("${yandex.folder-id}")
     private String yandexFolderId;
     private String IAMToken;
+    private boolean isReady;
 
     public YandexTranslateService(@Qualifier("yandexTranslateWebClient") WebClient yandexTranslateWebClient) {
         this.yandexTranslateWebClient = yandexTranslateWebClient;
@@ -42,6 +43,10 @@ public class YandexTranslateService {
     @PostConstruct
     private void init() {
         initIAMToken();
+    }
+
+    public CompletableFuture<String> tryTranslate(String text, AILanguage language) {
+        return isReady ? getTranslation(text, language) : CompletableFuture.completedFuture(text);
     }
 
     public CompletableFuture<String> getTranslation(String text, AILanguage language) {
@@ -69,8 +74,14 @@ public class YandexTranslateService {
 
     @Scheduled(fixedRate = 3600000L)
     private void initIAMToken() {
-        GetIAMTokenRequestDto dto = new GetIAMTokenRequestDto(yandexPassportOauthToken);
-        this.IAMToken = requestIAMToken(dto).join();
+        try{
+            GetIAMTokenRequestDto dto = new GetIAMTokenRequestDto(yandexPassportOauthToken);
+            this.IAMToken = requestIAMToken(dto).join();
+            this.isReady = true;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            this.isReady = false;
+        }
     }
 
     private CompletableFuture<String> requestIAMToken(GetIAMTokenRequestDto dto) {

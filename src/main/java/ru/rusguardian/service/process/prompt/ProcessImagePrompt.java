@@ -13,7 +13,6 @@ import ru.rusguardian.service.ai.constant.Provider;
 import ru.rusguardian.service.ai.dto.open_ai.image.OpenAiTextToImageRequestDto;
 import ru.rusguardian.service.ai.dto.stable_diffusion.img2video.StableDiffusionImg2VideoRequestDto;
 import ru.rusguardian.service.ai.dto.stable_diffusion.text_to_image.SDModelId;
-import ru.rusguardian.service.ai.image.MidjourneyImageService;
 import ru.rusguardian.service.ai.image.OpenAIImageService;
 import ru.rusguardian.service.ai.image.StableDiffusionImageService;
 import ru.rusguardian.service.process.transactional.ProcessTransactionalAIImageRequestUpdate;
@@ -40,7 +39,6 @@ public class ProcessImagePrompt {
     @Value("${server.host}")
     private String localHost;
 
-    private final MidjourneyImageService midjourneyImageService;
     private final OpenAIImageService openAIImageService;
     private final StableDiffusionImageService stableDiffusionImageService;
     private final ProcessTransactionalAIImageRequestUpdate transactionalAIImageRequestUpdate;
@@ -63,7 +61,7 @@ public class ProcessImagePrompt {
 
     public CompletableFuture<String> processImageChangeUrl(Chat chat, String telegramImageUrl, String prompt) {
         String initImageUrl = getInitImageUrl(telegramImageUrl);
-        return yandexTranslateService.getTranslation(prompt, AILanguage.ENGLISH)
+        return yandexTranslateService.tryTranslate(prompt, AILanguage.ENGLISH)
                 .thenCompose(resp -> stableDiffusionImageService.getPix2PixImageUrl(initImageUrl, resp)
                         .thenApply(url -> {
                             transactionalAIImageRequestUpdate.update(chat, AIModel.STABLE_DIFFUSION);
@@ -115,7 +113,7 @@ public class ProcessImagePrompt {
     @Async
     public CompletableFuture<String> processImg2VideoUrl(Chat chat, UserDataDto dto){
         StableDiffusionImg2VideoRequestDto requestDto = new StableDiffusionImg2VideoRequestDto();
-        requestDto.setPrompt(yandexTranslateService.getTranslation(dto.getPrompt(), AILanguage.ENGLISH).join());
+        requestDto.setPrompt(yandexTranslateService.tryTranslate(dto.getPrompt(), AILanguage.ENGLISH).join());
         requestDto.setInitImage(getInitImageUrl(dto.getImageUrl()));
         requestDto.setModelId(dto.getVideoModel().getValue());
         log.info(requestDto.toString());
@@ -134,11 +132,11 @@ public class ProcessImagePrompt {
         Provider provider = model.getProvider();
 
         return switch (provider) {
-            case STABLE_DIFFUSION -> yandexTranslateService.getTranslation(prompt, AILanguage.ENGLISH)
+            case STABLE_DIFFUSION -> yandexTranslateService.tryTranslate(prompt, AILanguage.ENGLISH)
                     .thenCompose(stableDiffusionImageService::getRealtimeTextToImageUrls);
             case OPEN_AI ->
                     openAIImageService.getTextToImageUrl(new OpenAiTextToImageRequestDto(chat.getId(), model, prompt)).thenApply(List::of);
-            case MIDJOURNEY -> yandexTranslateService.getTranslation(prompt, AILanguage.ENGLISH)
+            case MIDJOURNEY -> yandexTranslateService.tryTranslate(prompt, AILanguage.ENGLISH)
                     .thenCompose(resp -> stableDiffusionImageService.getModelTextToImageUrl(resp, SDModelId.CYBERREALISTIC_111));
             default -> throw new RuntimeException("UNKNOWN IMAGE PROVIDER " + model.getProvider());
         };
